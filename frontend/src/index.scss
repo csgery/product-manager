@@ -1,0 +1,90 @@
+@import "~bootstrap/scss/bootstrap";
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 1.2rem;
+}
+
+.darkmode {
+  background-color: rgb(50, 47, 47);
+}
+
+.lightmode {
+  background-color: rgb(193, 189, 189);
+}
+
+.App {
+  min-height: 100vh;
+}
+
+.container {
+  width: 75%;
+  max-width: 1600px;
+}
+
+// .card-body {
+//   max-width: 50%;
+// }
+
+.product-card-row {
+  // flex: 1 0 100px;
+  flex-wrap: wrap;
+}
+
+.product {
+  flex: 1 0 31%;
+}
+
+.deletedProduct-card {
+  background-color: rgb(227, 152, 152);
+}
+
+.spinnerbox-customsize {
+  size: 0.1em;
+  height: 1.5em;
+}
+
+.spinner-customsize {
+  height: 1.45em;
+  width: 1.45em;
+  margin: 1em 0;
+}
+
+.navlink {
+  font-size: 1.2rem;
+}
+.navbrand {
+  font-size: 1.4rem;
+}
+
+.darkmode-toggleBTN {
+  max-width: 100px;
+}
+
+@media (max-width: 900px) {
+  // .product-card-row {
+  //   display: flex;
+  //   flex-direction: column;
+  //   align-items: center;
+  // }
+  .product {
+    flex: 1 0 51%;
+  }
+}
+
+// @media (max-width: 600px) {
+//   .product-card-row {
+//     display: flex;
+//     flex-direction: column;
+//     align-items: center;
+//   }
+//   .product {
+//     flex: 1;
+//   }
+// }
