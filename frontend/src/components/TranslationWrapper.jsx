@@ -158,6 +158,7 @@ function TranslationWrapper({ children }) {
       productFormTitle: "Update Product Details",
 
       language: "Language",
+      iconMode: "Icon Mode",
     };
     const fetchMoreData = async () => {
       //console.log(await getMoreText(UITextToTranslate));

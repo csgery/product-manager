@@ -17,6 +17,8 @@ import { useNavigate } from "react-router-dom";
 import { RefreshTokenMutationContext } from "../../pages/TokenWrapper";
 import { DarkModeContext, LangContext } from "../../App";
 import { TbTrash, TbTrashOff } from "react-icons/tb";
+import { GrClose, GrCheckmark } from "react-icons/gr";
+import { MdOutlineDoneOutline, MdOutlineCancel } from "react-icons/md";
 
 export default function ProductUserModal({
   bind = "product",
@@ -231,7 +233,11 @@ export default function ProductUserModal({
             onClick={() => setShow(false)}
             className={showBTNLoadingSpinner && "disabled"}
           >
-            {modalCloseButtonText}
+            {iconMode ? (
+              <MdOutlineCancel style={{ fontSize: "1.6rem" }} />
+            ) : (
+              modalCloseButtonText
+            )}
           </Button>
           <Button
             variant={modalType === "Restore" ? "primary" : "danger"}
@@ -241,6 +247,8 @@ export default function ProductUserModal({
               <div className="text-center d-flex spinnerbox-customsize">
                 <div className="text-center align-self-center spinner-border spinner-customsize"></div>
               </div>
+            ) : iconMode ? (
+              <MdOutlineDoneOutline style={{ fontSize: "1.6rem" }} />
             ) : (
               modalButtonText
             )}

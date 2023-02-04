@@ -13,6 +13,7 @@ import { UITextContext } from "./TranslationWrapper";
 import { BiSelectMultiple } from "react-icons/bi";
 import { GrClose } from "react-icons/gr";
 import { TbTrash, TbTrashOff } from "react-icons/tb";
+import { IconModeContext } from "../App";
 
 export default function ProductsDeleted() {
   const { loading, error, data } = useQuery(GET_DELETEDPRODUCTS);
@@ -32,7 +33,7 @@ export default function ProductsDeleted() {
   const navigate = useNavigate();
   const UIText = useContext(UITextContext);
 
-  const iconMode = true;
+  const iconMode = useContext(IconModeContext);
 
   useEffect(() => {
     console.log(idsNamesToDelete);
@@ -62,8 +63,9 @@ export default function ProductsDeleted() {
 
   const handleSearchChange = (value) => {
     setSearchbarValue(() => value);
-    console.log("value:", value);
-    console.log("searchTypeBTN:", searchTypeBTN);
+    const fieldToSearchIn = "name"; // later implement: name or shortId
+    // console.log("value:", value);
+    // console.log("searchTypeBTN:", searchTypeBTN);
     if (value === "") {
       setDeletedProducts(data.deletedProducts);
     } else if (value) {
@@ -75,12 +77,12 @@ export default function ProductsDeleted() {
         searchTypeBTN === "wholeWord"
           ? new RegExp(`^${value}`)
           : new RegExp(`${value}`);
-      console.log("regex", regex);
-      console.log("searchbarValue state", searchbarValue);
+      // console.log("regex", regex);
+      // console.log("searchbarValue state", searchbarValue);
       const searchedData = data.deletedProducts.filter((item) =>
-        regex.test(item.name.toLowerCase())
+        regex.test(item[fieldToSearchIn].toLowerCase())
       );
-      console.log("searchedData:", searchedData);
+      // console.log("searchedData:", searchedData);
       if (searchedData) {
         setDeletedProducts(searchedData);
       } else {

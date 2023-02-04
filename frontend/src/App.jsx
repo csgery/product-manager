@@ -28,12 +28,17 @@ import "react-notifications-component/dist/theme.css";
 // import FAIDemo from "./components/FontAwesomeIcon_DEMO";
 export const DarkModeContext = createContext();
 export const LangContext = createContext();
+export const IconModeContext = createContext();
 
 function App() {
   const [lang, setLang] = useState(localStorage.getItem("lang") || "en");
   const [darkMode, setDarkMode] = useState(
     localStorage.getItem("darkmode") === "true" ? true : false
   );
+  const [iconMode, setIconMode] = useState(
+    localStorage.getItem("iconMode") === "true" ? true : false
+  );
+
   const handleDarkmodeChange = () => {
     localStorage.setItem("darkmode", !darkMode);
     setDarkMode(!darkMode);
@@ -42,6 +47,14 @@ function App() {
   const handleLangChange = (langParam) => {
     localStorage.setItem("lang", langParam);
     setLang(() => langParam);
+  };
+
+  const handleIconModeChange = (e) => {
+    if (e) {
+      e.stopPropagation();
+    }
+    localStorage.setItem("iconMode", !iconMode);
+    setIconMode(!iconMode);
   };
 
   useEffect(() => {
@@ -177,29 +190,31 @@ function App() {
       >
         <DarkModeContext.Provider value={darkMode}>
           <LangContext.Provider value={lang}>
-            <TranslationWrapper>
-              <Router>
-                <div
-                  className={"App " + (darkMode ? "darkmode " : "lightmode ")}
-                >
-                  <Navigation
-                    handleLangChange={handleLangChange}
-                    handleDarkmodeChange={handleDarkmodeChange}
-                  />
-                  <div className="container mt-1 ">
-                    <Routes>
-                      <Route path="/products">
-                        <Route path="" element={<ProductsPage />} />
-                        <Route path=":id" element={<ProductPage />} />
-                        <Route
-                          path="deleted"
-                          element={<DeletedProductsPage />}
-                        />
-                      </Route>
-                      <Route path="/viewer/:id" element={<ViewerPage />} />
-                      <Route path="/testdict" element={<DictTest />} />
+            <IconModeContext.Provider value={iconMode}>
+              <TranslationWrapper>
+                <Router>
+                  <div
+                    className={"App " + (darkMode ? "darkmode " : "lightmode ")}
+                  >
+                    <Navigation
+                      handleLangChange={handleLangChange}
+                      handleDarkmodeChange={handleDarkmodeChange}
+                      handleIconModeChange={handleIconModeChange}
+                    />
+                    <div className="container mt-1 ">
+                      <Routes>
+                        <Route path="/products">
+                          <Route path="" element={<ProductsPage />} />
+                          <Route path=":id" element={<ProductPage />} />
+                          <Route
+                            path="deleted"
+                            element={<DeletedProductsPage />}
+                          />
+                        </Route>
+                        <Route path="/viewer/:id" element={<ViewerPage />} />
+                        <Route path="/testdict" element={<DictTest />} />
 
-                      {/* <Route
+                        {/* <Route
                 path="/viewer/refreshtoken/:id"
                 element={
                   <RefreshTokenPage
@@ -208,31 +223,32 @@ function App() {
                   />
                 }
               /> */}
-                      <Route
-                        path="/login"
-                        element={
-                          <LoginPage
-                            setAccessTokenStorage={setAccessTokenStorage}
-                            setRefreshTokenStorage={setRefreshTokenStorage}
-                          />
-                        }
-                      />
-                      {/*pass token setters to the login component*/}
-                      <Route
-                        path="/logout"
-                        element={
-                          <LogoutPage
-                            setAccessTokenStorage={setAccessTokenStorage}
-                            setRefreshTokenStorage={setRefreshTokenStorage}
-                          />
-                        }
-                      />
-                      <Route path="*" element={<NotFoundPage />} />
-                    </Routes>
+                        <Route
+                          path="/login"
+                          element={
+                            <LoginPage
+                              setAccessTokenStorage={setAccessTokenStorage}
+                              setRefreshTokenStorage={setRefreshTokenStorage}
+                            />
+                          }
+                        />
+                        {/*pass token setters to the login component*/}
+                        <Route
+                          path="/logout"
+                          element={
+                            <LogoutPage
+                              setAccessTokenStorage={setAccessTokenStorage}
+                              setRefreshTokenStorage={setRefreshTokenStorage}
+                            />
+                          }
+                        />
+                        <Route path="*" element={<NotFoundPage />} />
+                      </Routes>
+                    </div>
                   </div>
-                </div>
-              </Router>
-            </TranslationWrapper>
+                </Router>
+              </TranslationWrapper>
+            </IconModeContext.Provider>
           </LangContext.Provider>
         </DarkModeContext.Provider>
       </TokenWrapper>

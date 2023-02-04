@@ -17,6 +17,7 @@ import { TbTrash, TbCirclePlus } from "react-icons/tb";
 import { ImCancelCircle } from "react-icons/im";
 import { GrClose } from "react-icons/gr";
 import { BiSelectMultiple } from "react-icons/bi";
+import { IconModeContext } from "../App";
 
 export default function ProductsDeleted() {
   const { loading, error, data } = useQuery(GET_VALIDPRODUCTS);
@@ -33,7 +34,7 @@ export default function ProductsDeleted() {
 
   const navigate = useNavigate();
   const UIText = useContext(UITextContext);
-  const iconMode = true;
+  const iconMode = useContext(IconModeContext);
 
   const getRefreshToken = useContext(RefreshTokenMutationContext);
   const darkMode = useContext(DarkModeContext);
@@ -61,8 +62,9 @@ export default function ProductsDeleted() {
 
   const handleSearchChange = (value) => {
     setSearchbarValue(() => value);
-    console.log("value:", value);
-    console.log("searchTypeBTN:", searchTypeBTN);
+    const fieldToSearchIn = "name"; // later implement: name or shortId
+    // console.log("value:", value);
+    // console.log("searchTypeBTN:", searchTypeBTN);
     if (value === "") {
       setValidProducts(data.validProducts);
     } else if (value) {
@@ -74,12 +76,12 @@ export default function ProductsDeleted() {
         searchTypeBTN === "wholeWord"
           ? new RegExp(`^${value}`)
           : new RegExp(`${value}`);
-      console.log("regex", regex);
-      console.log("searchbarValue state", searchbarValue);
+      // console.log("regex", regex);
+      // console.log("searchbarValue state", searchbarValue);
       const searchedData = data.validProducts.filter((item) =>
-        regex.test(item.name.toLowerCase())
+        regex.test(item[fieldToSearchIn].toLowerCase())
       );
-      console.log("searchedData:", searchedData);
+      // console.log("searchedData:", searchedData);
       if (searchedData) {
         setValidProducts(searchedData);
       } else {

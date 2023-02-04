@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useState, useRef, useCallback, useContext } from "react";
 import { TbTrash, TbTrashOff } from "react-icons/tb";
 import { UITextContext } from "./TranslationWrapper";
+import { IconModeContext } from "../App";
 
 import { LangContext } from "../App";
 
@@ -15,7 +16,7 @@ export default function Product({
 }) {
   const UIText = useContext(UITextContext);
 
-  const iconMode = true;
+  const iconMode = useContext(IconModeContext);
 
   const navigate = useNavigate();
   const [cbState, setCbState] = useState(false);
