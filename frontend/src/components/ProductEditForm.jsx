@@ -7,6 +7,7 @@ import { Store } from "react-notifications-component";
 import { getErrorMessageCode } from "../helper/helper";
 import { UITextContext } from "./TranslationWrapper";
 import { GrClose, GrCheckmark } from "react-icons/gr";
+import { MdOutlineDoneOutline, MdOutlineCancel } from "react-icons/md";
 
 const ProductEditForm = ({ product, setToggleEditForm, iconMode }) => {
   const [name, setName] = useState(product.name);
@@ -148,25 +149,25 @@ const ProductEditForm = ({ product, setToggleEditForm, iconMode }) => {
           ></input>
         </div>
         <button
-          type="submit"
-          className="btn btn-primary"
-          disabled={handleEditBTNDisabling()}
-        >
-          {iconMode ? (
-            <GrCheckmark style={{ fontSize: "1.6rem" }} />
-          ) : (
-            UIText.editButtonText
-          )}
-        </button>
-        <button
           type="button"
-          className="btn btn-danger ms-1"
+          className="btn btn-danger "
           onClick={() => setToggleEditForm(false)}
         >
           {iconMode ? (
-            <GrClose style={{ fontSize: "1.6rem" }} />
+            <MdOutlineCancel style={{ fontSize: "1.6rem" }} />
           ) : (
             UIText.cancelButtonText
+          )}
+        </button>
+        <button
+          type="submit"
+          className="btn btn-primary ms-1 "
+          disabled={handleEditBTNDisabling()}
+        >
+          {iconMode ? (
+            <MdOutlineDoneOutline style={{ fontSize: "1.6rem" }} />
+          ) : (
+            UIText.editButtonText
           )}
         </button>
       </form>

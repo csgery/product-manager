@@ -11,8 +11,11 @@ import { RefreshTokenMutationContext } from "../../pages/TokenWrapper";
 import { DarkModeContext, LangContext } from "../../App";
 import { TbTrash, TbCirclePlus } from "react-icons/tb";
 import { GrAdd } from "react-icons/gr";
+import { GrClose, GrCheckmark } from "react-icons/gr";
+import { MdOutlineDoneOutline, MdOutlineCancel } from "react-icons/md";
 
 import { UITextContext } from "../TranslationWrapper";
+import { IconModeContext } from "../../App";
 
 export default function ProductCreateModal() {
   const [name, setName] = useState("");
@@ -24,7 +27,7 @@ export default function ProductCreateModal() {
   const darkMode = useContext(DarkModeContext);
   const UIText = useContext(UITextContext);
 
-  const iconMode = true;
+  const iconMode = useContext(IconModeContext);
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
@@ -133,10 +136,18 @@ export default function ProductCreateModal() {
         </Modal.Body>
         <Modal.Footer className={darkMode && "bg-dark text-white"}>
           <Button variant="danger" onClick={handleClose}>
-            {UIText.closeButtonText}
+            {iconMode ? (
+              <MdOutlineCancel style={{ fontSize: "1.6rem" }} />
+            ) : (
+              UIText.closeButtonText
+            )}
           </Button>
           <Button variant="primary" onClick={handleSubmit}>
-            {UIText.createButtonText}
+            {iconMode ? (
+              <MdOutlineDoneOutline style={{ fontSize: "1.6rem" }} />
+            ) : (
+              UIText.createButtonText
+            )}
           </Button>
         </Modal.Footer>
       </Modal>

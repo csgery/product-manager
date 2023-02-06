@@ -14,12 +14,13 @@ import ProductUserModal from "./modals/ProductUserModal";
 import { UITextContext } from "./TranslationWrapper";
 import { TbEdit } from "react-icons/tb";
 import { Button, Modal } from "react-bootstrap";
+import { IconModeContext } from "../App";
 
 export default function ProductShowInfo() {
   const [toggleEditForm, setToggleEditForm] = useState(false);
 
   const UIText = useContext(UITextContext);
-  const iconMode = true;
+  const iconMode = useContext(IconModeContext);
 
   const { id } = useParams();
 
@@ -125,15 +126,21 @@ export default function ProductShowInfo() {
               </div>
 
               {!toggleEditForm && (
-                <>
+                <div className="mt-2">
                   {data.product.valid && (
                     <>
-                      <Button className="btn btn-light me-1 mb-2 ">
-                        <TbEdit
-                          style={{ fontSize: "1.6rem" }}
-                          //className="btn btn-light"
-                          onClick={handleFormToggle}
-                        />
+                      <Button
+                        className="btn btn-dark me-1 mb-2 "
+                        onClick={handleFormToggle}
+                      >
+                        {iconMode ? (
+                          <TbEdit
+                            style={{ fontSize: "1.6rem" }}
+                            //className="btn btn-light"
+                          />
+                        ) : (
+                          UIText.editButtonText
+                        )}
                       </Button>
                       {/* delete form */}
                       <ProductUserModal
@@ -205,7 +212,7 @@ export default function ProductShowInfo() {
                       />
                     </>
                   )}
-                </>
+                </div>
               )}
             </div>
           </div>
