@@ -1,0 +1,169 @@
+Every hash froms an English word.
+
+DB structure:
+    [
+        hash:1235412354: [
+            {
+                lang: 'en',
+                text: 'login',
+            },
+            {
+                lang: 'hu',
+                text: 'bejelentkezés',
+            },
+            {
+                lang: 'de',
+                text: 'valami',
+            },
+        ]
+    ]
+
+in mongoDB:
+[
+    {
+        id: gen.by.MDB,
+        hash: 1234,
+        dicts: [
+            {
+                en: 'login'
+            },
+            {
+                hu: 'bejelentkezés'
+            },
+            {
+                de: 'valami'
+            }
+        ]
+        
+        
+        
+    },
+    {
+        id: gen.by.MDB,
+        hash: 5678,
+        en: 'sign up',
+        hu: 'regisztráció',
+        de: 'valami 2'
+    },
+
+]
+
+// Codes:
+const getHash = (text) => {
+    // call a hashing algo that returns a unique integer
+    return ImportedHashingAlgoFromWeb(text)
+}
+
+const [getDict, {loading: getDictLoading, error: getDictError, data: getDictData}] = useMutation(GET_DICT);
+
+const [createDict, {loading: createDictLoading, error: createDictError, data: createDictData}] = useMutation(CREATE_DICT);
+
+// A React and ApolloClient based implementation
+const translate = async (text) => {
+    const lang = getLangFromContext() //en
+
+    // because every hash in the DB is a hashed value from an English text
+    if(lang === 'en') {
+        return text
+    }
+
+    // hash the text
+    const hash = getHash(text) //login
+
+    // CASHING like Redis in order to lower the DB operations (it is reading which is fast, but why not taking care of the DB if we could)
+    // is it necessary? because React cashing the page html data if we use react-router
+    ...
+
+    // fetch the text data from DB according to the hash
+    await getDict({variables: {hash, lang} })
+    const result = getDictData
+
+    // if there is no data with the given hash and lang combination
+    if(!result){
+        // create an entry in the DB with the hash lang combination
+        // it'll return this like a result: `${lang}_${text}`
+        await createDict({variables: {hash, lang, text})
+
+        // return the created entry result
+        return createDictData
+    }
+    return result
+}
+
+// ApolloServer approaches
+// Schema:
+type Dict:
+    ID: ID!
+    hash: Int!
+    dicts: Object
+Query:
+    getDict(hash: Int!, lang: String!): String
+Mutation:
+    createDict(hash: Int!, lang: String!, text: String!): String!
+
+
+// Mutation:
+createDict: async (parent, {hash, lang, text }) => {
+    const entry = await Dict.findOne({hash});
+    if(entry && entry.dicts[lang]) {
+        return text+'IT IS BAD!!!!';
+    }
+    let newEntry;
+    if(!entry){
+        newEntry = new Dict({
+            hash: hash,
+            dict: {
+                en: text,
+                [lang]: `${lang}_${text}`,
+            }
+        });
+    }
+
+    else if(!entry.dicts[lang]){
+        newEntry = {
+            ...entry,
+            dicts: {
+                ...entry.dicts, 
+                [lang]: `${lang}_${text}`
+            }
+        }
+    }
+    await newEntry.save();
+    return newEntry.dicts[lang];
+}
+
+// Query:
+getDict: async (parent, {hash, lang}) => {
+    const entry = await Dict.findOne({hash});
+    // if(!entry || !entry.dicts[lang]) {
+    //     return null
+    // }
+    // it'll return null if not exist
+    return entry?.dicts[lang];
+}
+
+
+
+
+
+
+const lang = 'en'
+const text = 'valami'
+
+const entry= {
+    hash: 123,
+    dicts: {
+            en: 'login',
+            hu: 'bejelentkezes'
+    }    
+    
+}
+let result
+if(entry.dicts[lang]){
+   result = entry.dicts[lang]
+    console.log(result)
+}
+else{
+    entry.dicts[lang] = `${lang}_${text}`
+    console.log(entry)
+}
