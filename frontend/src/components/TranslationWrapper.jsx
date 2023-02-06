@@ -158,11 +158,14 @@ function TranslationWrapper({ children }) {
       productFormTitle: "Update Product Details",
 
       // Searchbar
+      search: "Search",
       wrongCharacter: "Wrong character",
       wrongCharacters: "Wrong characters",
+      searchbarSettings: "Searchbar Settings",
 
       language: "Language",
       iconMode: "Icon Mode",
+      settings: "Settings",
     };
     const fetchMoreData = async () => {
       //console.log(await getMoreText(UITextToTranslate));

@@ -1,14 +1,21 @@
 import React, { useEffect, useState, useContext } from "react";
 import { UITextContext } from "./TranslationWrapper";
+import { IconModeContext } from "../App";
 import { Store } from "react-notifications-component";
+import Dropdown from "react-bootstrap/Dropdown";
+import { BsGear } from "react-icons/bs";
 
 function Searchbar({ setItemsToView, allItemsFromDB }) {
   const [searchbarValue, setSearchbarValue] = useState("");
   const [searchTypeBTN, setSearchTypeBTN] = useState(
     localStorage.getItem("searchTypeBTN") || "wholeWord"
   );
+  const [searchInBTN, setSearchInBTN] = useState(
+    localStorage.getItem("searchInBTN") || "name"
+  );
 
   const UIText = useContext(UITextContext);
+  const iconMode = useContext(IconModeContext);
 
   useEffect(() => {
     if (allItemsFromDB) {
@@ -21,11 +28,20 @@ function Searchbar({ setItemsToView, allItemsFromDB }) {
     if (allItemsFromDB) {
       handleSearchChange(searchbarValue);
     }
-  }, [searchTypeBTN]);
+  }, [searchTypeBTN, searchInBTN]);
 
   const handleSearchTypeBTNClick = (e) => {
+    e.preventDefault(); // prevents changing to the URL of the link href
+    e.stopPropagation(); // prevents the link click from bubbling
     localStorage.setItem("searchTypeBTN", e.target.value);
     setSearchTypeBTN(e.target.value);
+  };
+
+  const handleSearchInBTNClick = (e) => {
+    e.preventDefault(); // prevents changing to the URL of the link href
+    e.stopPropagation(); // prevents the link click from bubbling
+    localStorage.setItem("searchInBTN", e.target.value);
+    setSearchInBTN(e.target.value);
   };
 
   const handleSearchChange = (value) => {
@@ -49,7 +65,7 @@ function Searchbar({ setItemsToView, allItemsFromDB }) {
       value = value.replace(validationPattern, "");
     }
     setSearchbarValue(() => value);
-    const fieldToSearchIn = "name"; // later implement: name or shortId
+    const fieldToSearchIn = searchInBTN; // later implement: name or shortId
 
     if (value === "") {
       setItemsToView(allItemsFromDB);
@@ -77,33 +93,71 @@ function Searchbar({ setItemsToView, allItemsFromDB }) {
       <input
         className="form-control me-2 ms-1"
         type="search"
-        placeholder="Search"
-        aria-label="Search"
+        placeholder={UIText.search}
+        aria-label={UIText.search}
         onChange={(e) => handleSearchChange(e.target.value)}
         value={searchbarValue}
       />
-      <button
-        className={
-          (searchTypeBTN === "wholeWord"
-            ? "btn btn-light "
-            : "btn btn-outline-light ") + "me-1"
-        }
-        value="wholeWord"
-        onClick={(e) => handleSearchTypeBTNClick(e)}
-      >
-        {UIText.wholeWordButtonText}
-      </button>
-      <button
-        className={
-          searchTypeBTN === "matchCase"
-            ? "btn btn-light "
-            : "btn btn-outline-light "
-        }
-        value="matchCase"
-        onClick={(e) => handleSearchTypeBTNClick(e)}
-      >
-        {UIText.matchCaseButtonText}
-      </button>
+      <Dropdown>
+        <Dropdown.Toggle variant="light" id="dropdown-basic">
+          {iconMode ? (
+            <BsGear style={{ fontSize: "2rem" }} />
+          ) : (
+            UIText.searchbarSettings
+          )}
+        </Dropdown.Toggle>
+
+        <Dropdown.Menu className="lightmode">
+          <Dropdown.Item className="lightmode">
+            <button
+              className={
+                (searchTypeBTN === "wholeWord"
+                  ? "btn btn-light "
+                  : "btn btn-outline-light ") + "me-1"
+              }
+              value="wholeWord"
+              onClick={(e) => handleSearchTypeBTNClick(e)}
+            >
+              {UIText.wholeWordButtonText}
+            </button>
+            <button
+              className={
+                searchTypeBTN === "matchCase"
+                  ? "btn btn-light "
+                  : "btn btn-outline-light "
+              }
+              value="matchCase"
+              onClick={(e) => handleSearchTypeBTNClick(e)}
+            >
+              {UIText.matchCaseButtonText}
+            </button>
+          </Dropdown.Item>
+          <Dropdown.Item className="lightmode">
+            <button
+              className={
+                (searchInBTN === "name"
+                  ? "btn btn-light "
+                  : "btn btn-outline-light ") + "me-1"
+              }
+              value="name"
+              onClick={(e) => handleSearchInBTNClick(e)}
+            >
+              {UIText.name}
+            </button>
+            <button
+              className={
+                searchInBTN === "shortId"
+                  ? "btn btn-light "
+                  : "btn btn-outline-light "
+              }
+              value="shortId"
+              onClick={(e) => handleSearchInBTNClick(e)}
+            >
+              {UIText.shortID}
+            </button>
+          </Dropdown.Item>
+        </Dropdown.Menu>
+      </Dropdown>
     </div>
   );
 }
