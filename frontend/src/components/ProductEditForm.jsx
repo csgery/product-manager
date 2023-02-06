@@ -3,8 +3,11 @@ import { useState, useEffect, useRef, useContext } from "react";
 import { useMutation } from "@apollo/client";
 import { GET_PRODUCT, GET_VALIDPRODUCTS } from "../queries/productQueries";
 import { UPDATE_PRODUCT } from "../mutations/productMutations";
-import { Store } from "react-notifications-component";
-import { getErrorMessageCode } from "../helper/helper";
+import { createNotification } from "../helper/helper";
+import {
+  getErrorMessageCode,
+  productErrorCodes as errorCodes,
+} from "../helper/helper";
 import { UITextContext } from "./TranslationWrapper";
 import { GrClose, GrCheckmark } from "react-icons/gr";
 import { MdOutlineDoneOutline, MdOutlineCancel } from "react-icons/md";
@@ -27,25 +30,6 @@ const ProductEditForm = ({ product, setToggleEditForm, iconMode }) => {
   }, []);
 
   const focusRef = useRef(null);
-  const inputNameRef = useRef(null);
-  const inputShortIdRef = useRef(null);
-  const inputQuantityRef = useRef(null);
-
-  const createNotification = ({ title, message, type }) => {
-    Store.addNotification({
-      title: title,
-      message: message,
-      type: type,
-      insert: "top",
-      container: "top-right",
-      animationIn: ["animate__animated", "animate__fadeIn"],
-      animationOut: ["animate__animated", "animate__fadeOut"],
-      dismiss: {
-        duration: 5000,
-        onScreen: true,
-      },
-    });
-  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -81,13 +65,22 @@ const ProductEditForm = ({ product, setToggleEditForm, iconMode }) => {
       .catch((err) => {
         const { message, code } = getErrorMessageCode(err.message);
         // error notification message
-        console.log(err);
-        console.log("err.message", message);
-        console.log("err.extensions", err.extensions);
-        console.log("err.code", code);
-        if (code === "EXISTED_SHORTID") {
+        if (message) {
           err.message = message;
         }
+        // console.log(err);
+        // console.log("err.message", message);
+        // console.log("err.extensions", err.extensions);
+        // console.log("err.code", code);
+        // switch (code) {
+        //   case errorCodes.productExistedShortID:
+        //     break;
+        //   default:
+        //     break;
+        // }
+        // if (code === "EXISTED_SHORTID") {
+        //   err.message = message;
+        // }
         createNotification({
           title: "Failed To Update!",
           message: err.message,

@@ -4,6 +4,7 @@ import jwt from "jwt-decode";
 import { GET_DICT, GET_MOREDICT } from "../queries/dictQueries";
 import { CREATE_DICT, CREATE_MOREDICT } from "../mutations/dictMutations";
 import { print } from "graphql/language/printer";
+import { Store } from "react-notifications-component";
 
 const isSet = (permission) => {
   return localStorage.getItem("permissions").includes(permission);
@@ -26,10 +27,17 @@ const getUserId = () => {
 };
 
 const handleCustomError = (error, navigate, getRefreshToken) => {
+  // error: error object
   console.log(error);
+  const { message, code } = getErrorMessageCode(error.message);
+  // if there is no message then throw error
+  if (!message) {
+    throw error;
+  }
+  // if there is message then there'll be code too
   if (
-    error.message === "Please log in again!" ||
-    error.message === "Please log in first!"
+    code === userErrorCodes.userShouldReLogin ||
+    code === userErrorCodes.userLoginFirst
   ) {
     if (!navigate) {
       throw new Error(
@@ -40,10 +48,7 @@ const handleCustomError = (error, navigate, getRefreshToken) => {
     navigate("/logout", { replace: true });
   }
 
-  if (
-    error.message ===
-    "Expired access token! REDIRECT refreshToken RESOLVER REACT"
-  ) {
+  if (code === userErrorCodes.userExpiredAccessJWT) {
     if (!getRefreshToken) {
       throw new Error(
         "The getRefreshToken parameter is not provided for the handleCustomError function in the helper.js file!"
@@ -288,6 +293,55 @@ const getErrorMessageCode = (errorMessage) => {
   return { message: messageAndCode[0], code: messageAndCode[1] };
 };
 
+const createNotification = ({ title, message, type }) => {
+  Store.addNotification({
+    title: title,
+    message: message,
+    type: type,
+    insert: "top",
+    container: "top-right",
+    animationIn: ["animate__animated", "animate__fadeIn"],
+    animationOut: ["animate__animated", "animate__fadeOut"],
+    dismiss: {
+      duration: 5000,
+      onScreen: true,
+      pauseOnHover: true,
+    },
+  });
+};
+
+const userErrorCodes = {
+  userNotFound: "$USER_NOT-FOUND",
+  userDeleteFirst: "$USER_DELETE-FIRST",
+  userAlreadyRestored: "$USER_ALREADY-RESTORED",
+  userEmptyUpdate: "$USER_EMPTY-UPDATE",
+  userEmailExists: "$USER_EXISTED-EMAIL",
+  userProtectionViolation: "$USER_PROTECTION-VIOLATION",
+  userInvalidPasswordFormat: "$USER_INVALID-PASSWORDFORMAT",
+  userInvalidEmailFormat: "$USER_INVALID-EMAILFORMAT",
+  userShouldReLogin: "$USER_SHOULD-RELOGIN",
+  userLoginBlocked: "$USER_LOGIN-BLOCKED",
+  userAlreadyBlocked: "$USER_ALREADY-BLOCKED",
+  userAlreadyUnBlocked: "$USER_ALREADY-UNBLOCKED",
+  userLoginFirst: "$USER_LOGIN-FIRST",
+  userWrongCredentials: "$USER_WRONG-CREDENTIALS",
+  userExpiredAccessJWT: "$USER_EXPIRED-ACCESSJWT",
+  userExpiredRefreshJWT: "$USER_EXPIRED-REFRESHJWT",
+  userInvalidAccessJWT: "$USER_INVALID-ACCESSJWT",
+  userInvalidRefreshJWT: "$USER_INVALID-REFRESHJWT",
+  userNoAccessJWT: "$USER_NO-ACCESSJWT",
+  userNoRefreshJWT: "$USER_NO-REFRESHJWT",
+};
+
+const productErrorCodes = {
+  productNotFound: "$PRODUCT_NOT-FOUND",
+  productDeleteFirst: "$PRODUCT_DELETE-FIRST",
+  productAlreadyDeleted: "$PRODUCT_ALREADY-DELETED",
+  productAlreadyRestored: "$PRODUCT_ALREADY-RESTORED",
+  productEmptyUpdate: "$PRODUCT_EMPTY-UPDATE",
+  productExistedShortID: "$PRODUCT_EXISTED-SHORTID",
+};
+
 export {
   isSet,
   isLoggedIn,
@@ -300,5 +354,8 @@ export {
   hashString,
   getMoreDict,
   createMoreDict,
+  createNotification,
   getErrorMessageCode,
+  productErrorCodes,
+  userErrorCodes,
 };
