@@ -119,6 +119,7 @@ export default {
       console.log("texts:", texts);
       const textsObj = JSON.parse(texts);
       const resultObj = {};
+      console.log("textsObj:", textsObj);
       for (const [textKey, textValue] of Object.entries(textsObj)) {
         // textKey: productManager, textValue: ["12312", "Product Manager"]
         const hash = Number(textValue[0]);
@@ -129,9 +130,9 @@ export default {
         if (entry && entry.dicts[lang]) {
           resultObj[textKey] = entry.dicts[lang] + "IT IS BAD!!!!";
         }
-        let newEntry = {};
+        //let newEntry = {};
         if (!entry) {
-          newEntry = new Dict({
+          let newEntry = new Dict({
             hash: hash,
             dicts: {
               en: text,
@@ -145,8 +146,13 @@ export default {
           // const insert = new Dict({ hash: newEntry.hash, dicts: newEntry.dicts });
           // console.log("newEntry", newEntry);
           // console.log("insert", insert);
-          await newEntry.save();
-          resultObj[textKey] = newEntry.dicts[lang];
+          try {
+            await newEntry.save();
+            //.then((res) => console.log("entry has created:", res));
+            resultObj[textKey] = newEntry.dicts[lang];
+          } catch (err) {
+            console.log(err);
+          }
         } else if (!entry.dicts[lang]) {
           await entry.update(
             {

@@ -177,7 +177,7 @@ export default function ProductsDeleted() {
                   data.validProducts
                 )}
                 <Searchbar
-                  allItemsFromDB={data.validProducts || "12"}
+                  allItemsFromDB={data.validProducts}
                   setItemsToView={setValidProducts}
                 />
               </>

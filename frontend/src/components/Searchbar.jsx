@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useContext } from "react";
 import { UITextContext } from "./TranslationWrapper";
+import { Store } from "react-notifications-component";
 
 function Searchbar({ setItemsToView, allItemsFromDB }) {
   const [searchbarValue, setSearchbarValue] = useState("");
@@ -28,27 +29,41 @@ function Searchbar({ setItemsToView, allItemsFromDB }) {
   };
 
   const handleSearchChange = (value) => {
+    // characters that cause regex error: [ ] \ ( ) * +
+    const validationPattern = new RegExp(/[\[\]\\\(\)*+]/gi);
+    if (validationPattern.test(value)) {
+      const wrongCharacter = value[value.length - 1];
+      Store.addNotification({
+        title: `${UIText.wrongCharacter}: ` + wrongCharacter,
+        message: `${UIText.wrongCharacters}: ` + "[ ] ( ) * +",
+        type: "warning",
+        insert: "top",
+        container: "top-right",
+        animationIn: ["animate__animated", "animate__fadeIn"],
+        animationOut: ["animate__animated", "animate__fadeOut"],
+        dismiss: {
+          duration: 5000,
+          onScreen: true,
+        },
+      });
+      value = value.replace(validationPattern, "");
+    }
     setSearchbarValue(() => value);
     const fieldToSearchIn = "name"; // later implement: name or shortId
-    // console.log("value:", value);
-    // console.log("searchTypeBTN:", searchTypeBTN);
+
     if (value === "") {
       setItemsToView(allItemsFromDB);
     } else if (value) {
       // if whole text vs if pattern matching (from a button)
-      // const searchedData = data.validProducts.filter((item) =>
-      //   item.name./*toLowerCase().*/ includes(value)
-      // );
+
       const regex =
         searchTypeBTN === "wholeWord"
           ? new RegExp(`^${value}`)
           : new RegExp(`${value}`);
-      // console.log("regex", regex);
-      // console.log("searchbarValue state", searchbarValue);
+
       const searchedData = allItemsFromDB.filter((item) =>
         regex.test(item[fieldToSearchIn].toLowerCase())
       );
-      // console.log("searchedData:", searchedData);
       if (searchedData) {
         setItemsToView(searchedData);
       } else {

@@ -157,6 +157,10 @@ function TranslationWrapper({ children }) {
       // Edit product form
       productFormTitle: "Update Product Details",
 
+      // Searchbar
+      wrongCharacter: "Wrong character",
+      wrongCharacters: "Wrong characters",
+
       language: "Language",
       iconMode: "Icon Mode",
     };
