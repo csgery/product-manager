@@ -4,6 +4,7 @@ import { IconModeContext } from "../App";
 import { Store } from "react-notifications-component";
 import Dropdown from "react-bootstrap/Dropdown";
 import { BsGear } from "react-icons/bs";
+import { createNotification } from "../helper/helper";
 
 function Searchbar({ setItemsToView, allItemsFromDB }) {
   const [searchbarValue, setSearchbarValue] = useState("");
@@ -49,18 +50,10 @@ function Searchbar({ setItemsToView, allItemsFromDB }) {
     const validationPattern = new RegExp(/[\[\]\\\(\)*+]/gi);
     if (validationPattern.test(value)) {
       const wrongCharacter = value[value.length - 1];
-      Store.addNotification({
+      createNotification({
         title: `${UIText.wrongCharacter}: ` + wrongCharacter,
         message: `${UIText.wrongCharacters}: ` + "[ ] ( ) * +",
         type: "warning",
-        insert: "top",
-        container: "top-right",
-        animationIn: ["animate__animated", "animate__fadeIn"],
-        animationOut: ["animate__animated", "animate__fadeOut"],
-        dismiss: {
-          duration: 5000,
-          onScreen: true,
-        },
       });
       value = value.replace(validationPattern, "");
     }
