@@ -110,7 +110,7 @@ function App() {
   // console.log("refreshtoken:", refreshTokenStorage);
 
   const httpLink = createHttpLink({
-    uri: "http://localhost:3000/graphql",
+    uri: import.meta.env.VITE_BACKEND_URI,
     headers: {
       //...headers,
       authorization: accessTokenStorage ? `Bearer ${accessTokenStorage}` : "",
