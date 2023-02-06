@@ -94,7 +94,7 @@ export default function Navigation({
                         />
                         <label
                           className="form-check-label"
-                          for="flexSwitchCheckChecked"
+                          htmlFor="flexSwitchCheckChecked"
                         >
                           {UIText.iconMode}
                         </label>
