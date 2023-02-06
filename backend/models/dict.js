@@ -6,6 +6,7 @@ const dictSchema = new Schema(
     hash: {
       type: Number,
       required: true,
+      index: { unique: true },
     },
     dicts: {
       type: Schema.Types.Mixed,

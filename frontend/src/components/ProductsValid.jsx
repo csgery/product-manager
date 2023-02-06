@@ -18,6 +18,7 @@ import { ImCancelCircle } from "react-icons/im";
 import { GrClose } from "react-icons/gr";
 import { BiSelectMultiple } from "react-icons/bi";
 import { IconModeContext } from "../App";
+import Searchbar from "./Searchbar";
 
 export default function ProductsDeleted() {
   const { loading, error, data } = useQuery(GET_VALIDPRODUCTS);
@@ -27,17 +28,19 @@ export default function ProductsDeleted() {
     "btn btn-danger p-2 ms-1 me-2 mb-2 disabled"
   );
   const [validProducts, setValidProducts] = useState([]);
-  const [searchbarValue, setSearchbarValue] = useState("");
-  const [searchTypeBTN, setSearchTypeBTN] = useState(
-    localStorage.getItem("searchTypeBTN") || "wholeWord"
-  );
 
   const navigate = useNavigate();
   const UIText = useContext(UITextContext);
   const iconMode = useContext(IconModeContext);
-
   const getRefreshToken = useContext(RefreshTokenMutationContext);
   const darkMode = useContext(DarkModeContext);
+
+  useEffect(() => {
+    if (data && data.validProducts) {
+      // If validProducts's changed(because delete, restore or remove something) change the view data
+      setValidProducts(data.validProducts);
+    }
+  }, [data?.validProducts]);
 
   useEffect(() => {
     console.log(idsNamesToDelete);
@@ -52,50 +55,6 @@ export default function ProductsDeleted() {
     }
   }, [idsNamesToDelete]);
 
-  useEffect(() => {
-    if (data && data.validProducts) {
-      setValidProducts(data.validProducts);
-      // After a product is deleted clear the searchbar
-      setSearchbarValue("");
-    }
-  }, [data?.validProducts]);
-
-  const handleSearchChange = (value) => {
-    setSearchbarValue(() => value);
-    const fieldToSearchIn = "name"; // later implement: name or shortId
-    // console.log("value:", value);
-    // console.log("searchTypeBTN:", searchTypeBTN);
-    if (value === "") {
-      setValidProducts(data.validProducts);
-    } else if (value) {
-      // if whole text vs if pattern matching (from a button)
-      // const searchedData = data.validProducts.filter((item) =>
-      //   item.name./*toLowerCase().*/ includes(value)
-      // );
-      const regex =
-        searchTypeBTN === "wholeWord"
-          ? new RegExp(`^${value}`)
-          : new RegExp(`${value}`);
-      // console.log("regex", regex);
-      // console.log("searchbarValue state", searchbarValue);
-      const searchedData = data.validProducts.filter((item) =>
-        regex.test(item[fieldToSearchIn].toLowerCase())
-      );
-      // console.log("searchedData:", searchedData);
-      if (searchedData) {
-        setValidProducts(searchedData);
-      } else {
-        setValidProducts([]);
-      }
-    }
-  };
-
-  useEffect(() => {
-    if (data?.validProducts) {
-      handleSearchChange(searchbarValue);
-    }
-  }, [searchTypeBTN]);
-
   const handleShow = () => {
     setIdsNamesToDelete(() => []);
     setShowDeleteCBs(!showDeleteCBs);
@@ -107,13 +66,6 @@ export default function ProductsDeleted() {
   if (error) {
     handleCustomError(error, navigate, getRefreshToken);
   }
-
-  const handleSearchTypeBTNClick = (e) => {
-    localStorage.setItem("searchTypeBTN", e.target.value);
-    setSearchTypeBTN(e.target.value);
-    //handleSearchChange(searchbarValue);
-    //console.log(e.target.value);
-  };
 
   const handleSelectAllProducts = () => {
     // if idsNamesToDelete contains ALL of the actual elements from validProducts view -> remove them from idsNamesToDelete
@@ -220,44 +172,21 @@ export default function ProductsDeleted() {
                     </Button>
                   </div>
                 )}
-                <div className="d-flex" role="search">
-                  <input
-                    className="form-control me-2 ms-1"
-                    type="search"
-                    placeholder="Search"
-                    aria-label="Search"
-                    onChange={(e) => handleSearchChange(e.target.value)}
-                    value={searchbarValue}
-                  />
-                  <button
-                    className={
-                      (searchTypeBTN === "wholeWord"
-                        ? "btn btn-light "
-                        : "btn btn-outline-light ") + "me-1"
-                    }
-                    value="wholeWord"
-                    onClick={(e) => handleSearchTypeBTNClick(e)}
-                  >
-                    {UIText.wholeWordButtonText}
-                  </button>
-                  <button
-                    className={
-                      searchTypeBTN === "matchCase"
-                        ? "btn btn-light "
-                        : "btn btn-outline-light "
-                    }
-                    value="matchCase"
-                    onClick={(e) => handleSearchTypeBTNClick(e)}
-                  >
-                    {UIText.matchCaseButtonText}
-                  </button>
-                </div>
+                {console.log(
+                  "validProducts BEFORE searchbar:",
+                  data.validProducts
+                )}
+                <Searchbar
+                  allItemsFromDB={data.validProducts}
+                  setItemsToView={setValidProducts}
+                />
               </>
             ) : (
               <h3 className="mt-2">There is no products</h3>
             )}
           </div>
-          {validProducts.length > 0 && (
+          {console.log("validProducts", validProducts)}
+          {validProducts?.length > 0 && (
             <>
               <div className="d-flex align-center justify-content-between mt-3 pb-5 product-card-row ">
                 {console.log("validProducts:", validProducts)}
@@ -291,7 +220,7 @@ export default function ProductsDeleted() {
 
           {validProducts.length === 0 &&
             data.validProducts.length > 0 &&
-            searchbarValue !== "" &&
+            // searchbarValue !== "" &&
             "NO searched data"}
         </>
       )}

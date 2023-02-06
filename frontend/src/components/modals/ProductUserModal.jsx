@@ -35,10 +35,10 @@ export default function ProductUserModal({
   modalCloseButtonText,
   redirectPathAfterSuccess = null, // path to redirect after a successful modification (delete or restore)
 }) {
-  const [getValidProducts, { data: validProducts_data }] =
-    useLazyQuery(GET_VALIDPRODUCTS);
-  const [getDeletedProducts, { data: deletedProducts_data }] =
-    useLazyQuery(GET_DELETEDPRODUCTS);
+  // const [getValidProducts, { data: validProducts_data }] =
+  //   useLazyQuery(GET_VALIDPRODUCTS);
+  // const [getDeletedProducts, { data: deletedProducts_data }] =
+  //   useLazyQuery(GET_DELETEDPRODUCTS);
 
   const getRefreshToken = useContext(RefreshTokenMutationContext);
   const darkMode = useContext(DarkModeContext);
@@ -127,6 +127,7 @@ export default function ProductUserModal({
     e.preventDefault();
     setShowBTNLoadingSpinner(true);
     if (modalType === "Delete") {
+      console.log("items to delete BEFORE delete:", itemIdsNamesToProcess);
       for (const item of itemIdsNamesToProcess) {
         try {
           await deleteProduct({ variables: { id: item[0] } });
