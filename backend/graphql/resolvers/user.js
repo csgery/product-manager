@@ -24,6 +24,7 @@ import {
   userInvalidRefreshJWT_Error,
   userNoAccessJWT_Error,
   userNoRefreshJWT_Error,
+  userUsernameAlreadyExist_Error,
 } from "../../helper/errors/userErrors.js";
 import {
   checkEmailRegex,
@@ -108,9 +109,9 @@ export default {
         };
       });
     },
-    users: async () => {
+    deletedUsers: async () => {
       try {
-        const users = await User.find();
+        const users = await User.find({ valid: false });
         // TODO: this is same -> migrate to a function
         return users.map((user) => {
           return {
@@ -230,8 +231,19 @@ export default {
     ) => {
       try {
         const lang = req.headers.language || "en";
-        checkPWRegex(password);
-        checkEmailRegex(email);
+        checkPWRegex(password, lang);
+        checkEmailRegex(email, lang);
+
+        const existedUsername = await User.findOne({ username });
+        if (existedUsername) {
+          throw userUsernameAlreadyExist_Error(lang);
+        }
+
+        const existedEmail = await User.findOne({ email });
+        if (existedEmail) {
+          throw userEmailAlreadyExist_Error(lang);
+        }
+
         const hashedPassword = await bcrypt.hash(password, 12);
         let validatedPermissions = [];
         if (permissions?.length > 0) {
@@ -407,7 +419,7 @@ export default {
       return user.id;
     },
 
-    softDeleteUser: async (parent, { id }, { user: userCtx, req }) => {
+    deleteUser: async (parent, { id }, { user: userCtx, req }) => {
       try {
         const lang = req.headers.language || "en";
         const user = await User.findById(id);
@@ -447,7 +459,7 @@ export default {
         throw err;
       }
     },
-    restoreSoftDeleteUser: async (parent, { id }, { user: userCtx, req }) => {
+    restoreUser: async (parent, { id }, { user: userCtx, req }) => {
       try {
         const lang = req.headers.language || "en";
         const user = await User.findById(id);
@@ -471,7 +483,7 @@ export default {
         throw err;
       }
     },
-    deleteUser: async (parent, { id }, { user: userCtx, req }) => {
+    removeUser: async (parent, { id }, { user: userCtx, req }) => {
       try {
         const lang = req.headers.language || "en";
         const user = await User.findById(id);
@@ -590,6 +602,8 @@ export default {
     },
 
     login: async (parent, { email, password }, { req }) => {
+      // console.log("in login resolver");
+      // console.log("headers:", req?.headers);
       const lang = req.headers.language || "en";
       const user = await User.findOne({ email: email, valid: true });
       if (!user) {

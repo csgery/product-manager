@@ -16,7 +16,7 @@ export default `#graphql
   
   extend type Query {
     validUsers: [User!]!
-    users: [User!]!
+    deletedUsers: [User!]!
     user(id: ID!): User!
     viewer: User!
   }
@@ -31,11 +31,11 @@ export default `#graphql
       email: String!
     ): String!
     updatePermission(id: ID!, permissions: [String!]): String!
-    softDeleteUser(id: ID!): String!
-    restoreSoftDeleteUser(id: ID!): String!
+    deleteUser(id: ID!): String!
+    restoreUser(id: ID!): String!
     blockUser(id: ID!): String!
     unblockUser(id: ID!): String!
-    deleteUser(id: ID!): String!
+    removeUser(id: ID!): String!
 
     login(email: String!, password: String!): [String!]!
     invalidateTokens: Boolean!

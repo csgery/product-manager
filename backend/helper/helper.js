@@ -45,12 +45,12 @@ const hashString = (key) => {
  * Throws an error if not correct for the PW Regex
  * @param {String} password
  */
-const checkPWRegex = (password) => {
+const checkPWRegex = (password, lang) => {
   // regex: any utf8 character AND at least 1 number AND at least 1 spec. char.
   const pwRegex =
     /^(?=.*?[\u0000-\u007F])(?=.*?[0-9])(?=.*?[#?!@$%^&*-+]).{8,}$/;
   if (!pwRegex.test(password)) {
-    throw userPWRegex_Error();
+    throw userPWRegex_Error(lang);
   }
 };
 
@@ -58,11 +58,11 @@ const checkPWRegex = (password) => {
  * Throws an error if not correct for the Email Regex
  * @param {String} email
  */
-const checkEmailRegex = (email) => {
+const checkEmailRegex = (email, lang) => {
   // regex: any utf8 character AND at least 1 number AND at least 1 spec. char.
   const emailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
   if (!emailRegex.test(email)) {
-    throw userEmailRegex_Error();
+    throw userEmailRegex_Error(lang);
   }
 };
 
@@ -189,6 +189,7 @@ const userErrorCodes = {
   userAlreadyRestored: "USER_ALREADY-RESTORED",
   userEmptyUpdate: "USER_EMPTY-UPDATE",
   userEmailExists: "USER_EXISTED-EMAIL",
+  userUsernameExists: "USER_EXISTED-USERNAME",
   userProtectionViolation: "USER_PROTECTION-VIOLATION",
   userInvalidPasswordFormat: "USER_INVALID-PASSWORDFORMAT",
   userInvalidEmailFormat: "USER_INVALID-EMAILFORMAT",

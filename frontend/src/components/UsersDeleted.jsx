@@ -2,9 +2,9 @@ import { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@apollo/client";
 import Spinner from "./Spinner";
-import Product from "./Product";
+import User from "./User";
 import ProductUserModal from "./modals/ProductUserModal";
-import { GET_DELETEDPRODUCTS } from "../queries/productQueries";
+import { GET_DELETEDUSERS } from "../queries/userQueries";
 import { Button } from "react-bootstrap";
 import { UITextContext } from "./TranslationWrapper";
 import { BiSelectMultiple } from "react-icons/bi";
@@ -14,14 +14,14 @@ import { IconModeContext } from "../App";
 import Searchbar from "./Searchbar";
 import useCustomError from "../helper/hooks/useCustomError";
 
-export default function ProductsDeleted() {
-  const { loading, error, data } = useQuery(GET_DELETEDPRODUCTS);
+export default function UsersDeleted() {
+  const { loading, error, data } = useQuery(GET_DELETEDUSERS);
   const [showDeleteCBs, setShowDeleteCBs] = useState(false);
   const [idsNamesToDelete, setIdsNamesToDelete] = useState([]);
   const [deleteBTNClass, setDeleteBTNClass] = useState(
     "btn btn-danger p-2 ms-2 disabled "
   );
-  const [deletedProducts, setDeletedProducts] = useState([]);
+  const [deletedUsers, setDeletedUsers] = useState([]);
 
   const [handleCustomError] = useCustomError();
 
@@ -47,52 +47,52 @@ export default function ProductsDeleted() {
   };
 
   useEffect(() => {
-    if (data && data.deletedProducts) {
+    if (data && data.deletedUsers) {
       // If validProducts's changed(because delete, restore or remove something) change the view data
-      setDeletedProducts(data.deletedProducts);
+      setDeletedUsers(data.deletedUsers);
     }
-  }, [data?.deletedProducts]);
+  }, [data?.deletedUsers]);
 
-  const handleSelectAllProducts = () => {
+  const handleSelectAllUsers = () => {
     // if idsNamesToDelete contains ALL of the actual elements from validProducts view -> remove them from idsNamesToDelete
 
     // loop through validProducts
     // if validProduct is in the deletedProducts then add +1 to a counter
     // after the loop if counter == validProducts.length -> it means all of the validProducts has already in the deletedProducts -> remove them from the deletedProducts
     let counter = 0;
-    deletedProducts.forEach((item) => {
-      const product = idsNamesToDelete.find(
+    deletedUsers.forEach((item) => {
+      const user = idsNamesToDelete.find(
         (idNameToDelete) => idNameToDelete[0] === item.id
       );
-      if (product) {
+      if (user) {
         counter++;
       }
     });
-    if (counter === deletedProducts.length) {
+    if (counter === deletedUsers.length) {
       // console.log(
       //   "all validProducts have already in the idsNamesToDelete list, REMOVE THEM!"
       // );
 
-      deletedProducts.forEach((deletedProduct) => {
+      deletedUsers.forEach((deletedUser) => {
         setIdsNamesToDelete((oldIdsNamesToDelete) =>
           oldIdsNamesToDelete.filter(
-            (idNameToDelete) => deletedProduct.id !== idNameToDelete[0]
+            (idNameToDelete) => deletedUser.id !== idNameToDelete[0]
           )
         );
       });
     }
 
     // else add the validProducts which is not in the idsNamesToDelete
-    deletedProducts.forEach((deletedProduct) => {
+    deletedUsers.forEach((deletedUser) => {
       // check if the product has already set for delete
       const selectedProduct = idsNamesToDelete.find(
-        (item) => item[0] === deletedProduct.id
+        (item) => item[0] === deletedUser.id
       );
       // if not then add to the array
       if (!selectedProduct) {
         setIdsNamesToDelete((oldValues) => [
           ...oldValues,
-          [deletedProduct.id, deletedProduct.name, deletedProduct.shortId],
+          [deletedUser.id, deletedUser.username, deletedUser.email],
         ]);
       }
     });
@@ -110,7 +110,7 @@ export default function ProductsDeleted() {
     <>
       {!loading && !error && (
         <>
-          {data && data.deletedProducts.length > 0 ? (
+          {data && data.deletedUsers.length > 0 ? (
             <>
               <div className="mt-5">
                 {!showDeleteCBs ? (
@@ -132,7 +132,7 @@ export default function ProductsDeleted() {
                         />
                       </>
                     ) : (
-                      UIText.removeRestoreMultipleProductsButtonText
+                      UIText.removeRestoreMultipleUsersButtonText
                     )}
                   </Button>
                 ) : (
@@ -151,7 +151,7 @@ export default function ProductsDeleted() {
                 {showDeleteCBs && (
                   <>
                     <ProductUserModal
-                      bind="product"
+                      bind="user"
                       iconMode={iconMode}
                       itemIdsNamesToProcess={idsNamesToDelete}
                       areThereMultipleProducts={idsNamesToDelete?.length > 1}
@@ -160,20 +160,20 @@ export default function ProductsDeleted() {
                       handleShow={handleShow}
                       modalTitle={
                         idsNamesToDelete?.length > 1
-                          ? UIText.removeProductsTitle
-                          : UIText.removeProductTitle
+                          ? UIText.removeUsersTitle
+                          : UIText.removeUserTitle
                       }
                       modalText={
                         idsNamesToDelete?.length > 1
-                          ? UIText.removeProductsText
-                          : UIText.removeProductText
+                          ? UIText.removeUsersText
+                          : UIText.removeUserText
                       }
                       modalButtonText={UIText.removeButtonText}
                       modalCloseButtonText={UIText.closeButtonText}
                     />
 
                     <ProductUserModal
-                      bind="product"
+                      bind="user"
                       iconMode={iconMode}
                       itemIdsNamesToProcess={idsNamesToDelete}
                       areThereMultipleProducts={idsNamesToDelete?.length > 1}
@@ -182,20 +182,20 @@ export default function ProductsDeleted() {
                       handleShow={handleShow}
                       modalTitle={
                         idsNamesToDelete?.length > 1
-                          ? UIText.restoreProductsTitle
-                          : UIText.restoreProductTitle
+                          ? UIText.restoreUsersTitle
+                          : UIText.restoreUserTitle
                       }
                       modalText={
                         idsNamesToDelete?.length > 1
-                          ? UIText.restoreProductsText
-                          : UIText.restoreProductText
+                          ? UIText.restoreUsersText
+                          : UIText.restoreUserText
                       }
                       modalButtonText={UIText.restoreButtonText}
                       modalCloseButtonText={UIText.closeButtonText}
                     />
                     <Button
                       className="btn btn-light p-2 ms-1 me-2 mb-2"
-                      onClick={handleSelectAllProducts}
+                      onClick={handleSelectAllUsers}
                     >
                       {iconMode ? (
                         <BiSelectMultiple style={{ fontSize: "1.6rem" }} />
@@ -208,28 +208,28 @@ export default function ProductsDeleted() {
               </div>
 
               <Searchbar
-                allItemsFromDB={data.deletedProducts}
-                setItemsToView={setDeletedProducts}
-                searchbarBind="product"
+                allItemsFromDB={data.deletedUsers}
+                setItemsToView={setDeletedUsers}
+                searchbarBind="user"
               />
             </>
           ) : (
-            <h3 className="mt-2">There is no deleted products</h3>
+            <h3 className="mt-2">There is no deleted users</h3>
           )}
-          {deletedProducts.length > 0 && (
+          {deletedUsers.length > 0 && (
             <div className="d-flex align-center justify-content-between mt-3 pb-5 product-card-row ">
-              {deletedProducts.map((deletedProduct) => (
-                <Product
+              {deletedUsers.map((deletedUser) => (
+                <User
                   showDeleteCBs={showDeleteCBs}
                   setIdsNamesToDelete={setIdsNamesToDelete}
-                  key={deletedProduct.id}
-                  product={deletedProduct}
+                  key={deletedUser.id}
+                  user={deletedUser}
                   cardBackgroundClass={"deletedProduct-card"}
                   setDeleteCBChecked={
                     // idsNamesToDelete = [ []. [], ... [] ] array of arrays
                     idsNamesToDelete.find(
                       // item[0] === id field of the array
-                      (item) => item[0] === deletedProduct.id
+                      (item) => item[0] === deletedUser.id
                     )
                       ? true
                       : false
@@ -238,8 +238,8 @@ export default function ProductsDeleted() {
               ))}
             </div>
           )}
-          {deletedProducts.length === 0 &&
-            data.deletedProducts.length > 0 &&
+          {deletedUsers.length === 0 &&
+            data.deletedUsers.length > 0 &&
             // searchbarValue !== "" &&
             "NO searched data"}
         </>

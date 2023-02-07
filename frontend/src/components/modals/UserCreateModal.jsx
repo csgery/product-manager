@@ -1,7 +1,7 @@
 import { useState, useContext } from "react";
 import { useMutation } from "@apollo/client";
-import { CREATE_PRODUCT } from "../../mutations/productMutations";
-import { GET_VALIDPRODUCTS } from "../../queries/productQueries";
+import { CREATE_USER } from "../../mutations/userMutations";
+import { GET_VALIDUSERS } from "../../queries/userQueries";
 import { Button, Modal } from "react-bootstrap";
 import useCustomError from "../../helper/hooks/useCustomError";
 import { DarkModeContext } from "../../App";
@@ -11,13 +11,16 @@ import { createNotification } from "../../helper/helper";
 
 import { UITextContext } from "../TranslationWrapper";
 import { IconModeContext } from "../../App";
-import { validateProductInput } from "../../helper/helper";
+import {
+  validateUserEmailInput,
+  validateUserUsernameInput,
+} from "../../helper/helper";
 
-export default function ProductCreateModal() {
-  const [name, setName] = useState("");
-  const [shortId, setShortId] = useState("");
-  const [quantity, setQuantity] = useState(0);
+export default function UserCreateModal() {
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [show, setShow] = useState(false);
+  const password = "testPassword!1";
 
   const darkMode = useContext(DarkModeContext);
   const UIText = useContext(UITextContext);
@@ -29,27 +32,32 @@ export default function ProductCreateModal() {
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
 
-  const [addProduct, { data }] = useMutation(CREATE_PRODUCT, {
-    variables: { name, shortId, quantity },
+  const [addUser, { data }] = useMutation(CREATE_USER, {
+    variables: { username, email, password },
     update(cache, { data: { data } }) {
-      const { validProducts } = cache.readQuery({ query: GET_VALIDPRODUCTS });
-      console.log("addProduct:", addProduct);
+      const { validUsers } = cache.readQuery({ query: GET_VALIDUSERS });
+      console.log("addUser:", addUser);
       cache.writeQuery({
-        query: GET_VALIDPRODUCTS,
-        data: { validProducts: [...validProducts, addProduct] },
+        query: GET_VALIDUSERS,
+        data: { validUsers: [...validUsers, addUser] },
       });
     },
   });
 
-  const handleInputChange = (value, setStateCallback) => {
-    value = validateProductInput(value, UIText);
-    setStateCallback(value);
+  const handleUsernameChange = (value) => {
+    value = validateUserUsernameInput(value, UIText);
+    setUsername(value);
+  };
+
+  const handleEmailChange = (value) => {
+    value = validateUserEmailInput(value, UIText);
+    setEmail(value);
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (name === "" || shortId === "" || quantity < 1 || quantity > 1000) {
+    if (username === "" || email === "") {
       // error = true;
       return createNotification({
         title: UIText.warning,
@@ -58,11 +66,25 @@ export default function ProductCreateModal() {
       });
     }
 
-    addProduct(name, shortId, quantity)
+    if (username.length < 5) {
+      return createNotification({
+        title: UIText.error,
+        message: UIText.usernameTooShort,
+        type: "warning",
+      });
+    }
+    if (username.length > 32) {
+      return createNotification({
+        title: UIText.error,
+        message: UIText.usernameTooLong,
+        type: "warning",
+      });
+    }
+
+    addUser(username, email, password)
       .then(() => {
-        setName("");
-        setShortId("");
-        setQuantity(0);
+        setUsername("");
+        setEmail("");
         handleClose();
         createNotification({
           title: UIText.successfulOperation,
@@ -81,43 +103,33 @@ export default function ProductCreateModal() {
         {iconMode ? (
           <GrAdd style={{ fontSize: "1.6rem" }} />
         ) : (
-          UIText.createProductButtonText
+          UIText.createUserButtonText
         )}
       </Button>
 
       <Modal show={show} onHide={handleClose}>
         <Modal.Header closeButton className={darkMode && "bg-dark text-white"}>
-          <Modal.Title>{UIText.createProductButtonText}</Modal.Title>
+          <Modal.Title>{UIText.createUserButtonText}</Modal.Title>
         </Modal.Header>
         <Modal.Body className={darkMode && "bg-dark text-white"}>
           <div className="mb-3">
-            <label className="form-label">{UIText.name}</label>
+            <label className="form-label">{UIText.username}</label>
             <input
               type="text"
               className="form-control"
-              id="name"
-              onChange={(e) => handleInputChange(e.target.value, setName)}
-              value={name}
+              id="username"
+              onChange={(e) => handleUsernameChange(e.target.value)}
+              value={username}
             />
           </div>
           <div className="mb-3 danger">
-            <label className="form-label ">{UIText.shortID}</label>
+            <label className="form-label ">Email</label>
             <input
               type="text"
               className="form-control"
-              id="shortId"
-              onChange={(e) => handleInputChange(e.target.value, setShortId)}
-              value={shortId}
-            />
-          </div>
-          <div className="mb-3">
-            <label className="form-label">{UIText.quantity}</label>
-            <input
-              type="number"
-              className="form-control"
-              id="quantity"
-              onChange={(e) => setQuantity(Number(e.target.value))}
-              value={quantity}
+              id="email"
+              onChange={(e) => handleEmailChange(e.target.value)}
+              value={email}
             />
           </div>
         </Modal.Body>

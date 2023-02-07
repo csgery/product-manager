@@ -9,6 +9,11 @@ import {
   DELETE_PRODUCT,
 } from "../../mutations/productMutations";
 import {
+  DELETE_USER,
+  RESTORE_USER,
+  REMOVE_USER,
+} from "../../mutations/userMutations";
+import {
   GET_VALIDPRODUCTS,
   GET_DELETEDPRODUCTS,
 } from "../../queries/productQueries";
@@ -20,6 +25,7 @@ import { MdOutlineDoneOutline, MdOutlineCancel } from "react-icons/md";
 import useCustomError from "../../helper/hooks/useCustomError";
 import { createNotification } from "../../helper/helper";
 import { UITextContext } from "../TranslationWrapper";
+import { GET_DELETEDUSERS, GET_VALIDUSERS } from "../../queries/userQueries";
 
 export default function ProductUserModal({
   bind = "product",
@@ -29,7 +35,7 @@ export default function ProductUserModal({
   areThereMultipleProducts = false,
   deleteBTNClass = "btn btn-danger p-2 ms-1 me-2 mb-2",
   handleShow,
-  didProductComeFromItself = false, // true if the data came from a product card and not from the ProductsValid or ProductsDeleted page
+  didItemComeFromItself = false, // true if the data came from a product card and not from the ProductsValid or ProductsDeleted page
   modalTitle,
   modalText,
   modalButtonText, // show modal and accept buttons too
@@ -103,90 +109,156 @@ export default function ProductUserModal({
   });
   const [restoreDeletedProduct] = useMutation(RESTOREDELETED_PRODUCT, {
     refetchQueries: [GET_VALIDPRODUCTS, GET_DELETEDPRODUCTS],
-    // update(cache, { data: { restoreDeletedProduct } }) {
-    //   var { deletedProducts } = cache.readQuery({
-    //     query: GET_DELETEDPRODUCTS,
+  });
+
+  const [deleteUser] = useMutation(DELETE_USER, {
+    refetchQueries: [GET_VALIDUSERS, GET_DELETEDUSERS],
+  });
+
+  const [removeUser] = useMutation(REMOVE_USER, {
+    refetchQueries: [{ query: GET_DELETEDUSERS }],
+    // TODO: update method below would be better
+    // update(cache, { data: { removeUser } }) {
+    //   // console.log(removedProduct);
+    //   // read the GET_DELETEDPRODUCTS cashed query
+    //   const { deletedUsers } = cache.readQuery({
+    //     query: GET_DELETEDUSERS,
     //   });
+    //   // remove the deleted value from it
     //   cache.writeQuery({
-    //     query: GET_DELETEDPRODUCTS,
+    //     query: GET_DELETEDUSERS,
     //     data: {
-    //       deletedProducts: deletedProducts.filter(
-    //         (product) => product.id !== restoreDeletedProduct.id
+    //       deletedUsers: deletedUsers.filter(
+    //         (user) => user.id !== removeUser.id
     //       ),
     //     },
     //   });
-    //   var { validProducts } = cache.readQuery({
-    //     query: GET_VALIDPRODUCTS,
-    //   });
-    //   cache.writeQuery({
-    //     query: GET_VALIDPRODUCTS,
-    //     data: {
-    //       validProducts: [...validProducts, restoreDeletedProduct],
-    //     },
-    //   });
     // },
+  });
+  const [restoreUser] = useMutation(RESTORE_USER, {
+    refetchQueries: [GET_VALIDUSERS, GET_DELETEDUSERS],
   });
 
   const handleClick = async (e) => {
     e.preventDefault();
     setShowBTNLoadingSpinner(true);
-    if (modalType === "Delete") {
-      //console.log("items to delete BEFORE delete:", itemIdsNamesToProcess);
-      for (const item of itemIdsNamesToProcess) {
-        try {
-          await deleteProduct({ variables: { id: item[0] } });
-          createNotification({
-            title: UIText.successfulOperation,
-            message: `${item[1]} ${UIText.successfullyDeleted}`,
-            type: "success",
-          });
-        } catch (err) {
-          handleCustomError(err);
+    if (bind === "product") {
+      if (modalType === "Delete") {
+        //console.log("items to delete BEFORE delete:", itemIdsNamesToProcess);
+        for (const item of itemIdsNamesToProcess) {
+          try {
+            await deleteProduct({ variables: { id: item[0] } });
+            createNotification({
+              title: UIText.successfulOperation,
+              message: `${item[1]} ${UIText.successfullyDeleted}`,
+              type: "success",
+            });
+          } catch (err) {
+            handleCustomError(err);
+          }
         }
-      }
-      // itemIdsNamesToProcess.forEach((item) => {
-      //   deleteProduct({ variables: { id: item[0] } })
-      //     .then()
-      //     .cache((err) => console.log(err));
-      // });
-    } else if (modalType === "Restore") {
-      for (const item of itemIdsNamesToProcess) {
-        try {
-          await restoreDeletedProduct({ variables: { id: item[0] } });
-          createNotification({
-            title: UIText.successfulOperation,
-            message: `${item[1]} ${UIText.successfullyRestored}`,
-            type: "success",
-          });
-        } catch (err) {
-          handleCustomError(err);
+        // itemIdsNamesToProcess.forEach((item) => {
+        //   deleteProduct({ variables: { id: item[0] } })
+        //     .then()
+        //     .cache((err) => console.log(err));
+        // });
+      } else if (modalType === "Restore") {
+        for (const item of itemIdsNamesToProcess) {
+          try {
+            await restoreDeletedProduct({ variables: { id: item[0] } });
+            createNotification({
+              title: UIText.successfulOperation,
+              message: `${item[1]} ${UIText.successfullyRestored}`,
+              type: "success",
+            });
+          } catch (err) {
+            handleCustomError(err);
+          }
         }
-      }
-      // itemIdsNamesToProcess.forEach((item) => {
-      //   restoreDeletedProduct({ variables: { id: item[0] } });
-      //   // .then()
-      //   // .cache((err) => console.log(err));
-      // });
-    } else if (modalType === "Remove") {
-      for (const item of itemIdsNamesToProcess) {
-        try {
-          await removeProduct({ variables: { id: item[0] } });
-          createNotification({
-            title: UIText.successfulOperation,
-            message: `${item[1]} ${UIText.successfullyRemoved}`,
-            type: "success",
-          });
-        } catch (err) {
-          handleCustomError(err);
+        // itemIdsNamesToProcess.forEach((item) => {
+        //   restoreDeletedProduct({ variables: { id: item[0] } });
+        //   // .then()
+        //   // .cache((err) => console.log(err));
+        // });
+      } else if (modalType === "Remove") {
+        for (const item of itemIdsNamesToProcess) {
+          try {
+            await removeProduct({ variables: { id: item[0] } });
+            createNotification({
+              title: UIText.successfulOperation,
+              message: `${item[1]} ${UIText.successfullyRemoved}`,
+              type: "success",
+            });
+          } catch (err) {
+            handleCustomError(err);
+          }
         }
+        // itemIdsNamesToProcess.forEach((item) => {
+        //   removeProduct({ variables: { id: item[0] } });
+        //   // .then()
+        //   // .cache((err) => console.log(err));
+        // });
       }
-      // itemIdsNamesToProcess.forEach((item) => {
-      //   removeProduct({ variables: { id: item[0] } });
-      //   // .then()
-      //   // .cache((err) => console.log(err));
-      // });
+    } else {
+      if (modalType === "Delete") {
+        //console.log("items to delete BEFORE delete:", itemIdsNamesToProcess);
+        for (const item of itemIdsNamesToProcess) {
+          try {
+            await deleteUser({ variables: { id: item[0] } });
+            createNotification({
+              title: UIText.successfulOperation,
+              message: `${item[1]} ${UIText.successfullyDeleted}`,
+              type: "success",
+            });
+          } catch (err) {
+            handleCustomError(err);
+          }
+        }
+        // itemIdsNamesToProcess.forEach((item) => {
+        //   deleteProduct({ variables: { id: item[0] } })
+        //     .then()
+        //     .cache((err) => console.log(err));
+        // });
+      } else if (modalType === "Restore") {
+        for (const item of itemIdsNamesToProcess) {
+          try {
+            await restoreUser({ variables: { id: item[0] } });
+            createNotification({
+              title: UIText.successfulOperation,
+              message: `${item[1]} ${UIText.successfullyRestored}`,
+              type: "success",
+            });
+          } catch (err) {
+            handleCustomError(err);
+          }
+        }
+        // itemIdsNamesToProcess.forEach((item) => {
+        //   restoreDeletedProduct({ variables: { id: item[0] } });
+        //   // .then()
+        //   // .cache((err) => console.log(err));
+        // });
+      } else if (modalType === "Remove") {
+        for (const item of itemIdsNamesToProcess) {
+          try {
+            await removeUser({ variables: { id: item[0] } });
+            createNotification({
+              title: UIText.successfulOperation,
+              message: `${item[1]} ${UIText.successfullyRemoved}`,
+              type: "success",
+            });
+          } catch (err) {
+            handleCustomError(err);
+          }
+        }
+        // itemIdsNamesToProcess.forEach((item) => {
+        //   removeProduct({ variables: { id: item[0] } });
+        //   // .then()
+        //   // .cache((err) => console.log(err));
+        // });
+      }
     }
-    if (!didProductComeFromItself) {
+
+    if (!didItemComeFromItself) {
       handleShow();
     }
     setShowBTNLoadingSpinner(false);

@@ -118,7 +118,7 @@ app.use(
       if (!authHeader) {
         console.log("no header");
         // console.log(req.headers);
-        return;
+        return { req };
       }
       const accessToken = authHeader.split(" ")[1] || "";
       // const refreshToken = refreshHeader;

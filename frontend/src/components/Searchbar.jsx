@@ -4,16 +4,28 @@ import { IconModeContext } from "../App";
 import { Store } from "react-notifications-component";
 import Dropdown from "react-bootstrap/Dropdown";
 import { BsGear } from "react-icons/bs";
-import { createNotification, validateInput } from "../helper/helper";
+import { createNotification, validateProductInput } from "../helper/helper";
 
-function Searchbar({ setItemsToView, allItemsFromDB }) {
+function Searchbar({
+  setItemsToView,
+  allItemsFromDB,
+  searchbarBind /*product or user*/,
+}) {
   const [searchbarValue, setSearchbarValue] = useState("");
-  const [searchTypeBTN, setSearchTypeBTN] = useState(
-    localStorage.getItem("searchTypeBTN") || "wholeWord"
-  );
-  const [searchInBTN, setSearchInBTN] = useState(
-    localStorage.getItem("searchInBTN") || "name"
-  );
+  const [searchTypeBTN, setSearchTypeBTN] = useState(() => {
+    if (searchbarBind === "product") {
+      return localStorage.getItem("searchTypeProductBTN") || "wholeWord";
+    } else if (searchbarBind === "user") {
+      return localStorage.getItem("searchTypeUserBTN") || "wholeWord";
+    }
+  });
+  const [searchInBTN, setSearchInBTN] = useState(() => {
+    if (searchbarBind === "product") {
+      return localStorage.getItem("searchInProductBTN") || "name";
+    } else if (searchbarBind === "user") {
+      return localStorage.getItem("searchInUserBTN") || "username";
+    }
+  });
 
   const UIText = useContext(UITextContext);
   const iconMode = useContext(IconModeContext);
@@ -34,20 +46,28 @@ function Searchbar({ setItemsToView, allItemsFromDB }) {
   const handleSearchTypeBTNClick = (e) => {
     e.preventDefault(); // prevents changing to the URL of the link href
     e.stopPropagation(); // prevents the link click from bubbling
-    localStorage.setItem("searchTypeBTN", e.target.value);
+    if (searchbarBind === "product") {
+      localStorage.setItem("searchTypeProductBTN", e.target.value);
+    } else if (searchbarBind === "user") {
+      localStorage.setItem("searchTypeUserBTN", e.target.value);
+    }
     setSearchTypeBTN(e.target.value);
   };
 
   const handleSearchInBTNClick = (e) => {
     e.preventDefault(); // prevents changing to the URL of the link href
     e.stopPropagation(); // prevents the link click from bubbling
-    localStorage.setItem("searchInBTN", e.target.value);
+    if (searchbarBind === "product") {
+      localStorage.setItem("searchInProductBTN", e.target.value);
+    } else if (searchbarBind === "user") {
+      localStorage.setItem("searchInUserBTN", e.target.value);
+    }
     setSearchInBTN(e.target.value);
   };
 
   const handleSearchChange = (value) => {
     // characters that cause regex error: [ ] \ ( ) * +
-    value = validateInput(value, UIText);
+    value = validateProductInput(value, UIText);
     setSearchbarValue(() => value);
     const fieldToSearchIn = searchInBTN; // later implement: name or shortId
 
@@ -119,25 +139,25 @@ function Searchbar({ setItemsToView, allItemsFromDB }) {
           <Dropdown.Item className="lightmode">
             <button
               className={
-                (searchInBTN === "name"
+                (searchInBTN === "name" || searchInBTN === "username"
                   ? "btn btn-light "
                   : "btn btn-outline-light ") + "me-1"
               }
-              value="name"
+              value={searchbarBind === "product" ? "name" : "username"}
               onClick={(e) => handleSearchInBTNClick(e)}
             >
-              {UIText.name}
+              {searchbarBind === "product" ? UIText.name : UIText.username}
             </button>
             <button
               className={
-                searchInBTN === "shortId"
+                searchInBTN === "shortId" || searchInBTN === "email"
                   ? "btn btn-light "
                   : "btn btn-outline-light "
               }
-              value="shortId"
+              value={searchbarBind === "product" ? "shortId" : "email"}
               onClick={(e) => handleSearchInBTNClick(e)}
             >
-              {UIText.shortID}
+              {searchbarBind === "product" ? UIText.shortID : "Email"}
             </button>
           </Dropdown.Item>
         </Dropdown.Menu>

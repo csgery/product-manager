@@ -105,6 +105,7 @@ function TranslationWrapper({ children }) {
       products: "Products",
       deletedProducts: "Deleted Products",
       users: "Users",
+      deletedUsers: "Deleted Users",
       viewer: "Viewer",
       logout: "Logout",
       login: "Login",
@@ -118,6 +119,13 @@ function TranslationWrapper({ children }) {
       removeProductsTitle: "Remove Products",
       removeProductTitle: "Remove Product",
 
+      deleteUsersTitle: "Delete Users",
+      deleteUserTitle: "Delete User",
+      restoreUsersTitle: "Restore Users",
+      restoreUserTitle: "Restore User",
+      removeUsersTitle: "Remove Users",
+      removeUserTitle: "Remove User",
+
       // Modal body texts
       deleteProductsText: "Are you sure to delete the following products?",
       deleteProductText: "Are you sure to delete the following product?",
@@ -125,6 +133,13 @@ function TranslationWrapper({ children }) {
       restoreProductText: "Are you sure to restore the following product?",
       removeProductsText: "Are you sure to remove the following products?",
       removeProductText: "Are you sure to remove the following product?",
+
+      deleteUsersText: "Are you sure to delete the following users?",
+      deleteUserText: "Are you sure to delete the following user?",
+      restoreUsersText: "Are you sure to restore the following users?",
+      restoreUserText: "Are you sure to restore the following user?",
+      removeUsersText: "Are you sure to remove the following users?",
+      removeUserText: "Are you sure to remove the following user?",
 
       // Modal buttons text
       deleteButtonText: "Delete",
@@ -134,6 +149,7 @@ function TranslationWrapper({ children }) {
       deleteMultipleProductsButtonText: "Delete Multiple Products",
       removeRestoreMultipleProductsButtonText:
         "Remove/Restore Multiple Products",
+      removeRestoreMultipleUsersButtonText: "Remove/Restore Multiple Users",
       cancelButtonText: "Cancel",
       createButtonText: "Create",
       editButtonText: "Edit",
@@ -143,6 +159,14 @@ function TranslationWrapper({ children }) {
       name: "Name",
       shortID: "Short ID",
       quantity: "Quantity",
+
+      // Create User Modal
+      createUserButtonText: "Create User",
+      username: "Username",
+      //email: "Email",
+      password: "Password",
+      usernameTooShort: "Username should be at least 5 character!",
+      usernameTooLong: "Username should be maximum 32 character!",
 
       // Searchbar
       wholeWordButtonText: "Whole Word",
