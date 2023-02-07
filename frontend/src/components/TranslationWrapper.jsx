@@ -173,6 +173,7 @@ function TranslationWrapper({ children }) {
       successfullyCreated: "Successfully Created!",
       successfullyDeleted: "Successfully Deleted!",
       successfullyRemoved: "Successfully Removed!",
+      successfullyRestored: "Successfully Restored!",
       fillOutAllField: "Please fill out all fields!",
       quantityTooLarge: "Quantity is larger than 1000!",
 

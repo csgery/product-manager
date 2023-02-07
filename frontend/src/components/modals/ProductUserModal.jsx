@@ -18,6 +18,8 @@ import { TbTrash, TbTrashOff } from "react-icons/tb";
 import { GrClose, GrCheckmark } from "react-icons/gr";
 import { MdOutlineDoneOutline, MdOutlineCancel } from "react-icons/md";
 import useCustomError from "../../helper/hooks/useCustomError";
+import { createNotification } from "../../helper/helper";
+import { UITextContext } from "../TranslationWrapper";
 
 export default function ProductUserModal({
   bind = "product",
@@ -40,6 +42,8 @@ export default function ProductUserModal({
   //   useLazyQuery(GET_DELETEDPRODUCTS);
 
   const darkMode = useContext(DarkModeContext);
+
+  const UIText = useContext(UITextContext);
 
   const navigate = useNavigate();
 
@@ -127,10 +131,15 @@ export default function ProductUserModal({
     e.preventDefault();
     setShowBTNLoadingSpinner(true);
     if (modalType === "Delete") {
-      console.log("items to delete BEFORE delete:", itemIdsNamesToProcess);
+      //console.log("items to delete BEFORE delete:", itemIdsNamesToProcess);
       for (const item of itemIdsNamesToProcess) {
         try {
           await deleteProduct({ variables: { id: item[0] } });
+          createNotification({
+            title: UIText.successfulOperation,
+            message: `${item[1]} ${UIText.successfullyDeleted}`,
+            type: "success",
+          });
         } catch (err) {
           handleCustomError(err);
         }
@@ -144,6 +153,11 @@ export default function ProductUserModal({
       for (const item of itemIdsNamesToProcess) {
         try {
           await restoreDeletedProduct({ variables: { id: item[0] } });
+          createNotification({
+            title: UIText.successfulOperation,
+            message: `${item[1]} ${UIText.successfullyRestored}`,
+            type: "success",
+          });
         } catch (err) {
           handleCustomError(err);
         }
@@ -157,6 +171,11 @@ export default function ProductUserModal({
       for (const item of itemIdsNamesToProcess) {
         try {
           await removeProduct({ variables: { id: item[0] } });
+          createNotification({
+            title: UIText.successfulOperation,
+            message: `${item[1]} ${UIText.successfullyRemoved}`,
+            type: "success",
+          });
         } catch (err) {
           handleCustomError(err);
         }

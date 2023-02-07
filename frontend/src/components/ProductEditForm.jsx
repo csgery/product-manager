@@ -3,7 +3,7 @@ import { useState, useEffect, useRef, useContext } from "react";
 import { useMutation } from "@apollo/client";
 import { GET_PRODUCT, GET_VALIDPRODUCTS } from "../queries/productQueries";
 import { UPDATE_PRODUCT } from "../mutations/productMutations";
-import { createNotification } from "../helper/helper";
+import { createNotification, validateInput } from "../helper/helper";
 import useCustomError from "../helper/hooks/useCustomError";
 import { UITextContext } from "./TranslationWrapper";
 import { GrClose, GrCheckmark } from "react-icons/gr";
@@ -28,6 +28,11 @@ const ProductEditForm = ({ product, setToggleEditForm, iconMode }) => {
   }, []);
 
   const focusRef = useRef(null);
+
+  const handleInputChange = (value, setStateCallback) => {
+    value = validateInput(value, UIText);
+    setStateCallback(value);
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -93,7 +98,7 @@ const ProductEditForm = ({ product, setToggleEditForm, iconMode }) => {
             className="form-control"
             id="name"
             value={name}
-            onChange={(e) => setName(e.target.value)}
+            onChange={(e) => handleInputChange(e.target.value, setName)}
           />
         </div>
         <div className="mb-3">
@@ -103,7 +108,7 @@ const ProductEditForm = ({ product, setToggleEditForm, iconMode }) => {
             className="form-control"
             id="shortId"
             value={shortId}
-            onChange={(e) => setShortId(e.target.value)}
+            onChange={(e) => handleInputChange(e.target.value, setShortId)}
           ></input>
         </div>
         <div className="mb-3">
