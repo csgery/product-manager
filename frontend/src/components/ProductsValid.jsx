@@ -6,9 +6,8 @@ import ProductCreateModal from "./modals/ProductCreateModal";
 import ProductUserModal from "./modals/ProductUserModal";
 import { GET_VALIDPRODUCTS } from "../queries/productQueries";
 import { Button } from "react-bootstrap";
-import { handleCustomError } from "../helper/helper";
+import useCustomError from "../helper/hooks/useCustomError";
 import { useNavigate } from "react-router-dom";
-import { RefreshTokenMutationContext } from "../pages/TokenWrapper";
 import { DarkModeContext } from "./../App";
 import { UITextContext } from "./TranslationWrapper";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -29,10 +28,11 @@ export default function ProductsDeleted() {
   );
   const [validProducts, setValidProducts] = useState([]);
 
+  const [handleCustomError] = useCustomError();
+
   const navigate = useNavigate();
   const UIText = useContext(UITextContext);
   const iconMode = useContext(IconModeContext);
-  const getRefreshToken = useContext(RefreshTokenMutationContext);
   const darkMode = useContext(DarkModeContext);
 
   useEffect(() => {
@@ -64,7 +64,7 @@ export default function ProductsDeleted() {
 
   // if (error) return <p>Something Went Wrong {error.message}</p>;
   if (error) {
-    handleCustomError(error, navigate, getRefreshToken);
+    handleCustomError(error);
   }
 
   const handleSelectAllProducts = () => {

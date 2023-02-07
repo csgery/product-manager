@@ -4,10 +4,7 @@ import { useMutation } from "@apollo/client";
 import { GET_PRODUCT, GET_VALIDPRODUCTS } from "../queries/productQueries";
 import { UPDATE_PRODUCT } from "../mutations/productMutations";
 import { createNotification } from "../helper/helper";
-import {
-  getErrorMessageCode,
-  productErrorCodes as errorCodes,
-} from "../helper/helper";
+import useCustomError from "../helper/hooks/useCustomError";
 import { UITextContext } from "./TranslationWrapper";
 import { GrClose, GrCheckmark } from "react-icons/gr";
 import { MdOutlineDoneOutline, MdOutlineCancel } from "react-icons/md";
@@ -16,6 +13,7 @@ const ProductEditForm = ({ product, setToggleEditForm, iconMode }) => {
   const [name, setName] = useState(product.name);
   const [shortId, setShortId] = useState(product.shortId);
   const [quantity, setQuantity] = useState(product.quantity);
+  const [handleCustomError] = useCustomError();
 
   const UIText = useContext(UITextContext);
 
@@ -36,16 +34,16 @@ const ProductEditForm = ({ product, setToggleEditForm, iconMode }) => {
     if (name === "" || shortId === "" || quantity < 1) {
       // error = true;
       return createNotification({
-        title: "Failed To Update!",
-        message: "Please fill out all fields!",
-        type: "danger",
+        title: UIText.warning,
+        message: UIText.fillOutAllField,
+        type: "warning",
       });
     }
 
     if (quantity > 1000) {
       return createNotification({
-        title: "Failed To Update!",
-        message: "Quantity is larger than 1000",
+        title: UIText.error,
+        message: UIText.quantityTooLarge,
         type: "danger",
       });
     }
@@ -54,8 +52,8 @@ const ProductEditForm = ({ product, setToggleEditForm, iconMode }) => {
       .then(() => {
         // successful notification message
         createNotification({
-          title: "Successful Update!",
-          message: "Product Successfully Updated",
+          title: UIText.successfulOperation,
+          message: UIText.successfullyUpdated,
           type: "success",
         });
 
@@ -63,30 +61,7 @@ const ProductEditForm = ({ product, setToggleEditForm, iconMode }) => {
         setToggleEditForm(false);
       })
       .catch((err) => {
-        const { message, code } = getErrorMessageCode(err.message);
-        // error notification message
-        if (message) {
-          err.message = message;
-        }
-        // console.log(err);
-        // console.log("err.message", message);
-        // console.log("err.extensions", err.extensions);
-        // console.log("err.code", code);
-        // switch (code) {
-        //   case errorCodes.productExistedShortID:
-        //     break;
-        //   default:
-        //     break;
-        // }
-        // if (code === "EXISTED_SHORTID") {
-        //   err.message = message;
-        // }
-        createNotification({
-          title: "Failed To Update!",
-          message: err.message,
-          type: "danger",
-        });
-        // throw err;
+        handleCustomError(err);
       });
   };
 

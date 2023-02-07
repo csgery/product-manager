@@ -26,39 +26,6 @@ const getUserId = () => {
   return jwt(localStorage.getItem("accesstoken")).sub;
 };
 
-const handleCustomError = (error, navigate, getRefreshToken) => {
-  // error: error object
-  console.log(error);
-  const { message, code } = getErrorMessageCode(error.message);
-  // if there is no message then throw error
-  if (!message) {
-    throw error;
-  }
-  // if there is message then there'll be code too
-  if (
-    code === userErrorCodes.userShouldReLogin ||
-    code === userErrorCodes.userLoginFirst
-  ) {
-    if (!navigate) {
-      throw new Error(
-        "The navigate parameter is not provided for the handleCustomError function in the helper.js file!"
-      );
-    }
-    // redirect to logout, where all client side data will be removed and will be redirected to login
-    navigate("/logout", { replace: true });
-  }
-
-  if (code === userErrorCodes.userExpiredAccessJWT) {
-    if (!getRefreshToken) {
-      throw new Error(
-        "The getRefreshToken parameter is not provided for the handleCustomError function in the helper.js file!"
-      );
-    }
-    getRefreshToken();
-    //navigate(`/viewer/refreshtoken/${getUserId()}`);
-  }
-};
-
 //
 // Jenkins "One-At-A-Time" hash function, more info:
 // https://en.wikipedia.org/wiki/Jenkins_hash_function
@@ -310,43 +277,60 @@ const createNotification = ({ title, message, type }) => {
   });
 };
 
+const errorCodePrefix = "$";
+
 const userErrorCodes = {
-  userNotFound: "$USER_NOT-FOUND",
-  userDeleteFirst: "$USER_DELETE-FIRST",
-  userAlreadyRestored: "$USER_ALREADY-RESTORED",
-  userEmptyUpdate: "$USER_EMPTY-UPDATE",
-  userEmailExists: "$USER_EXISTED-EMAIL",
-  userProtectionViolation: "$USER_PROTECTION-VIOLATION",
-  userInvalidPasswordFormat: "$USER_INVALID-PASSWORDFORMAT",
-  userInvalidEmailFormat: "$USER_INVALID-EMAILFORMAT",
-  userShouldReLogin: "$USER_SHOULD-RELOGIN",
-  userLoginBlocked: "$USER_LOGIN-BLOCKED",
-  userAlreadyBlocked: "$USER_ALREADY-BLOCKED",
-  userAlreadyUnBlocked: "$USER_ALREADY-UNBLOCKED",
-  userLoginFirst: "$USER_LOGIN-FIRST",
-  userWrongCredentials: "$USER_WRONG-CREDENTIALS",
-  userExpiredAccessJWT: "$USER_EXPIRED-ACCESSJWT",
-  userExpiredRefreshJWT: "$USER_EXPIRED-REFRESHJWT",
-  userInvalidAccessJWT: "$USER_INVALID-ACCESSJWT",
-  userInvalidRefreshJWT: "$USER_INVALID-REFRESHJWT",
-  userNoAccessJWT: "$USER_NO-ACCESSJWT",
-  userNoRefreshJWT: "$USER_NO-REFRESHJWT",
+  userNotFound: "USER_NOT-FOUND",
+  userDeleteFirst: "USER_DELETE-FIRST",
+  userAlreadyDeleted: "USER_ALREADY-DELETED",
+  userAlreadyRestored: "USER_ALREADY-RESTORED",
+  userEmptyUpdate: "USER_EMPTY-UPDATE",
+  userEmailExists: "USER_EXISTED-EMAIL",
+  userProtectionViolation: "USER_PROTECTION-VIOLATION",
+  userInvalidPasswordFormat: "USER_INVALID-PASSWORDFORMAT",
+  userInvalidEmailFormat: "USER_INVALID-EMAILFORMAT",
+  userShouldReLogin: "USER_SHOULD-RELOGIN",
+  userLoginBlocked: "USER_LOGIN-BLOCKED",
+  userAlreadyBlocked: "USER_ALREADY-BLOCKED",
+  userAlreadyUnBlocked: "USER_ALREADY-UNBLOCKED",
+  userLoginFirst: "USER_LOGIN-FIRST",
+  userWrongCredentials: "USER_WRONG-CREDENTIALS",
+  userExpiredAccessJWT: "USER_EXPIRED-ACCESSJWT",
+  userExpiredRefreshJWT: "USER_EXPIRED-REFRESHJWT",
+  userInvalidAccessJWT: "USER_INVALID-ACCESSJWT",
+  userInvalidRefreshJWT: "USER_INVALID-REFRESHJWT",
+  userNoAccessJWT: "USER_NO-ACCESSJWT",
+  userNoRefreshJWT: "USER_NO-REFRESHJWT",
 };
 
 const productErrorCodes = {
-  productNotFound: "$PRODUCT_NOT-FOUND",
-  productDeleteFirst: "$PRODUCT_DELETE-FIRST",
-  productAlreadyDeleted: "$PRODUCT_ALREADY-DELETED",
-  productAlreadyRestored: "$PRODUCT_ALREADY-RESTORED",
-  productEmptyUpdate: "$PRODUCT_EMPTY-UPDATE",
-  productExistedShortID: "$PRODUCT_EXISTED-SHORTID",
+  productNotFound: "PRODUCT_NOT-FOUND",
+  productDeleteFirst: "PRODUCT_DELETE-FIRST",
+  productAlreadyDeleted: "PRODUCT_ALREADY-DELETED",
+  productAlreadyRestored: "PRODUCT_ALREADY-RESTORED",
+  productEmptyUpdate: "PRODUCT_EMPTY-UPDATE",
+  productExistedShortID: "PRODUCT_EXISTED-SHORTID",
+};
+
+const validateInput = (input, UIText) => {
+  const validationPattern = new RegExp(/[\[\]\\\(\)*+]/gi);
+  if (validationPattern.test(input)) {
+    const wrongCharacter = input[input.length - 1];
+    createNotification({
+      title: `${UIText.wrongCharacter}: ` + wrongCharacter,
+      message: `${UIText.wrongCharacters}: ` + "[ ] ( ) * +",
+      type: "warning",
+    });
+    input = input.replace(validationPattern, "");
+  }
+  console.log("valid input:", input);
+  return input;
 };
 
 export {
   isSet,
   isLoggedIn,
   getUserId,
-  handleCustomError,
   translate,
   getDict,
   createDict,
@@ -358,4 +342,6 @@ export {
   getErrorMessageCode,
   productErrorCodes,
   userErrorCodes,
+  errorCodePrefix,
+  validateInput,
 };

@@ -124,10 +124,11 @@ export default {
         throw err;
       }
     },
-    user: async (parent, { id }) => {
+    user: async (parent, { id }, { req }) => {
+      const lang = req.headers.language || "en";
       const user = await User.findById(id);
       if (!user) {
-        throw userNotFound_Error();
+        throw userNotFound_Error(lang);
       }
       // this is same -> migrate to a function
       return {
@@ -137,10 +138,11 @@ export default {
         updatedAt: formatDate(user.updatedAt),
       };
     },
-    viewer: async (parent, args, { user: userCtx }) => {
+    viewer: async (parent, args, { user: userCtx, req }) => {
+      const lang = req.headers.language || "en";
       const user = await User.findById(userCtx.sub);
       if (!user) {
-        throw userNotFound_Error();
+        throw userNotFound_Error(lang);
       }
       return user;
     },
@@ -224,9 +226,10 @@ export default {
     createUser: async (
       parent,
       { username, email, password, permissions },
-      { user: userCtx }
+      { user: userCtx, req }
     ) => {
       try {
+        const lang = req.headers.language || "en";
         checkPWRegex(password);
         checkEmailRegex(email);
         const hashedPassword = await bcrypt.hash(password, 12);
@@ -267,12 +270,13 @@ export default {
       }
     },
 
-    updateUser: async (parent, { id, email }, { user: userCtx }) => {
+    updateUser: async (parent, { id, email }, { user: userCtx, req }) => {
       try {
+        const lang = req.headers.language || "en";
         checkEmailRegex(email);
         let user = await User.findById(id);
         if (!user) {
-          throw userNotFound_Error();
+          throw userNotFound_Error(lang);
         }
         const fieldsToUpdate = {};
         const fieldsToLog = {};
@@ -296,7 +300,7 @@ export default {
             });
             // create the log entry
             await userLog.save();
-            throw userEmailAlreadyExist_Error();
+            throw userEmailAlreadyExist_Error(lang);
           }
 
           changes = true;
@@ -330,7 +334,7 @@ export default {
         }
 
         // if there is no changes
-        throw userNotChanged_Error();
+        throw userNotChanged_Error(lang);
       } catch (err) {
         throw err;
       }
@@ -339,11 +343,12 @@ export default {
     updatePermission: async (
       parent,
       { id, permissions: newPermissions },
-      { user: userCtx }
+      { user: userCtx, req }
     ) => {
+      const lang = req.headers.language || "en";
       const user = await User.findById(id);
       if (!user) {
-        throw userNotFound_Error();
+        throw userNotFound_Error(lang);
       }
 
       // START Add permissions
@@ -377,7 +382,7 @@ export default {
         });
         console.log(userLog);
         await userLog.save();
-        throw userNotChanged_Error();
+        throw userNotChanged_Error(lang);
       }
 
       const fieldsToLog = {};
@@ -402,11 +407,12 @@ export default {
       return user.id;
     },
 
-    softDeleteUser: async (parent, { id }, { user: userCtx }) => {
+    softDeleteUser: async (parent, { id }, { user: userCtx, req }) => {
       try {
+        const lang = req.headers.language || "en";
         const user = await User.findById(id);
         if (!user) {
-          throw userNotFound_Error();
+          throw userNotFound_Error(lang);
         }
         if (user.permissions.includes(PERMS.protected)) {
           const userLog = new UserLog({
@@ -420,7 +426,7 @@ export default {
           throw userIsProtected();
         }
         if (!user.valid) {
-          throw userAlreadySoftDeleted_Error();
+          throw userAlreadySoftDeleted_Error(lang);
         }
         await user.update({
           valid: false,
@@ -441,14 +447,15 @@ export default {
         throw err;
       }
     },
-    restoreSoftDeleteUser: async (parent, { id }, { user: userCtx }) => {
+    restoreSoftDeleteUser: async (parent, { id }, { user: userCtx, req }) => {
       try {
+        const lang = req.headers.language || "en";
         const user = await User.findById(id);
         if (!user) {
-          throw userNotFound_Error();
+          throw userNotFound_Error(lang);
         }
         if (user.valid) {
-          throw userAlreadyValid_Error();
+          throw userAlreadyValid_Error(lang);
         }
         await user.update({ valid: true, createdBy: userCtx.sub });
         const userLog = new UserLog({
@@ -464,11 +471,12 @@ export default {
         throw err;
       }
     },
-    deleteUser: async (parent, { id }, { user: userCtx }) => {
+    deleteUser: async (parent, { id }, { user: userCtx, req }) => {
       try {
+        const lang = req.headers.language || "en";
         const user = await User.findById(id);
         if (!user) {
-          throw userNotFound_Error();
+          throw userNotFound_Error(lang);
         }
         if (user.permissions.includes(PERMS.protected)) {
           const userLog = new UserLog({
@@ -482,7 +490,7 @@ export default {
           throw userIsProtected();
         }
         if (user.valid) {
-          throw userSoftDeleteFirst_Error();
+          throw userSoftDeleteFirst_Error(lang);
         }
         await user.delete();
         const userLog = new UserLog({
@@ -501,11 +509,12 @@ export default {
     changePassword: async (
       parent,
       { id, currentPassword, newPassword },
-      { user: userCtx }
+      { user: userCtx, req }
     ) => {
+      const lang = req.headers.language || "en";
       const user = await User.findOne({ _id: id, valid: true });
       if (!user) {
-        throw userNotFound_Error();
+        throw userNotFound_Error(lang);
       }
       checkPWRegex(newPassword);
       const isPWCorrect = await bcrypt.compare(currentPassword, user.password);
@@ -515,7 +524,7 @@ export default {
             "PW is incorrect BUT THIS MESSAGE ONLY FOR DEVELOPMENT!"
           );
         } else {
-          throw userWrongEmailOrPass_Error();
+          throw userWrongEmailOrPass_Error(lang);
         }
       }
       const hashedPassword = await bcrypt.hash(newPassword, 12);
@@ -523,16 +532,17 @@ export default {
       return user.id;
     },
 
-    blockUser: async (parent, { id }, { user: userCtx }) => {
+    blockUser: async (parent, { id }, { user: userCtx, req }) => {
+      const lang = req.headers.language || "en";
       const user = await User.findById(id);
       if (!user) {
-        throw userNotFound_Error();
+        throw userNotFound_Error(lang);
       }
       if (user.permissions.includes(PERMS.protected)) {
         throw userIsProtected();
       }
       if (!user.canLogin) {
-        throw userAlreadyBlocked_Error();
+        throw userAlreadyBlocked_Error(lang);
       }
       await user.update({
         shouldUserReLogin: true,
@@ -554,16 +564,17 @@ export default {
       return user.id;
     },
 
-    unblockUser: async (parent, { id }, { user: userCtx }) => {
+    unblockUser: async (parent, { id }, { user: userCtx, req }) => {
+      const lang = req.headers.language || "en";
       const user = await User.findById(id);
       if (!user) {
-        throw userNotFound_Error();
+        throw userNotFound_Error(lang);
       }
       if (user.permissions.includes(PERMS.protected)) {
         throw userIsProtected();
       }
       if (user.canLogin) {
-        throw userAlreadyUnblocked_Error();
+        throw userAlreadyUnblocked_Error(lang);
       }
       await user.update({ canLogin: true });
 
@@ -578,13 +589,14 @@ export default {
       return user.id;
     },
 
-    login: async (parent, { email, password }) => {
+    login: async (parent, { email, password }, { req }) => {
+      const lang = req.headers.language || "en";
       const user = await User.findOne({ email: email, valid: true });
       if (!user) {
-        throw userNotFound_Error();
+        throw userNotFound_Error(lang);
       }
       if (!user.canLogin) {
-        throw userLoginBlocked_Error();
+        throw userLoginBlocked_Error(lang);
       }
       const isPWCorrect = await bcrypt.compare(password, user.password);
       if (!isPWCorrect) {
@@ -593,7 +605,7 @@ export default {
             "PW is incorrect BUT THIS MESSAGE ONLY FOR DEVELOPMENT!"
           );
         } else {
-          throw userWrongEmailOrPass_Error();
+          throw userWrongEmailOrPass_Error(lang);
         }
       }
 
@@ -605,7 +617,7 @@ export default {
       });
       return [accessToken, refreshToken];
     },
-    invalidateTokens: async (_, __, { user: userCtx }) => {
+    invalidateTokens: async (_, __, { user: userCtx, req }) => {
       // is it like a logout mutation?
       if (!userCtx || !userCtx.sub) {
         return false;
@@ -617,9 +629,10 @@ export default {
     refreshToken: async (parent, args, { req }) => {
       // TODO: refresh token, Cookie management? -> Client side cookies
       console.log(req);
+      const lang = req.headers.language || "en";
       let refreshToken = req.headers.refreshtoken;
       if (!refreshToken) {
-        throw userNoRefreshJWT_Error();
+        throw userNoRefreshJWT_Error(lang);
       }
 
       let verifiedTokenData = null;
@@ -633,7 +646,7 @@ export default {
         if (err.message === "jwt expired") {
           console.log("refresh token expired");
           // return the user context and check in the permissions file
-          throw userExpiredRefreshJWT_Error();
+          throw userExpiredRefreshJWT_Error(lang);
         }
         if (err.message === "jwt must be provided") {
           console.log("there is no refresh token or wrong format");
@@ -641,16 +654,16 @@ export default {
           return;
         }
         console.log(err);
-        throw userInvalidRefreshJWT_Error();
+        throw userInvalidRefreshJWT_Error(lang);
       }
 
       const user = await User.findById(verifiedTokenData.sub);
       if (!user) {
-        throw new userNotFound_Error();
+        throw new userNotFound_Error(lang);
       }
 
       if (user.CFT !== verifiedTokenData[process.env.JWT_TOKEN_SCOPE].CFT) {
-        throw userExpiredRefreshJWT_Error();
+        throw userExpiredRefreshJWT_Error(lang);
       }
 
       await revokeTokens(user.id);

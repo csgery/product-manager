@@ -12,13 +12,12 @@ import {
   GET_VALIDPRODUCTS,
   GET_DELETEDPRODUCTS,
 } from "../../queries/productQueries";
-import { handleCustomError } from "../../helper/helper";
 import { useNavigate } from "react-router-dom";
-import { RefreshTokenMutationContext } from "../../pages/TokenWrapper";
 import { DarkModeContext, LangContext } from "../../App";
 import { TbTrash, TbTrashOff } from "react-icons/tb";
 import { GrClose, GrCheckmark } from "react-icons/gr";
 import { MdOutlineDoneOutline, MdOutlineCancel } from "react-icons/md";
+import useCustomError from "../../helper/hooks/useCustomError";
 
 export default function ProductUserModal({
   bind = "product",
@@ -40,10 +39,11 @@ export default function ProductUserModal({
   // const [getDeletedProducts, { data: deletedProducts_data }] =
   //   useLazyQuery(GET_DELETEDPRODUCTS);
 
-  const getRefreshToken = useContext(RefreshTokenMutationContext);
   const darkMode = useContext(DarkModeContext);
 
   const navigate = useNavigate();
+
+  const [handleCustomError] = useCustomError();
 
   const [show, setShow] = useState(false);
 
@@ -132,7 +132,7 @@ export default function ProductUserModal({
         try {
           await deleteProduct({ variables: { id: item[0] } });
         } catch (err) {
-          handleCustomError(err, navigate, getRefreshToken);
+          handleCustomError(err);
         }
       }
       // itemIdsNamesToProcess.forEach((item) => {
@@ -145,7 +145,7 @@ export default function ProductUserModal({
         try {
           await restoreDeletedProduct({ variables: { id: item[0] } });
         } catch (err) {
-          handleCustomError(err, navigate, getRefreshToken);
+          handleCustomError(err);
         }
       }
       // itemIdsNamesToProcess.forEach((item) => {
@@ -158,7 +158,7 @@ export default function ProductUserModal({
         try {
           await removeProduct({ variables: { id: item[0] } });
         } catch (err) {
-          handleCustomError(err, navigate, getRefreshToken);
+          handleCustomError(err);
         }
       }
       // itemIdsNamesToProcess.forEach((item) => {

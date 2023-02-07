@@ -6,14 +6,13 @@ import Product from "./Product";
 import ProductUserModal from "./modals/ProductUserModal";
 import { GET_DELETEDPRODUCTS } from "../queries/productQueries";
 import { Button } from "react-bootstrap";
-import { RefreshTokenMutationContext } from "../pages/TokenWrapper";
-import { handleCustomError } from "../helper/helper";
 import { UITextContext } from "./TranslationWrapper";
 import { BiSelectMultiple } from "react-icons/bi";
 import { GrClose } from "react-icons/gr";
 import { TbTrash, TbTrashOff } from "react-icons/tb";
 import { IconModeContext } from "../App";
 import Searchbar from "./Searchbar";
+import useCustomError from "../helper/hooks/useCustomError";
 
 export default function ProductsDeleted() {
   const { loading, error, data } = useQuery(GET_DELETEDPRODUCTS);
@@ -24,8 +23,8 @@ export default function ProductsDeleted() {
   );
   const [deletedProducts, setDeletedProducts] = useState([]);
 
-  const navigate = useNavigate();
-  const getRefreshToken = useContext(RefreshTokenMutationContext);
+  const [handleCustomError] = useCustomError();
+
   const UIText = useContext(UITextContext);
   const iconMode = useContext(IconModeContext);
 
@@ -102,7 +101,7 @@ export default function ProductsDeleted() {
   if (loading) return <Spinner />;
 
   if (error) {
-    handleCustomError(error, navigate, getRefreshToken);
+    handleCustomError(error);
   }
 
   console.log(data);
