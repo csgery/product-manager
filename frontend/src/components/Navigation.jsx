@@ -63,8 +63,8 @@ export default function Navigation({
                     <Nav.Link onClick={() => handleNavigate("/users")}>
                       {UIText.users}
                     </Nav.Link>
-                    <Nav.Link onClick={() => handleNavigate("/testdict")}>
-                      TEST DICT OLD!
+                    <Nav.Link onClick={() => handleNavigate("/users/deleted")}>
+                      {UIText.deletedUsers}
                     </Nav.Link>
                   </>
                 )}

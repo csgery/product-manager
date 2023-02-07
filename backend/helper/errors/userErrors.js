@@ -63,6 +63,15 @@ const userEmailAlreadyExist_Error = async (lang) =>
       extensions: { code: -26 },
     }
   );
+const userUsernameAlreadyExist_Error = async (lang) =>
+  new GraphQLError(
+    (await translateError("This username is already exist!", lang)) +
+      prefix +
+      errorCodes.userUsernameExists,
+    {
+      extensions: { code: -26 },
+    }
+  );
 const userIsProtected = async (lang) =>
   new GraphQLError(
     (await translateError(
@@ -212,6 +221,7 @@ export {
   userAlreadyValid_Error,
   userNotChanged_Error,
   userEmailAlreadyExist_Error,
+  userUsernameAlreadyExist_Error,
   userIsProtected,
   userPWRegex_Error,
   userEmailRegex_Error,

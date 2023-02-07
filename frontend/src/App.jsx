@@ -12,6 +12,9 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import ProductsPage from "./pages/ProductsPage";
 import DeletedProductsPage from "./pages/DeletedProductsPage";
 import ProductPage from "./pages/ProductPage";
+import UsersPage from "./pages/UsersPage";
+import DeletedUsersPage from "./pages/DeletedUsersPage";
+import UserPage from "./pages/UserPage";
 import LoginPage from "./pages/LoginPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import Navigation from "./components/Navigation";
@@ -97,6 +100,16 @@ function App() {
             },
           },
           deletedProducts: {
+            merge(existing, incoming) {
+              return incoming;
+            },
+          },
+          validUsers: {
+            merge(existing, incoming) {
+              return incoming;
+            },
+          },
+          deletedUsers: {
             merge(existing, incoming) {
               return incoming;
             },
@@ -208,6 +221,14 @@ function App() {
                           <Route
                             path="deleted"
                             element={<DeletedProductsPage />}
+                          />
+                        </Route>
+                        <Route path="/users">
+                          <Route path="" element={<UsersPage />} />
+                          <Route path=":id" element={<UserPage />} />
+                          <Route
+                            path="deleted"
+                            element={<DeletedUsersPage />}
                           />
                         </Route>
                         <Route path="/viewer/:id" element={<ViewerPage />} />

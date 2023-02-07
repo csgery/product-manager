@@ -35,4 +35,34 @@ const GET_USER = gql`
   }
 `;
 
-export { VIEWER, GET_USER };
+const GET_VALIDUSERS = gql`
+  query ValidUsers {
+    validUsers {
+      id
+      username
+      email
+      permissions
+      createdBy
+      shouldUserReLogin
+      canLogin
+      valid
+    }
+  }
+`;
+
+const GET_DELETEDUSERS = gql`
+  query DeletedUsers {
+    deletedUsers {
+      id
+      username
+      email
+      permissions
+      createdBy
+      shouldUserReLogin
+      canLogin
+      valid
+    }
+  }
+`;
+
+export { VIEWER, GET_USER, GET_VALIDUSERS, GET_DELETEDUSERS };

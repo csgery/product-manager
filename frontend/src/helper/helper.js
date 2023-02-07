@@ -312,8 +312,7 @@ const productErrorCodes = {
   productExistedShortID: "PRODUCT_EXISTED-SHORTID",
 };
 
-const validateInput = (input, UIText) => {
-  const validationPattern = new RegExp(/[\[\]\\\(\)*+]/gi);
+const validateInput = (input, UIText, validationPattern) => {
   if (validationPattern.test(input)) {
     const wrongCharacter = input[input.length - 1];
     createNotification({
@@ -325,6 +324,26 @@ const validateInput = (input, UIText) => {
   }
   console.log("valid input:", input);
   return input;
+};
+
+const validateProductInput = (input, UIText) => {
+  const validationPattern = new RegExp(/[\[\]\\\(\)*+]/gi);
+  return validateInput(input, UIText, validationPattern);
+};
+
+const validateUserEmailInput = (input, UIText) => {
+  const validationPattern = new RegExp(/[\[\]\\\(\)*+]/gi);
+  return validateInput(input, UIText, validationPattern);
+};
+
+const validateUserUsernameInput = (input, UIText) => {
+  const validationPattern = new RegExp(/[\[\]\\\(\)*+]/gi);
+  return validateInput(input, UIText, validationPattern);
+};
+
+const validateUserPasswordInput = (input, UIText) => {
+  const validationPattern = new RegExp(/[\[\]\\\(\)*+]/gi);
+  return validateInput(input, UIText, validationPattern);
 };
 
 export {
@@ -343,5 +362,8 @@ export {
   productErrorCodes,
   userErrorCodes,
   errorCodePrefix,
-  validateInput,
+  validateProductInput,
+  validateUserEmailInput,
+  validateUserUsernameInput,
+  validateUserPasswordInput,
 };

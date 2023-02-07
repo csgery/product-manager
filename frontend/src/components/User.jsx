@@ -7,8 +7,8 @@ import { IconModeContext } from "../App";
 
 import { LangContext } from "../App";
 
-export default function Product({
-  product,
+export default function User({
+  user,
   showDeleteCBs = false,
   setDeleteCBChecked,
   setIdsNamesToDelete,
@@ -42,7 +42,7 @@ export default function Product({
   }, [setDeleteCBChecked]);
 
   const handleNavigate = () => {
-    if (!showDeleteCBs) navigate(`/products/${product.id}`, { replace: true });
+    if (!showDeleteCBs) navigate(`/users/${user.id}`, { replace: true });
   };
 
   const stopPropagation = (e) => {
@@ -80,13 +80,13 @@ export default function Product({
       console.log("add id");
       setIdsNamesToDelete((oldIdsNamesToDelete) => [
         ...oldIdsNamesToDelete,
-        [product.id, product.name, product.shortId],
+        [user.id, user.username, user.email],
       ]);
     } else {
       console.log("delete id");
       setIdsNamesToDelete((oldIdsNamesToDelete) => {
         const modifiedValues = oldIdsNamesToDelete.filter(
-          (item) => item[0] != product.id
+          (item) => item[0] != user.id
         );
         return modifiedValues;
       });
@@ -115,61 +115,50 @@ export default function Product({
             ref={checkbox}
           />
         )}
-        <h5 className="card-title">{product.name}</h5>
-        <h6 className="card-subtitle mb-2 ">{product.shortId}</h6>
-        <p className="card-text">
-          Description: Some quick example text to build on the card title and
-          make up the bulk of the card's content.
-        </p>
-        <p className="card-text">Quantity: {product.quantity}</p>
+        <h5 className="card-title">{user.username}</h5>
+        <h6 className="card-subtitle mb-2 ">{user.email}</h6>
 
         {!showDeleteCBs && (
           <>
-            {product.valid ? (
+            {user.valid ? (
               <ProductUserModal
-                bind="product"
+                bind="user"
                 iconMode={iconMode}
-                itemIdsNamesToProcess={[
-                  [product.id, product.name, product.shortId],
-                ]}
+                itemIdsNamesToProcess={[[user.id, user.username, user.email]]}
                 areThereMultipleProducts={false}
                 modalType="Delete"
                 deleteBTNClass="btn btn-danger p-2 me-2"
                 didItemComeFromItself={true}
-                modalTitle={UIText.deleteProductTitle}
-                modalText={UIText.deleteProductText}
+                modalTitle={UIText.deleteUserTitle}
+                modalText={UIText.deleteUserText}
                 modalButtonText={UIText.deleteButtonText}
                 modalCloseButtonText={UIText.closeButtonText}
               />
             ) : (
               <>
                 <ProductUserModal
-                  bind="product"
+                  bind="user"
                   iconMode={iconMode}
-                  itemIdsNamesToProcess={[
-                    [product.id, product.name, product.shortId],
-                  ]}
+                  itemIdsNamesToProcess={[[user.id, user.username, user.email]]}
                   areThereMultipleProducts={false}
                   modalType="Remove"
                   deleteBTNClass="btn btn-danger p-2 me-2"
                   didItemComeFromItself={true}
-                  modalTitle={UIText.removeProductTitle}
-                  modalText={UIText.removeProductText}
+                  modalTitle={UIText.removeUserTitle}
+                  modalText={UIText.removeUserText}
                   modalButtonText={UIText.removeButtonText}
                   modalCloseButtonText={UIText.closeButtonText}
                 />
                 <ProductUserModal
-                  bind="product"
+                  bind="user"
                   iconMode={iconMode}
-                  itemIdsNamesToProcess={[
-                    [product.id, product.name, product.shortId],
-                  ]}
+                  itemIdsNamesToProcess={[[user.id, user.username, user.email]]}
                   areThereMultipleProducts={false}
                   modalType="Restore"
                   deleteBTNClass="btn btn-danger p-2 me-2"
                   didItemComeFromItself={true}
-                  modalTitle={UIText.restoreProductTitle}
-                  modalText={UIText.restoreProductText}
+                  modalTitle={UIText.restoreUserTitle}
+                  modalText={UIText.restoreUserText}
                   modalButtonText={UIText.restoreButtonText}
                   modalCloseButtonText={UIText.closeButtonText}
                 />
