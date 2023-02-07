@@ -20,7 +20,6 @@ import ViewerPage from "./pages/ViewerPage";
 import DictTest from "./components/DictTest";
 import { useConfigClient } from "./helper/useConfigHeader";
 import { onError } from "@apollo/client/link/error";
-import TokenWrapper from "./pages/TokenWrapper";
 import TranslationWrapper from "./components/TranslationWrapper";
 // import RefreshTokenPage from "./pages/RefreshTokenPage";
 import { ReactNotifications } from "react-notifications-component";
@@ -29,6 +28,7 @@ import "react-notifications-component/dist/theme.css";
 export const DarkModeContext = createContext();
 export const LangContext = createContext();
 export const IconModeContext = createContext();
+export const TokensContext = createContext();
 
 function App() {
   const [lang, setLang] = useState(localStorage.getItem("lang") || "en");
@@ -184,9 +184,8 @@ function App() {
   return (
     <ApolloProvider client={client}>
       <ReactNotifications />
-      <TokenWrapper
-        setAccessTokenStorage={setAccessTokenStorage}
-        setRefreshTokenStorage={setRefreshTokenStorage}
+      <TokensContext.Provider
+        value={[setAccessTokenStorage, setRefreshTokenStorage]}
       >
         <DarkModeContext.Provider value={darkMode}>
           <LangContext.Provider value={lang}>
@@ -251,7 +250,7 @@ function App() {
             </IconModeContext.Provider>
           </LangContext.Provider>
         </DarkModeContext.Provider>
-      </TokenWrapper>
+      </TokensContext.Provider>
       {/* <nav class="navbar fixed-bottom bg-body-tertiary">
         <div class="container-fluid">
           <a class="navbar-brand" href="#">

@@ -166,6 +166,18 @@ function TranslationWrapper({ children }) {
       language: "Language",
       iconMode: "Icon Mode",
       settings: "Settings",
+      warning: "Warning!",
+      error: "Error!",
+      successfulOperation: "Successful Operation!",
+      successfullyUpdated: "Successfully Updated!",
+      successfullyCreated: "Successfully Created!",
+      successfullyDeleted: "Successfully Deleted!",
+      successfullyRemoved: "Successfully Removed!",
+      successfullyRestored: "Successfully Restored!",
+      fillOutAllField: "Please fill out all fields!",
+      quantityTooLarge: "Quantity is larger than 1000!",
+
+      // some frontend validation
     };
     const fetchMoreData = async () => {
       //console.log(await getMoreText(UITextToTranslate));

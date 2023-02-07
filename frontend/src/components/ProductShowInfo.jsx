@@ -77,8 +77,13 @@ export default function ProductShowInfo() {
       {console.log("data:", data)}
       {!loading && !error && data && (
         <>
+          {" "}
+          {/* 'card mx-1 px-01 mb-2 product' */}
           <div
-            className="card mx-auto w-75 px-1 mt-4"
+            className={
+              (!data.product.valid ? "deletedProduct-card " : "") +
+              "card mx-auto w-75 px-1 mt-4 "
+            }
             style={{ width: "18rem" }}
           >
             <div className="card-body">
@@ -216,7 +221,6 @@ export default function ProductShowInfo() {
               )}
             </div>
           </div>
-
           {data.product.valid && toggleEditForm && (
             <ProductEditForm
               product={data.product}

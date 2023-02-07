@@ -180,37 +180,39 @@ const translateError = async (errorMessage, lang) => {
   return result;
 };
 
+const errorCodePrefix = "$";
+
 const userErrorCodes = {
-  userNotFound: "$USER_NOT-FOUND",
-  userDeleteFirst: "$USER_DELETE-FIRST",
-  userAlreadyDeleted: "$USER_ALREADY-DELETED",
-  userAlreadyRestored: "$USER_ALREADY-RESTORED",
-  userEmptyUpdate: "$USER_EMPTY-UPDATE",
-  userEmailExists: "$USER_EXISTED-EMAIL",
-  userProtectionViolation: "$USER_PROTECTION-VIOLATION",
-  userInvalidPasswordFormat: "$USER_INVALID-PASSWORDFORMAT",
-  userInvalidEmailFormat: "$USER_INVALID-EMAILFORMAT",
-  userShouldReLogin: "$USER_SHOULD-RELOGIN",
-  userLoginBlocked: "$USER_LOGIN-BLOCKED",
-  userAlreadyBlocked: "$USER_ALREADY-BLOCKED",
-  userAlreadyUnBlocked: "$USER_ALREADY-UNBLOCKED",
-  userLoginFirst: "$USER_LOGIN-FIRST",
-  userWrongCredentials: "$USER_WRONG-CREDENTIALS",
-  userExpiredAccessJWT: "$USER_EXPIRED-ACCESSJWT",
-  userExpiredRefreshJWT: "$USER_EXPIRED-REFRESHJWT",
-  userInvalidAccessJWT: "$USER_INVALID-ACCESSJWT",
-  userInvalidRefreshJWT: "$USER_INVALID-REFRESHJWT",
-  userNoAccessJWT: "$USER_NO-ACCESSJWT",
-  userNoRefreshJWT: "$USER_NO-REFRESHJWT",
+  userNotFound: "USER_NOT-FOUND",
+  userDeleteFirst: "USER_DELETE-FIRST",
+  userAlreadyDeleted: "USER_ALREADY-DELETED",
+  userAlreadyRestored: "USER_ALREADY-RESTORED",
+  userEmptyUpdate: "USER_EMPTY-UPDATE",
+  userEmailExists: "USER_EXISTED-EMAIL",
+  userProtectionViolation: "USER_PROTECTION-VIOLATION",
+  userInvalidPasswordFormat: "USER_INVALID-PASSWORDFORMAT",
+  userInvalidEmailFormat: "USER_INVALID-EMAILFORMAT",
+  userShouldReLogin: "USER_SHOULD-RELOGIN",
+  userLoginBlocked: "USER_LOGIN-BLOCKED",
+  userAlreadyBlocked: "USER_ALREADY-BLOCKED",
+  userAlreadyUnBlocked: "USER_ALREADY-UNBLOCKED",
+  userLoginFirst: "USER_LOGIN-FIRST",
+  userWrongCredentials: "USER_WRONG-CREDENTIALS",
+  userExpiredAccessJWT: "USER_EXPIRED-ACCESSJWT",
+  userExpiredRefreshJWT: "USER_EXPIRED-REFRESHJWT",
+  userInvalidAccessJWT: "USER_INVALID-ACCESSJWT",
+  userInvalidRefreshJWT: "USER_INVALID-REFRESHJWT",
+  userNoAccessJWT: "USER_NO-ACCESSJWT",
+  userNoRefreshJWT: "USER_NO-REFRESHJWT",
 };
 
 const productErrorCodes = {
-  productNotFound: "$PRODUCT_NOT-FOUND",
-  productDeleteFirst: "$PRODUCT_DELETE-FIRST",
-  productAlreadyDeleted: "$PRODUCT_ALREADY-DELETED",
-  productAlreadyRestored: "$PRODUCT_ALREADY-RESTORED",
-  productEmptyUpdate: "$PRODUCT_EMPTY-UPDATE",
-  productExistedShortID: "$PRODUCT_EXISTED-SHORTID",
+  productNotFound: "PRODUCT_NOT-FOUND",
+  productDeleteFirst: "PRODUCT_DELETE-FIRST",
+  productAlreadyDeleted: "PRODUCT_ALREADY-DELETED",
+  productAlreadyRestored: "PRODUCT_ALREADY-RESTORED",
+  productEmptyUpdate: "PRODUCT_EMPTY-UPDATE",
+  productExistedShortID: "PRODUCT_EXISTED-SHORTID",
 };
 
 export {
@@ -223,4 +225,5 @@ export {
   translateError,
   userErrorCodes,
   productErrorCodes,
+  errorCodePrefix,
 };

@@ -4,7 +4,7 @@ import { IconModeContext } from "../App";
 import { Store } from "react-notifications-component";
 import Dropdown from "react-bootstrap/Dropdown";
 import { BsGear } from "react-icons/bs";
-import { createNotification } from "../helper/helper";
+import { createNotification, validateInput } from "../helper/helper";
 
 function Searchbar({ setItemsToView, allItemsFromDB }) {
   const [searchbarValue, setSearchbarValue] = useState("");
@@ -47,16 +47,7 @@ function Searchbar({ setItemsToView, allItemsFromDB }) {
 
   const handleSearchChange = (value) => {
     // characters that cause regex error: [ ] \ ( ) * +
-    const validationPattern = new RegExp(/[\[\]\\\(\)*+]/gi);
-    if (validationPattern.test(value)) {
-      const wrongCharacter = value[value.length - 1];
-      createNotification({
-        title: `${UIText.wrongCharacter}: ` + wrongCharacter,
-        message: `${UIText.wrongCharacters}: ` + "[ ] ( ) * +",
-        type: "warning",
-      });
-      value = value.replace(validationPattern, "");
-    }
+    value = validateInput(value, UIText);
     setSearchbarValue(() => value);
     const fieldToSearchIn = searchInBTN; // later implement: name or shortId
 
