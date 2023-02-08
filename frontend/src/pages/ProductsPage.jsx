@@ -1,4 +1,4 @@
-import ProductsValid from "../components/ProductsValid";
+import ProductsValid from "../components/product/ProductsValid";
 
 export default function ProductsPage() {
   return <ProductsValid />;

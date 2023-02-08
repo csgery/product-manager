@@ -1,11 +1,11 @@
-import ProductUserModal from "./modals/ProductUserModal";
+import ProductUserModal from "../modals/ProductUserModal";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState, useRef, useCallback, useContext } from "react";
 import { TbTrash, TbTrashOff } from "react-icons/tb";
-import { UITextContext } from "./TranslationWrapper";
-import { IconModeContext } from "../App";
+import { UITextContext } from "../TranslationWrapper";
+import { IconModeContext } from "../../App";
 
-import { LangContext } from "../App";
+import { LangContext } from "../../App";
 
 export default function User({
   user,

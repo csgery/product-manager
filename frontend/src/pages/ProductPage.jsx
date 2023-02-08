@@ -1,4 +1,4 @@
-import ProductShowInfo from "../components/ProductShowInfo";
+import ProductShowInfo from "../components/product/ProductShowInfo";
 
 export default function ProductPage() {
   return <ProductShowInfo />;

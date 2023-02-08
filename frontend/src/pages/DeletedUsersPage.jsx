@@ -1,4 +1,4 @@
-import UsersDeleted from "../components/UsersDeleted";
+import UsersDeleted from "../components/user/UsersDeleted";
 
 export default function ProductsPage() {
   return <UsersDeleted />;

@@ -1,32 +1,29 @@
-import { useState, useEffect, useContext, useCallback } from "react";
+import { useState, useEffect, useContext } from "react";
 import { useQuery } from "@apollo/client";
-import Spinner from "./Spinner";
-import User from "./User";
-import UserCreateModal from "./modals/UserCreateModal";
-import ProductUserModal from "./modals/ProductUserModal";
-import { GET_VALIDUSERS } from "../queries/userQueries";
+import Spinner from "../Spinner";
+import Product from "./Product";
+import ProductCreateModal from "../modals/ProductCreateModal";
+import ProductUserModal from "../modals/ProductUserModal";
+import { GET_VALIDPRODUCTS } from "../../queries/productQueries";
 import { Button } from "react-bootstrap";
-import useCustomError from "../helper/hooks/useCustomError";
+import useCustomError from "../../helper/hooks/useCustomError";
 import { useNavigate } from "react-router-dom";
-import { DarkModeContext } from "../App";
-import { UITextContext } from "./TranslationWrapper";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTrashCan, faTrashAlt } from "@fortawesome/free-regular-svg-icons";
-import { TbTrash, TbCirclePlus } from "react-icons/tb";
-import { ImCancelCircle } from "react-icons/im";
+import { DarkModeContext } from "../../App";
+import { UITextContext } from "../TranslationWrapper";
+import { TbTrash } from "react-icons/tb";
 import { GrClose } from "react-icons/gr";
 import { BiSelectMultiple } from "react-icons/bi";
-import { IconModeContext } from "../App";
-import Searchbar from "./Searchbar";
+import { IconModeContext } from "../../App";
+import Searchbar from "../Searchbar";
 
-export default function UsersValid() {
-  const { loading, error, data } = useQuery(GET_VALIDUSERS);
+export default function ProductsDeleted() {
+  const { loading, error, data } = useQuery(GET_VALIDPRODUCTS);
   const [showDeleteCBs, setShowDeleteCBs] = useState(false);
   const [idsNamesToDelete, setIdsNamesToDelete] = useState([]);
   const [deleteBTNClass, setDeleteBTNClass] = useState(
     "btn btn-danger p-2 ms-1 me-2 mb-2 disabled"
   );
-  const [validUsers, setValidUsers] = useState([]);
+  const [validProducts, setValidProducts] = useState([]);
 
   const [handleCustomError] = useCustomError();
 
@@ -36,11 +33,11 @@ export default function UsersValid() {
   const darkMode = useContext(DarkModeContext);
 
   useEffect(() => {
-    if (data && data.validUsers) {
+    if (data && data.validProducts) {
       // If validProducts's changed(because delete, restore or remove something) change the view data
-      setValidUsers(data.validUsers);
+      setValidProducts(data.validProducts);
     }
-  }, [data?.validUsers]);
+  }, [data?.validProducts]);
 
   useEffect(() => {
     console.log(idsNamesToDelete);
@@ -67,46 +64,46 @@ export default function UsersValid() {
     handleCustomError(error);
   }
 
-  const handleSelectAllUsers = () => {
+  const handleSelectAllProducts = () => {
     // if idsNamesToDelete contains ALL of the actual elements from validProducts view -> remove them from idsNamesToDelete
 
     // loop through validProducts
     // if validProduct is in the deletedProducts then add +1 to a counter
     // after the loop if counter == validProducts.length -> it means all of the validProducts has already in the deletedProducts -> remove them from the deletedProducts
     let counter = 0;
-    validUsers.forEach((item) => {
-      const user = idsNamesToDelete.find(
+    validProducts.forEach((item) => {
+      const product = idsNamesToDelete.find(
         (idNameToDelete) => idNameToDelete[0] === item.id
       );
-      if (user) {
+      if (product) {
         counter++;
       }
     });
-    if (counter === validUsers.length) {
+    if (counter === validProducts.length) {
       // console.log(
       //   "all validProducts have already in the idsNamesToDelete list, REMOVE THEM!"
       // );
 
-      validUsers.forEach((validUser) => {
+      validProducts.forEach((validProduct) => {
         setIdsNamesToDelete((oldIdsNamesToDelete) =>
           oldIdsNamesToDelete.filter(
-            (idNameToDelete) => validUser.id !== idNameToDelete[0]
+            (idNameToDelete) => validProduct.id !== idNameToDelete[0]
           )
         );
       });
     }
 
     // else add the validProducts which is not in the idsNamesToDelete
-    validUsers.forEach((validUser) => {
+    validProducts.forEach((validProduct) => {
       // check if the product has already set for delete
-      const selectedUser = idsNamesToDelete.find(
-        (item) => item[0] === validUser.id
+      const selectedProduct = idsNamesToDelete.find(
+        (item) => item[0] === validProduct.id
       );
       // if not then add to the array
-      if (!selectedUser) {
+      if (!selectedProduct) {
         setIdsNamesToDelete((oldValues) => [
           ...oldValues,
-          [validUser.id, validUser.username, validUser.email],
+          [validProduct.id, validProduct.name, validProduct.shortId],
         ]);
       }
     });
@@ -117,8 +114,8 @@ export default function UsersValid() {
       {!loading && !error && (
         <>
           <div className="mt-5">
-            <UserCreateModal />
-            {data && data.validUsers.length > 0 ? (
+            <ProductCreateModal />
+            {data && data.validProducts.length > 0 ? (
               <>
                 {!showDeleteCBs ? (
                   <Button
@@ -144,25 +141,25 @@ export default function UsersValid() {
                       )}
                     </Button>
                     <ProductUserModal
-                      bind="user"
+                      bind="product"
                       iconMode={iconMode}
                       itemIdsNamesToProcess={idsNamesToDelete}
                       areThereMultipleProducts={idsNamesToDelete?.length > 1}
                       modalType="Delete"
                       deleteBTNClass={deleteBTNClass}
                       handleShow={handleShow}
-                      modalTitle={UIText.deleteUserTitle}
+                      modalTitle={UIText.deleteProductTitle}
                       modalText={
                         idsNamesToDelete?.length > 1
-                          ? UIText.deleteUsersText
-                          : UIText.deleteUserText
+                          ? UIText.deleteProductsText
+                          : UIText.deleteProductText
                       }
                       modalButtonText={UIText.deleteButtonText}
                       modalCloseButtonText={UIText.closeButtonText}
                     />
                     <Button
                       className="btn btn-light p-2 ms-1 me-2 mb-2"
-                      onClick={handleSelectAllUsers}
+                      onClick={handleSelectAllProducts}
                     >
                       {iconMode ? (
                         <BiSelectMultiple style={{ fontSize: "1.6rem" }} />
@@ -172,32 +169,35 @@ export default function UsersValid() {
                     </Button>
                   </div>
                 )}
-                {console.log("validUsers BEFORE searchbar:", data.validUsers)}
+                {console.log(
+                  "validProducts BEFORE searchbar:",
+                  data.validProducts
+                )}
                 <Searchbar
-                  allItemsFromDB={data.validUsers}
-                  setItemsToView={setValidUsers}
-                  searchbarBind="user"
+                  allItemsFromDB={data.validProducts}
+                  setItemsToView={setValidProducts}
+                  searchbarBind="product"
                 />
               </>
             ) : (
-              <h3 className="mt-2">There is users</h3>
+              <h3 className="mt-2">There is no products</h3>
             )}
           </div>
-          {console.log("validUsers", validUsers)}
-          {validUsers?.length > 0 && (
+          {console.log("validProducts", validProducts)}
+          {validProducts?.length > 0 && (
             <>
               <div className="d-flex align-center justify-content-between mt-3 pb-5 product-card-row ">
-                {console.log("validUsers:", validUsers)}
+                {console.log("validProducts:", validProducts)}
                 {console.log(
                   "inside product rendering idsNamesToDelete:",
                   idsNamesToDelete
                 )}
-                {validUsers.map((validUser) => (
-                  <User
+                {validProducts.map((validProduct) => (
+                  <Product
                     showDeleteCBs={showDeleteCBs}
                     setIdsNamesToDelete={setIdsNamesToDelete}
-                    key={validUser.id}
-                    user={validUser}
+                    key={validProduct.id}
+                    product={validProduct}
                     cardBackgroundClass={
                       darkMode ? " text-white bg-dark " : " bg-light "
                     }
@@ -205,7 +205,7 @@ export default function UsersValid() {
                       // idsNamesToDelete = [ []. [], ... [] ] array of arrays
                       idsNamesToDelete.find(
                         // item[0] === id field of the array
-                        (item) => item[0] === validUser.id
+                        (item) => item[0] === validProduct.id
                       )
                         ? true
                         : false
@@ -216,8 +216,8 @@ export default function UsersValid() {
             </>
           )}
 
-          {validUsers.length === 0 &&
-            data.validUsers.length > 0 &&
+          {validProducts.length === 0 &&
+            data.validProducts.length > 0 &&
             // searchbarValue !== "" &&
             "NO searched data"}
         </>

@@ -1,22 +1,19 @@
-import React, { createRef, useRef, useEffect, useContext } from "react";
+import React, { useEffect, useContext } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useQuery, useLazyQuery } from "@apollo/client";
-import { GET_USER } from "../queries/userQueries";
+import { GET_USER } from "../../queries/userQueries";
 import { useState } from "react";
-import { GET_PRODUCT } from "../queries/productQueries";
-import Spinner from "./Spinner";
+import { GET_PRODUCT } from "../../queries/productQueries";
+import Spinner from "../Spinner";
 import ProductEditForm from "./ProductEditForm";
-import ProductDeleteModal from "./modals/ProductUserModal";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPenToSquare } from "@fortawesome/free-regular-svg-icons";
 import moment from "moment";
-import ProductUserModal from "./modals/ProductUserModal";
-import { UITextContext } from "./TranslationWrapper";
+import ProductUserModal from "../modals/ProductUserModal";
+import { UITextContext } from "../TranslationWrapper";
 import { TbEdit } from "react-icons/tb";
 import { Button, Modal } from "react-bootstrap";
-import { IconModeContext } from "../App";
+import { IconModeContext } from "../../App";
 
-export default function ProductDeletedShowInfo() {
+export default function ProductShowInfo() {
   const [toggleEditForm, setToggleEditForm] = useState(false);
 
   const UIText = useContext(UITextContext);
@@ -77,7 +74,7 @@ export default function ProductDeletedShowInfo() {
   // you have validproducts reading rights, so you can read products/ID
   // and you dont have invalidproducts reading right, so you CANT read products/deleted/ID
   // BUT there was an exploit: if you copy the deletedProduct ID and use product/ID, you can read the deleted product with validproducts reading right...)
-  if (!data.product.valid) {
+  if (data.product.valid) {
     return (
       <>
         {console.log("data:", data)}
@@ -127,7 +124,7 @@ export default function ProductDeletedShowInfo() {
                           ? editorUserData.user.username
                           : "Hidden"}
                         {/* if there is no right to read this than show Hidden, if
-                        there is no last editor than show - */}
+                      there is no last editor than show - */}
                       </p>
                       <p className="card-text mt-1 mb-0 pt-1">
                         Last Updated At:{" "}

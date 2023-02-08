@@ -7,18 +7,18 @@ import React, {
 } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useQuery, useLazyQuery } from "@apollo/client";
-import { GET_USER } from "../queries/userQueries";
+import { GET_USER } from "../../queries/userQueries";
 // import { GET_PRODUCT } from "../queries/productQueries";
-import Spinner from "./Spinner";
+import Spinner from "./../Spinner";
 import UserEditForm from "./UserEditForm";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPenToSquare } from "@fortawesome/free-regular-svg-icons";
 import moment from "moment";
-import ProductUserModal from "./modals/ProductUserModal";
-import { UITextContext } from "./TranslationWrapper";
+import ProductUserModal from "../modals/ProductUserModal";
+import { UITextContext } from "../TranslationWrapper";
 import { TbEdit } from "react-icons/tb";
 import { Button, Modal } from "react-bootstrap";
-import { IconModeContext } from "../App";
+import { IconModeContext } from "../../App";
 
 export default function UserDeletedShowInfo() {
   const [toggleEditForm, setToggleEditForm] = useState(false);

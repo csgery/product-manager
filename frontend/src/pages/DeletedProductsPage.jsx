@@ -1,4 +1,4 @@
-import ProductsDeleted from "../components/ProductsDeleted";
+import ProductsDeleted from "../components/product/ProductsDeleted";
 
 export default function ProductsPage() {
   return <ProductsDeleted />;

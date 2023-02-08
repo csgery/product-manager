@@ -1,12 +1,11 @@
 import React from "react";
 import { useState, useEffect, useRef, useContext } from "react";
 import { useMutation } from "@apollo/client";
-import { GET_PRODUCT, GET_VALIDPRODUCTS } from "../queries/productQueries";
-import { UPDATE_PRODUCT } from "../mutations/productMutations";
-import { createNotification, validateProductInput } from "../helper/helper";
-import useCustomError from "../helper/hooks/useCustomError";
-import { UITextContext } from "./TranslationWrapper";
-import { GrClose, GrCheckmark } from "react-icons/gr";
+import { GET_VALIDPRODUCTS } from "../../queries/productQueries";
+import { UPDATE_PRODUCT } from "../../mutations/productMutations";
+import { createNotification, validateProductInput } from "../../helper/helper";
+import useCustomError from "../../helper/hooks/useCustomError";
+import { UITextContext } from "../TranslationWrapper";
 import { MdOutlineDoneOutline, MdOutlineCancel } from "react-icons/md";
 
 const ProductEditForm = ({ product, setToggleEditForm, iconMode }) => {

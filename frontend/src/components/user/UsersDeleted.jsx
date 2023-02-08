@@ -1,18 +1,17 @@
 import { useState, useEffect, useContext } from "react";
-import { useNavigate } from "react-router-dom";
 import { useQuery } from "@apollo/client";
-import Spinner from "./Spinner";
+import Spinner from "../Spinner";
 import User from "./User";
-import ProductUserModal from "./modals/ProductUserModal";
-import { GET_DELETEDUSERS } from "../queries/userQueries";
+import ProductUserModal from "../modals/ProductUserModal";
+import { GET_DELETEDUSERS } from "../../queries/userQueries";
 import { Button } from "react-bootstrap";
-import { UITextContext } from "./TranslationWrapper";
+import { UITextContext } from "./../TranslationWrapper";
 import { BiSelectMultiple } from "react-icons/bi";
 import { GrClose } from "react-icons/gr";
 import { TbTrash, TbTrashOff } from "react-icons/tb";
-import { IconModeContext } from "../App";
-import Searchbar from "./Searchbar";
-import useCustomError from "../helper/hooks/useCustomError";
+import { IconModeContext } from "../../App";
+import Searchbar from "../Searchbar";
+import useCustomError from "../../helper/hooks/useCustomError";
 
 export default function UsersDeleted() {
   const { loading, error, data } = useQuery(GET_DELETEDUSERS);
