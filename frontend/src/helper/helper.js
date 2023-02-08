@@ -1,5 +1,3 @@
-import React, { useContext } from "react";
-import { redirect } from "react-router-dom";
 import jwt from "jwt-decode";
 import { GET_DICT, GET_MOREDICT } from "../queries/dictQueries";
 import { CREATE_DICT, CREATE_MOREDICT } from "../mutations/dictMutations";
@@ -19,21 +17,21 @@ const auth = {
     readOwn_user: "read:own_user",
     readValid_users: "read:valid_users",
     readInvalid_users: "read:invalid_users",
-    insertAny_user: "insert:any_user",
+    insert_user: "insert:user",
     //updateAny_user: "update:any_user", //update only yourself
     updateUser_permissions: "update:user_permissions",
-    softdeleteAny_user: "softdelete:any_user",
-    restoreSoftdelete_user: "restoreSoftdelete:user",
-    deleteAny_user: "delete:any_user",
+    delete_user: "delete:user",
+    restore_user: "restore:user",
+    remove_user: "remove:user",
 
     // products
     readValid_products: "read:valid_products",
     readInvalid_products: "read:invalid_products",
-    insertAny_product: "insert:any_product",
-    updateAny_product: "update:any_product",
-    softdeleteAny_product: "softdelete:any_product",
-    restoreSoftdelete_product: "restoreSoftdelete:product",
-    deleteAny_product: "delete:any_product",
+    insert_product: "insert:product",
+    update_product: "update:product",
+    delete_product: "delete:product",
+    restore_product: "restore:product",
+    remove_product: "remove:product",
   },
   isAuthenticated: () => {
     const tokenScope = import.meta.env.VITE_BACKEND_URI;

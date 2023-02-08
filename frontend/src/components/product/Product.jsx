@@ -1,11 +1,9 @@
 import ProductUserModal from "../modals/ProductUserModal";
 import { useNavigate } from "react-router-dom";
-import { useEffect, useState, useRef, useCallback, useContext } from "react";
-import { TbTrash, TbTrashOff } from "react-icons/tb";
+import { useEffect, useState, useRef, useContext } from "react";
 import { UITextContext } from "../TranslationWrapper";
 import { IconModeContext } from "../../App";
-
-import { LangContext } from "../../App";
+import { auth } from "../../helper/helper";
 
 export default function Product({
   product,
@@ -129,23 +127,6 @@ export default function Product({
         {!showDeleteCBs && (
           <>
             {product.valid ? (
-<<<<<<< Updated upstream
-              <ProductUserModal
-                bind="product"
-                iconMode={iconMode}
-                itemIdsNamesToProcess={[
-                  [product.id, product.name, product.shortId],
-                ]}
-                areThereMultipleProducts={false}
-                modalType="Delete"
-                deleteBTNClass="btn btn-danger p-2 me-2"
-                didItemComeFromItself={true}
-                modalTitle={UIText.deleteProductTitle}
-                modalText={UIText.deleteProductText}
-                modalButtonText={UIText.deleteButtonText}
-                modalCloseButtonText={UIText.closeButtonText}
-              />
-=======
               auth.isSet(auth.PERMS.delete_product) && (
                 <ProductUserModal
                   bind="product"
@@ -163,7 +144,6 @@ export default function Product({
                   modalCloseButtonText={UIText.closeButtonText}
                 />
               )
->>>>>>> Stashed changes
             ) : (
               <>
                 {auth.isSet(auth.PERMS.remove_product) && (

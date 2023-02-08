@@ -135,7 +135,7 @@ export default function User({
         {!showDeleteCBs && (
           <>
             {user.valid ? (
-              auth.isSet(auth.PERMS.delete_user) &&
+              auth.isSet(auth.PERMS.delete) &&
               (!auth.isReadingOwnUser(user.id) ||
                 !user.permissions.includes("protected")) && (
                 <ProductUserModal
