@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useMutation } from "@apollo/client";
 import { LOGIN_USER } from "../mutations/userMutations";
 import Spinner from "../components/Spinner";
-import { getUserId } from "../helper/helper";
+import { auth } from "../helper/helper";
 
 export default function LoginPage({
   setAccessTokenStorage,
@@ -24,7 +24,7 @@ export default function LoginPage({
       setAccessTokenStorage(localStorage.getItem("accesstoken"));
       setRefreshTokenStorage(localStorage.getItem("refreshtoken"));
 
-      const id = getUserId();
+      const id = auth.getUserId();
       navigate(`/viewer/${id}`, { replace: true });
     },
   });
@@ -35,8 +35,18 @@ export default function LoginPage({
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    // because every request has checked at backend before gave to the backend's resolvers
+    // the tokens'll be checked too
+    // to prevent backends tokenvalidation errors if the token is invalid(if someone modified it inside localstorage)
+    // remove everything before send login request
+    localStorage.clear();
+    setAccessTokenStorage(null);
+    setRefreshTokenStorage(null);
+
     signinUser(email, password);
   };
+
   return (
     <div className="card">
       {error && <div className="red card-panel">{error.message}</div>}

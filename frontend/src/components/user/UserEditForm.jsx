@@ -1,11 +1,14 @@
 import React from "react";
 import { useState, useEffect, useRef, useContext } from "react";
 import { useMutation } from "@apollo/client";
-import { GET_VALIDUSERS } from "../queries/userQueries";
-import { UPDATE_USER } from "../mutations/userMutations";
-import { createNotification, validateUserEmailInput } from "../helper/helper";
-import useCustomError from "../helper/hooks/useCustomError";
-import { UITextContext } from "./TranslationWrapper";
+import { GET_VALIDUSERS } from "../../queries/userQueries";
+import { UPDATE_USER } from "../../mutations/userMutations";
+import {
+  createNotification,
+  validateUserEmailInput,
+} from "../../helper/helper";
+import useCustomError from "../../helper/hooks/useCustomError";
+import { UITextContext } from "./../TranslationWrapper";
 import { GrClose, GrCheckmark } from "react-icons/gr";
 import { MdOutlineDoneOutline, MdOutlineCancel } from "react-icons/md";
 

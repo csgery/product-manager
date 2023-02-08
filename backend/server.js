@@ -115,9 +115,9 @@ app.use(
       let userFromToken = null;
       const authHeader = req.headers.authorization;
       // const refreshHeader = req.headers.refreshtoken;
+      console.log(req.headers);
       if (!authHeader) {
         console.log("no header");
-        // console.log(req.headers);
         return { req };
       }
       const accessToken = authHeader.split(" ")[1] || "";

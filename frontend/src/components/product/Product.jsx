@@ -1,11 +1,11 @@
-import ProductUserModal from "./modals/ProductUserModal";
+import ProductUserModal from "../modals/ProductUserModal";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState, useRef, useCallback, useContext } from "react";
 import { TbTrash, TbTrashOff } from "react-icons/tb";
-import { UITextContext } from "./TranslationWrapper";
-import { IconModeContext } from "../App";
+import { UITextContext } from "../TranslationWrapper";
+import { IconModeContext } from "../../App";
 
-import { LangContext } from "../App";
+import { LangContext } from "../../App";
 
 export default function Product({
   product,
@@ -42,7 +42,10 @@ export default function Product({
   }, [setDeleteCBChecked]);
 
   const handleNavigate = () => {
-    if (!showDeleteCBs) navigate(`/products/${product.id}`, { replace: true });
+    if (!showDeleteCBs) {
+      if (product.valid) navigate(`/products/${product.id}`, { replace: true });
+      else navigate(`/products/deleted/${product.id}`, { replace: true });
+    }
   };
 
   const stopPropagation = (e) => {

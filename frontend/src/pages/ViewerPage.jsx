@@ -2,7 +2,7 @@ import { useParams } from "react-router-dom";
 import { useQuery } from "@apollo/client";
 import { VIEWER } from "../queries/userQueries";
 import Spinner from "../components/Spinner";
-import UserPermissions from "../components/UserPermissions";
+import UserPermissions from "../components/user/UserPermissions";
 
 export default function ViewerPage() {
   const { id } = useParams();

@@ -21,12 +21,16 @@ import Navigation from "./components/Navigation";
 import LogoutPage from "./pages/LogoutPage";
 import ViewerPage from "./pages/ViewerPage";
 import DictTest from "./components/DictTest";
-import { useConfigClient } from "./helper/useConfigHeader";
+import BadAuth from "./components/BadAuth";
+// import { useConfigClient } from "./helper/useConfigHeader";
+import { auth } from "./helper/helper";
 import { onError } from "@apollo/client/link/error";
 import TranslationWrapper from "./components/TranslationWrapper";
 // import RefreshTokenPage from "./pages/RefreshTokenPage";
 import { ReactNotifications } from "react-notifications-component";
 import "react-notifications-component/dist/theme.css";
+import DeletedProductPage from "./pages/DeletedProductPage";
+import DeletedUserPage from "./pages/DeletedUserPage";
 // import FAIDemo from "./components/FontAwesomeIcon_DEMO";
 export const DarkModeContext = createContext();
 export const LangContext = createContext();
@@ -41,6 +45,33 @@ function App() {
   const [iconMode, setIconMode] = useState(
     localStorage.getItem("iconMode") === "true" ? true : false
   );
+
+  const checkPermsBeforeRoute = (
+    permission,
+    elementOnSuccess,
+    userIdToView
+  ) => {
+    if (!auth.isAuthenticated()) {
+      return <BadAuth />;
+    }
+    if (permission === "isAuthenticated") {
+      //console.log("pathname:", window.location.pathname);
+      return elementOnSuccess;
+    }
+    console.log(userIdToView);
+    // we can't check this here, but in the components we can
+    // if (
+    //   permission === "isReadingOwnUser" &&
+    //   auth.isReadingOwnUser(userIdToView)
+    // ) {
+    //   // if(!userIdToView) throw new Error('userIdToView is needed but given parameter is null!')
+    //   return elementOnSuccess;
+    // }
+    if (auth.isSet(permission)) {
+      return elementOnSuccess;
+    }
+    return <BadAuth />;
+  };
 
   const handleDarkmodeChange = () => {
     localStorage.setItem("darkmode", !darkMode);
@@ -64,13 +95,25 @@ function App() {
     console.log("darkmode:", darkMode);
   });
 
-  const [accessTokenStorage, setAccessTokenStorage] = useState(
-    localStorage.getItem("accesstoken")
-  ); // by default it is null
+  // because every request has checked at backend before gave to the backend's resolvers
+  // the tokens'll be checked too
+  // to prevent backends tokenvalidation errors if the token is invalid(if someone modified it inside localstorage)
+  // check are tokens valid and if they're set to state
+  const [accessTokenStorage, setAccessTokenStorage] = useState(() => {
+    if (!auth.checkTokenIsValid()) {
+      return null;
+    } else {
+      return localStorage.getItem("accesstoken");
+    }
+  }); // by default it is null
 
-  const [refreshTokenStorage, setRefreshTokenStorage] = useState(
-    localStorage.getItem("refreshtoken")
-  ); // by default it is null
+  const [refreshTokenStorage, setRefreshTokenStorage] = useState(() => {
+    if (!auth.checkTokenIsValid()) {
+      return null;
+    } else {
+      return localStorage.getItem("refreshtoken");
+    }
+  }); // by default it is null
 
   // in order to avoid a warning and later a potential error, implement the merge functions inside Query object
   const cache = new InMemoryCache({
@@ -216,23 +259,80 @@ function App() {
                     <div className="container mt-1 ">
                       <Routes>
                         <Route path="/products">
-                          <Route path="" element={<ProductsPage />} />
-                          <Route path=":id" element={<ProductPage />} />
                           <Route
-                            path="deleted"
-                            element={<DeletedProductsPage />}
+                            path=""
+                            element={checkPermsBeforeRoute(
+                              auth.PERMS.readValid_products,
+                              <ProductsPage />
+                            )}
+                          />
+                          <Route
+                            path=":id"
+                            element={checkPermsBeforeRoute(
+                              auth.PERMS.readValid_products,
+                              <ProductPage />
+                            )}
+                          />
+                        </Route>
+                        <Route path="/products/deleted">
+                          <Route
+                            path=""
+                            element={checkPermsBeforeRoute(
+                              auth.PERMS.readInvalid_products,
+                              <DeletedProductsPage />
+                            )}
+                          />
+                          <Route
+                            path=":id"
+                            element={checkPermsBeforeRoute(
+                              auth.PERMS.readInvalid_products,
+                              <DeletedProductPage />
+                            )}
                           />
                         </Route>
                         <Route path="/users">
-                          <Route path="" element={<UsersPage />} />
-                          <Route path=":id" element={<UserPage />} />
                           <Route
-                            path="deleted"
-                            element={<DeletedUsersPage />}
+                            path=""
+                            element={checkPermsBeforeRoute(
+                              auth.PERMS.readValid_users,
+                              <UsersPage />
+                            )}
+                          />
+                          <Route
+                            path=":id"
+                            element={checkPermsBeforeRoute(
+                              auth.PERMS.readValid_users, // the access needs to be validated in the UserPage (or related component)
+                              <UserPage />
+                            )}
                           />
                         </Route>
-                        <Route path="/viewer/:id" element={<ViewerPage />} />
-                        <Route path="/testdict" element={<DictTest />} />
+                        <Route path="users/deleted">
+                          <Route
+                            path=""
+                            element={checkPermsBeforeRoute(
+                              auth.PERMS.readInvalid_users,
+                              <DeletedUsersPage />
+                            )}
+                          />
+                          <Route
+                            path=":id"
+                            element={checkPermsBeforeRoute(
+                              auth.PERMS.readInvalid_users, // the access needs to be validated in the UserPage (or related component)
+                              <DeletedUserPage />
+                            )}
+                          />
+                        </Route>
+                        <Route
+                          path="/viewer/:id"
+                          element={checkPermsBeforeRoute(
+                            auth.PERMS.readOwn_user,
+                            <ViewerPage />
+                          )}
+                        />
+                        <Route
+                          path="/testdict"
+                          element={checkPermsBeforeRoute("test", <DictTest />)}
+                        />
 
                         {/* <Route
                 path="/viewer/refreshtoken/:id"
