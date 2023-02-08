@@ -6,25 +6,116 @@ import { CREATE_DICT, CREATE_MOREDICT } from "../mutations/dictMutations";
 import { print } from "graphql/language/printer";
 import { Store } from "react-notifications-component";
 
-const isSet = (permission) => {
-  return localStorage.getItem("permissions").includes(permission);
+// const isSet = (permission) => {
+//   return localStorage.getItem("permissions").includes(permission);
+// };
+
+const auth = {
+  PERMS: {
+    // basic permission
+    protected: "protected",
+
+    // users
+    readOwn_user: "read:own_user",
+    readValid_users: "read:valid_users",
+    readInvalid_users: "read:invalid_users",
+    insertAny_user: "insert:any_user",
+    //updateAny_user: "update:any_user", //update only yourself
+    updateUser_permissions: "update:user_permissions",
+    softdeleteAny_user: "softdelete:any_user",
+    restoreSoftdelete_user: "restoreSoftdelete:user",
+    deleteAny_user: "delete:any_user",
+
+    // products
+    readValid_products: "read:valid_products",
+    readInvalid_products: "read:invalid_products",
+    insertAny_product: "insert:any_product",
+    updateAny_product: "update:any_product",
+    softdeleteAny_product: "softdelete:any_product",
+    restoreSoftdelete_product: "restoreSoftdelete:product",
+    deleteAny_product: "delete:any_product",
+  },
+  isAuthenticated: () => {
+    const tokenScope = import.meta.env.VITE_BACKEND_URI;
+    try {
+      const tokenData = auth.getTokenData();
+      if (!tokenData) {
+        //console.log("tokenData", tokenData);
+        return false;
+      }
+      // if the token scope different or not exists
+      if (!tokenData[tokenScope]) {
+        const error = new Error();
+        error.name = "INVALID TOKEN SCOPE";
+        throw error;
+      }
+      return true;
+    } catch (error) {
+      return false;
+    }
+  },
+  getUserId: () => {
+    return jwt(localStorage.getItem("accesstoken")).sub;
+  },
+  isSet: (permission) => {
+    const tokenScope = import.meta.env.VITE_BACKEND_URI;
+    const tokenData = auth.getTokenData();
+    if (!tokenData) {
+      return false;
+    }
+    const permissions = tokenData[tokenScope].permissions;
+    console.log("permissions", permissions);
+
+    if (!permission) return false;
+    return permissions.includes(permission);
+  },
+  isReadingOwnUser: (userIdToView) => {
+    if (!userIdToView) {
+      throw new Error("userIdToView is needed but given parameter is null!");
+    }
+    return auth.getUserId() === userIdToView;
+  },
+  checkTokenIsValid: () => {
+    const accessToken = localStorage.getItem("accesstoken");
+    if (!accessToken) return false;
+    try {
+      jwt(accessToken);
+      return true;
+    } catch (error) {
+      if (Object.getPrototypeOf(error).name === "InvalidTokenError") {
+        console.log("INVALID TOKEN ERROR");
+      } else {
+        console.log(error);
+      }
+      return false;
+    }
+  },
+  getTokenData: () => {
+    if (!auth.checkTokenIsValid()) {
+      return null;
+    }
+    return jwt(localStorage.getItem("accesstoken"));
+  },
+  // getUserPermissions: () => {
+  //   return jwt(localStorage.getItem("accesstoken")) backend.permissions;
+  // },
 };
 
-const isLoggedIn = () => {
-  console.log(localStorage.getItem("accesstoken"));
-  console.log(localStorage.getItem("accesstoken") !== "");
+// const isLoggedIn = () => {
+//   // console.log(localStorage.getItem("accesstoken"));
+//   // console.log(localStorage.getItem("accesstoken") !== "");
 
-  // TODO: If there is no access token or expired but there is refresh token -> redirect refreshToken gql resolver and get a new token. If it's failed too, then redirect login page
+//   // TODO: If there is no access token or expired but there is refresh token -> redirect refreshToken gql resolver and get a new token. If it's failed too, then redirect login page
 
-  return (
-    localStorage.getItem("accesstoken") !== "" &&
-    localStorage.getItem("accesstoken") !== null
-  );
-};
+//   return (
+//     localStorage.getItem("accesstoken") !== "" &&
+//     localStorage.getItem("accesstoken") !== null
+//   );
+// };
 
-const getUserId = () => {
-  return jwt(localStorage.getItem("accesstoken")).sub;
-};
+// const getUserId = () => {
+//   return jwt(localStorage.getItem("accesstoken")).sub;
+// };
 
 //
 // Jenkins "One-At-A-Time" hash function, more info:
@@ -286,6 +377,7 @@ const userErrorCodes = {
   userAlreadyRestored: "USER_ALREADY-RESTORED",
   userEmptyUpdate: "USER_EMPTY-UPDATE",
   userEmailExists: "USER_EXISTED-EMAIL",
+  userUsernameExists: "USER_EXISTED-USERNAME",
   userProtectionViolation: "USER_PROTECTION-VIOLATION",
   userInvalidPasswordFormat: "USER_INVALID-PASSWORDFORMAT",
   userInvalidEmailFormat: "USER_INVALID-EMAILFORMAT",
@@ -347,9 +439,7 @@ const validateUserPasswordInput = (input, UIText) => {
 };
 
 export {
-  isSet,
-  isLoggedIn,
-  getUserId,
+  auth,
   translate,
   getDict,
   createDict,

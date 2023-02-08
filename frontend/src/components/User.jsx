@@ -42,7 +42,13 @@ export default function User({
   }, [setDeleteCBChecked]);
 
   const handleNavigate = () => {
-    if (!showDeleteCBs) navigate(`/users/${user.id}`, { replace: true });
+    if (!showDeleteCBs) {
+      if (user.valid) {
+        navigate(`/users/${user.id}`, { replace: true });
+      } else {
+        navigate(`/users/deleted/${user.id}`, { replace: true });
+      }
+    }
   };
 
   const stopPropagation = (e) => {

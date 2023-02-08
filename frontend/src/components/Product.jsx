@@ -42,7 +42,10 @@ export default function Product({
   }, [setDeleteCBChecked]);
 
   const handleNavigate = () => {
-    if (!showDeleteCBs) navigate(`/products/${product.id}`, { replace: true });
+    if (!showDeleteCBs) {
+      if (product.valid) navigate(`/products/${product.id}`, { replace: true });
+      else navigate(`/products/deleted/${product.id}`, { replace: true });
+    }
   };
 
   const stopPropagation = (e) => {

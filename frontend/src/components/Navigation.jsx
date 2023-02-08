@@ -6,7 +6,7 @@ import Navbar from "react-bootstrap/Navbar";
 import NavDropdown from "react-bootstrap/NavDropdown";
 import { Link, useNavigate } from "react-router-dom";
 import { DarkModeContext, LangContext } from "../App";
-import { isLoggedIn, getUserId } from "../helper/helper";
+import { auth } from "../helper/helper";
 import DarkModeBTNToggle from "./DarkModeBTNToggle";
 import LangSelectDropdown from "./LangSelectDropdown";
 import { UITextContext } from "./TranslationWrapper";
@@ -46,26 +46,38 @@ export default function Navigation({
             <Navbar.Toggle aria-controls="responsive-navbar-nav" />
             <Navbar.Collapse id="responsive-navbar-nav">
               <Nav className="me-auto">
-                {isLoggedIn() && (
+                {auth.isAuthenticated() && (
                   <>
-                    <Nav.Link
-                      onClick={() => handleNavigate("/products")}
-                      // href="#products"
-                    >
-                      {UIText.products}
-                    </Nav.Link>
-                    <Nav.Link
-                      onClick={() => handleNavigate("/products/deleted")}
-                      // href="#deletedproducts"
-                    >
-                      {UIText.deletedProducts}
-                    </Nav.Link>
-                    <Nav.Link onClick={() => handleNavigate("/users")}>
-                      {UIText.users}
-                    </Nav.Link>
-                    <Nav.Link onClick={() => handleNavigate("/users/deleted")}>
-                      {UIText.deletedUsers}
-                    </Nav.Link>
+                    {auth.isSet(auth.PERMS.readValid_products) && (
+                      <Nav.Link
+                        onClick={() => handleNavigate("/products")}
+                        // href="#products"
+                      >
+                        {UIText.products}
+                      </Nav.Link>
+                    )}
+                    {auth.isSet(auth.PERMS.readInvalid_products) && (
+                      <Nav.Link
+                        onClick={() => handleNavigate("/products/deleted")}
+                        // href="#deletedproducts"
+                      >
+                        {UIText.deletedProducts}
+                      </Nav.Link>
+                    )}
+
+                    {auth.isSet(auth.PERMS.readValid_users) && (
+                      <Nav.Link onClick={() => handleNavigate("/users")}>
+                        {UIText.users}
+                      </Nav.Link>
+                    )}
+
+                    {auth.isSet(auth.PERMS.readInvalid_users) && (
+                      <Nav.Link
+                        onClick={() => handleNavigate("/users/deleted")}
+                      >
+                        {UIText.deletedUsers}
+                      </Nav.Link>
+                    )}
                   </>
                 )}
               </Nav>
@@ -74,7 +86,7 @@ export default function Navigation({
                   handleDarkmodeChange={handleDarkmodeChange}
                 />
                 <LangSelectDropdown handleLangChange={handleLangChange} />
-                {isLoggedIn() ? (
+                {auth.isAuthenticated() ? (
                   <NavDropdown
                     title={UIText.profile}
                     id="collasible-nav-dropdown"
@@ -109,7 +121,9 @@ export default function Navigation({
                       {UIText.iconMode} */}
                     </NavDropdown.Item>
                     <NavDropdown.Item
-                      onClick={() => handleNavigate(`/viewer/${getUserId()}`)}
+                      onClick={() =>
+                        handleNavigate(`/viewer/${auth.getUserId()}`)
+                      }
                       className="navlink"
                     >
                       {UIText.viewer}

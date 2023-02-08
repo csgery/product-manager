@@ -16,7 +16,7 @@ import { TbEdit } from "react-icons/tb";
 import { Button, Modal } from "react-bootstrap";
 import { IconModeContext } from "../App";
 
-export default function ProductShowInfo() {
+export default function ProductDeletedShowInfo() {
   const [toggleEditForm, setToggleEditForm] = useState(false);
 
   const UIText = useContext(UITextContext);
@@ -77,7 +77,7 @@ export default function ProductShowInfo() {
   // you have validproducts reading rights, so you can read products/ID
   // and you dont have invalidproducts reading right, so you CANT read products/deleted/ID
   // BUT there was an exploit: if you copy the deletedProduct ID and use product/ID, you can read the deleted product with validproducts reading right...)
-  if (data.product.valid) {
+  if (!data.product.valid) {
     return (
       <>
         {console.log("data:", data)}
@@ -127,7 +127,7 @@ export default function ProductShowInfo() {
                           ? editorUserData.user.username
                           : "Hidden"}
                         {/* if there is no right to read this than show Hidden, if
-                      there is no last editor than show - */}
+                        there is no last editor than show - */}
                       </p>
                       <p className="card-text mt-1 mb-0 pt-1">
                         Last Updated At:{" "}

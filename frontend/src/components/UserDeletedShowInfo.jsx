@@ -1,12 +1,16 @@
-import React, { createRef, useRef, useEffect, useContext } from "react";
+import React, {
+  useState,
+  createRef,
+  useRef,
+  useEffect,
+  useContext,
+} from "react";
 import { useParams, Link } from "react-router-dom";
 import { useQuery, useLazyQuery } from "@apollo/client";
 import { GET_USER } from "../queries/userQueries";
-import { useState } from "react";
-import { GET_PRODUCT } from "../queries/productQueries";
+// import { GET_PRODUCT } from "../queries/productQueries";
 import Spinner from "./Spinner";
-import ProductEditForm from "./ProductEditForm";
-import ProductDeleteModal from "./modals/ProductUserModal";
+import UserEditForm from "./UserEditForm";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPenToSquare } from "@fortawesome/free-regular-svg-icons";
 import moment from "moment";
@@ -16,7 +20,7 @@ import { TbEdit } from "react-icons/tb";
 import { Button, Modal } from "react-bootstrap";
 import { IconModeContext } from "../App";
 
-export default function ProductShowInfo() {
+export default function UserDeletedShowInfo() {
   const [toggleEditForm, setToggleEditForm] = useState(false);
 
   const UIText = useContext(UITextContext);
@@ -24,7 +28,7 @@ export default function ProductShowInfo() {
 
   const { id } = useParams();
 
-  const { loading, error, data } = useQuery(GET_PRODUCT, {
+  const { loading, error, data } = useQuery(GET_USER, {
     variables: { id },
   });
   const [
@@ -45,14 +49,14 @@ export default function ProductShowInfo() {
   ] = useLazyQuery(GET_USER);
 
   useEffect(() => {
-    if (data?.product.createdBy) {
-      console.log("data.product.createdBy:", data.product.createdBy);
-      getCreatorUser({ variables: { id: data.product.createdBy } });
-    } else if (data?.product.updatedBy) {
-      console.log("data.product.updatedBy:", data.product.updatedBy);
-      getEditorUser({ variables: { id: data.product.updatedBy } });
+    if (data?.user.createdBy) {
+      console.log("data.user.createdBy:", data.user.createdBy);
+      getCreatorUser({ variables: { id: data.user.createdBy } });
+    } else if (data?.user.updatedBy) {
+      console.log("data.user.updatedBy:", data.user.updatedBy);
+      getEditorUser({ variables: { id: data.user.updatedBy } });
     }
-  }, [data?.product.createdBy, data?.product.updatedBy]);
+  }, [data?.user.createdBy, data?.user.updatedBy]);
 
   if (loading) return <Spinner />;
 
@@ -73,11 +77,11 @@ export default function ProductShowInfo() {
   // console.log("product:", data.product);
   // console.log("userData:", userData);
 
-  // if the product is valid than return that product (it needs to avoid an expoit:
-  // you have validproducts reading rights, so you can read products/ID
-  // and you dont have invalidproducts reading right, so you CANT read products/deleted/ID
-  // BUT there was an exploit: if you copy the deletedProduct ID and use product/ID, you can read the deleted product with validproducts reading right...)
-  if (data.product.valid) {
+  // if the user is valid than return that user (it needs to avoid an expoit:
+  // you have validusers reading rights, so you can read users/ID
+  // and you dont have invalidusers reading right, so you CANT read users/deleted/ID
+  // BUT there was an exploit: if you copy the deleteduser ID and use user/ID, you can read the deleted user with validusers reading right...)
+  if (!data.user.valid) {
     return (
       <>
         {console.log("data:", data)}
@@ -87,7 +91,7 @@ export default function ProductShowInfo() {
             {/* 'card mx-1 px-01 mb-2 product' */}
             <div
               className={
-                (!data.product.valid ? "deletedProduct-card " : "") +
+                (!data.user.valid ? "deletedProduct-card " : "") +
                 "card mx-auto w-75 px-1 mt-4 "
               }
               style={{ width: "18rem" }}
@@ -99,17 +103,11 @@ export default function ProductShowInfo() {
                       Go Back
                     </Link>
                   </div>
-                  <div className="mt-3 h5">Name: {data.product.name}</div>
+                  <div className="mt-3 h5">Username: {data.user.username}</div>
                 </h5>
 
                 <p className="card-text mt-1 mb-0 pt-1">
-                  Short ID: {data.product.shortId}
-                </p>
-                <p className="card-text mt-1 mb-0 pt-1">
-                  Quantity: {data.product.quantity}
-                </p>
-                <p className="card-text mt-1 mb-0 pt-1">
-                  Description: {data.product.description}
+                  Email: {data.user.email}
                 </p>
                 <div className="product-admin-info">
                   <p className="card-text mt-1 mb-0 pt-1">
@@ -117,9 +115,11 @@ export default function ProductShowInfo() {
                     {creatorUserData ? creatorUserData.user.username : "Hidden"}
                   </p>
                   <p className="card-text mt-1 mb-0 pt-1">
-                    Created At: {new Date(data.product.createdAt).toISOString()}
+                    Created At:{" "}
+                    {/* {new Date(data.user.createdAt).toISOString()} */}
+                    {moment(data.user.createdAt).toLocaleString()}
                   </p>
-                  {data.product.createdAt !== data.product.updatedAt && (
+                  {data.user.createdAt !== data.user.updatedAt && (
                     <>
                       <p className="card-text mt-1 mb-0 pt-1">
                         Last Updated By:{" "}
@@ -127,12 +127,12 @@ export default function ProductShowInfo() {
                           ? editorUserData.user.username
                           : "Hidden"}
                         {/* if there is no right to read this than show Hidden, if
-                      there is no last editor than show - */}
+                        there is no last editor than show - */}
                       </p>
                       <p className="card-text mt-1 mb-0 pt-1">
                         Last Updated At:{" "}
                         {/* {new Date(data.product.updatedAt).toISOString()} */}
-                        {moment(data.product.updatedAt).toLocaleString()}
+                        {moment(data.user.updatedAt).toLocaleString()}
                       </p>
                     </>
                   )}
@@ -140,7 +140,7 @@ export default function ProductShowInfo() {
 
                 {!toggleEditForm && (
                   <div className="mt-2">
-                    {data.product.valid && (
+                    {data.user.valid && (
                       <>
                         <Button
                           className="btn btn-dark me-1 mb-2 "
@@ -160,14 +160,10 @@ export default function ProductShowInfo() {
                           bind="product"
                           iconMode={iconMode}
                           itemIdsNamesToProcess={[
-                            [
-                              data.product.id,
-                              data.product.name,
-                              data.product.shortId,
-                            ],
+                            [data.user.id, data.user.username, data.user.email],
                           ]}
-                          didItemComeFromItself={true}
-                          redirectPathAfterSuccess={"/products/"}
+                          didProductComeFromItself={true}
+                          redirectPathAfterSuccess={"/users/"}
                           areThereMultipleProducts={false}
                           modalType="Delete"
                           deleteBTNClass={"btn btn-danger p-2 ms-1 me-2 mb-2 "}
@@ -178,17 +174,13 @@ export default function ProductShowInfo() {
                         />
                       </>
                     )}
-                    {!data.product?.valid && (
+                    {!data.user?.valid && (
                       <>
                         <ProductUserModal
                           bind="product"
                           iconMode={iconMode}
                           itemIdsNamesToProcess={[
-                            [
-                              data.product.id,
-                              data.product.name,
-                              data.product.shortId,
-                            ],
+                            [data.user.id, data.user.username, data.user.email],
                           ]}
                           didProductComeFromItself={true}
                           redirectPathAfterSuccess={"/products/deleted"}
@@ -205,13 +197,9 @@ export default function ProductShowInfo() {
                           bind="product"
                           iconMode={iconMode}
                           itemIdsNamesToProcess={[
-                            [
-                              data.product.id,
-                              data.product.name,
-                              data.product.shortId,
-                            ],
+                            [data.user.id, data.user.username, data.user.email],
                           ]}
-                          didProductComeFromItself={true}
+                          didItemComeFromItself={true}
                           redirectPathAfterSuccess={"/products/deleted"}
                           areThereMultipleProducts={false}
                           modalType="Restore"
@@ -229,9 +217,9 @@ export default function ProductShowInfo() {
                 )}
               </div>
             </div>
-            {data.product.valid && toggleEditForm && (
-              <ProductEditForm
-                product={data.product}
+            {data.user.valid && toggleEditForm && (
+              <UserEditForm
+                user={data.user}
                 setToggleEditForm={setToggleEditForm}
                 iconMode={iconMode}
               />
@@ -240,5 +228,5 @@ export default function ProductShowInfo() {
         )}
       </>
     );
-  } else return <>Product Not Found</>;
+  } else return <>User Not Found</>;
 }
