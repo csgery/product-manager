@@ -435,7 +435,7 @@ export default {
             message: "user-protection-violation",
           });
           await userLog.save();
-          throw userIsProtected();
+          throw userIsProtected(lang);
         }
         if (!user.valid) {
           throw userAlreadySoftDeleted_Error(lang);

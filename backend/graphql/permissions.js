@@ -16,21 +16,21 @@ export const PERMS = {
   readOwn_user: "read:own_user",
   readValid_users: "read:valid_users",
   readInvalid_users: "read:invalid_users",
-  insertAny_user: "insert:any_user",
+  insert_user: "insert:user",
   //updateAny_user: "update:any_user", //update only yourself
   updateUser_permissions: "update:user_permissions",
-  softdeleteAny_user: "softdelete:any_user",
-  restoreSoftdelete_user: "restoreSoftdelete:user",
-  deleteAny_user: "delete:any_user",
+  delete_user: "delete:user",
+  restore_user: "restore:user",
+  remove_user: "remove:user",
 
   // products
   readValid_products: "read:valid_products",
   readInvalid_products: "read:invalid_products",
-  insertAny_product: "insert:any_product",
-  updateAny_product: "update:any_product",
-  softdeleteAny_product: "softdelete:any_product",
-  restoreSoftdelete_product: "restoreSoftdelete:product",
-  deleteAny_product: "delete:any_product",
+  insert_product: "insert:product",
+  update_product: "update:product",
+  delete_product: "delete:product",
+  restore_product: "restore:product",
+  remove_product: "remove:product",
 };
 
 export const PERMS_DEPENDENCIES = {
@@ -42,21 +42,21 @@ export const PERMS_DEPENDENCIES = {
   // [PERMS.insertAny_user]: [PERMS.readAny_user],
   //update only yourself
   //[PERMS.updateAny_user]: [PERMS.insertAny_user],
-  [PERMS.insertAny_user]: [PERMS.readValid_users],
-  [PERMS.softdeleteAny_user]: [PERMS.readInvalid_users],
-  [PERMS.restoreSoftdelete_user]: [PERMS.softdeleteAny_user],
-  [PERMS.deleteAny_user]: [PERMS.softdeleteAny_user],
+  [PERMS.insert_user]: [PERMS.readValid_users],
+  [PERMS.delete_user]: [PERMS.readInvalid_users],
+  [PERMS.restore_user]: [PERMS.delete_user],
+  [PERMS.remove_user]: [PERMS.delete_user],
 
   [PERMS.updateUser_permissions]: [PERMS.readInvalid_users],
 
   // products
   [PERMS.readValid_products]: [],
   [PERMS.readInvalid_products]: [PERMS.readValid_products],
-  [PERMS.insertAny_product]: [PERMS.readValid_products],
-  [PERMS.updateAny_product]: [PERMS.insertAny_product],
-  [PERMS.softdeleteAny_product]: [PERMS.insertAny_product],
-  [PERMS.restoreSoftdelete_product]: [PERMS.softdeleteAny_product],
-  [PERMS.deleteAny_product]: [PERMS.softdeleteAny_product],
+  [PERMS.insert_product]: [PERMS.readValid_products],
+  [PERMS.update_product]: [PERMS.insert_product],
+  [PERMS.delete_product]: [PERMS.readInvalid_products],
+  [PERMS.restore_product]: [PERMS.delete_product],
+  [PERMS.remove_product]: [PERMS.delete_product],
 };
 
 async function checkPermission(user, permission, lang) {
@@ -139,7 +139,7 @@ const isReadingOwnUser = rule()((parent, { id }, { user }) => {
 
 const canCreateUser = rule()((parent, args, { user, req }) => {
   const lang = req.headers.language || "en";
-  return checkPermission(user, PERMS.insertAny_user, lang);
+  return checkPermission(user, PERMS.insert_user, lang);
 });
 
 const canUpdateUserPermissions = rule()((parent, args, { user, req }) => {
@@ -147,19 +147,19 @@ const canUpdateUserPermissions = rule()((parent, args, { user, req }) => {
   return checkPermission(user, PERMS.updateUser_permissions, lang);
 });
 
-const canSoftdeleteAnyUser = rule()((parent, args, { user, req }) => {
+const canDeleteUser = rule()((parent, args, { user, req }) => {
   const lang = req.headers.language || "en";
-  return checkPermission(user, PERMS.softdeleteAny_user, lang);
+  return checkPermission(user, PERMS.delete_user, lang);
 });
 
-const canRestoreSoftdeleteUser = rule()((parent, args, { user, req }) => {
+const canRestoreUser = rule()((parent, args, { user, req }) => {
   const lang = req.headers.language || "en";
-  return checkPermission(user, PERMS.restoreSoftdelete_user, lang);
+  return checkPermission(user, PERMS.restore_user, lang);
 });
 
-const canDeleteAnyUser = rule()((parent, args, { user, req }) => {
+const canRemoveUser = rule()((parent, args, { user, req }) => {
   const lang = req.headers.language || "en";
-  return checkPermission(user, PERMS.deleteAny_user, lang);
+  return checkPermission(user, PERMS.remove_user, lang);
 });
 
 // Products
@@ -176,24 +176,24 @@ const isOwnProduct = rule()(async (parent, { id }, { user }) => {
   return product.createdBy === user.username;
 });
 
-const canUpdateAnyProduct = rule()((parent, args, { user, req }) => {
+const canUpdateProduct = rule()((parent, args, { user, req }) => {
   const lang = req.headers.language || "en";
-  return checkPermission(user, PERMS.updateAny_product, lang);
+  return checkPermission(user, PERMS.update_product, lang);
 });
 
-const canSoftdeleteAnyProduct = rule()((parent, args, { user, req }) => {
+const canDeleteProduct = rule()((parent, args, { user, req }) => {
   const lang = req.headers.language || "en";
-  return checkPermission(user, PERMS.softdeleteAny_product, lang);
+  return checkPermission(user, PERMS.delete_product, lang);
 });
 
-const canRestoreSoftdeleteProduct = rule()((parent, args, { user, req }) => {
+const canRestoreProduct = rule()((parent, args, { user, req }) => {
   const lang = req.headers.language || "en";
-  return checkPermission(user, PERMS.restoreSoftdelete_product, lang);
+  return checkPermission(user, PERMS.restore_product, lang);
 });
 
-const canDeleteAnyProduct = rule()((parent, args, { user, req }) => {
+const canRemoveProduct = rule()((parent, args, { user, req }) => {
   const lang = req.headers.language || "en";
-  return checkPermission(user, PERMS.deleteAny_product, lang);
+  return checkPermission(user, PERMS.remove_product, lang);
 });
 
 export default shield(
@@ -215,17 +215,17 @@ export default shield(
       changePassword: isReadingOwnUser,
       updateUser: isReadingOwnUser,
       updatePermission: canUpdateUserPermissions,
-      deleteUser: and(canSoftdeleteAnyUser, not(isReadingOwnUser)),
-      restoreUser: and(canRestoreSoftdeleteUser, not(isReadingOwnUser)),
-      removeUser: and(canDeleteAnyUser, not(isReadingOwnUser)),
+      deleteUser: and(canDeleteUser, not(isReadingOwnUser)),
+      restoreUser: and(canRestoreUser, not(isReadingOwnUser)),
+      removeUser: and(canRemoveUser, not(isReadingOwnUser)),
       invalidateTokens: isAuthenticated,
       //refreshToken: isAuthenticated,
 
       createProduct: isAuthenticated,
-      updateProduct: or(isOwnProduct, canUpdateAnyProduct),
-      deleteProduct: canSoftdeleteAnyProduct,
-      restoreDeletedProduct: canRestoreSoftdeleteProduct,
-      removeProduct: canDeleteAnyProduct,
+      updateProduct: or(isOwnProduct, canUpdateProduct),
+      deleteProduct: canDeleteProduct,
+      restoreDeletedProduct: canRestoreProduct,
+      removeProduct: canRemoveProduct,
     },
   },
   {
