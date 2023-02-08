@@ -129,6 +129,7 @@ export default function Product({
         {!showDeleteCBs && (
           <>
             {product.valid ? (
+<<<<<<< Updated upstream
               <ProductUserModal
                 bind="product"
                 iconMode={iconMode}
@@ -144,38 +145,61 @@ export default function Product({
                 modalButtonText={UIText.deleteButtonText}
                 modalCloseButtonText={UIText.closeButtonText}
               />
+=======
+              auth.isSet(auth.PERMS.delete_product) && (
+                <ProductUserModal
+                  bind="product"
+                  iconMode={iconMode}
+                  itemIdsNamesToProcess={[
+                    [product.id, product.name, product.shortId],
+                  ]}
+                  areThereMultipleProducts={false}
+                  modalType="Delete"
+                  deleteBTNClass="btn btn-danger p-2 me-2"
+                  didItemComeFromItself={true}
+                  modalTitle={UIText.deleteProductTitle}
+                  modalText={UIText.deleteProductText}
+                  modalButtonText={UIText.deleteButtonText}
+                  modalCloseButtonText={UIText.closeButtonText}
+                />
+              )
+>>>>>>> Stashed changes
             ) : (
               <>
-                <ProductUserModal
-                  bind="product"
-                  iconMode={iconMode}
-                  itemIdsNamesToProcess={[
-                    [product.id, product.name, product.shortId],
-                  ]}
-                  areThereMultipleProducts={false}
-                  modalType="Remove"
-                  deleteBTNClass="btn btn-danger p-2 me-2"
-                  didItemComeFromItself={true}
-                  modalTitle={UIText.removeProductTitle}
-                  modalText={UIText.removeProductText}
-                  modalButtonText={UIText.removeButtonText}
-                  modalCloseButtonText={UIText.closeButtonText}
-                />
-                <ProductUserModal
-                  bind="product"
-                  iconMode={iconMode}
-                  itemIdsNamesToProcess={[
-                    [product.id, product.name, product.shortId],
-                  ]}
-                  areThereMultipleProducts={false}
-                  modalType="Restore"
-                  deleteBTNClass="btn btn-danger p-2 me-2"
-                  didItemComeFromItself={true}
-                  modalTitle={UIText.restoreProductTitle}
-                  modalText={UIText.restoreProductText}
-                  modalButtonText={UIText.restoreButtonText}
-                  modalCloseButtonText={UIText.closeButtonText}
-                />
+                {auth.isSet(auth.PERMS.remove_product) && (
+                  <ProductUserModal
+                    bind="product"
+                    iconMode={iconMode}
+                    itemIdsNamesToProcess={[
+                      [product.id, product.name, product.shortId],
+                    ]}
+                    areThereMultipleProducts={false}
+                    modalType="Remove"
+                    deleteBTNClass="btn btn-danger p-2 me-2"
+                    didItemComeFromItself={true}
+                    modalTitle={UIText.removeProductTitle}
+                    modalText={UIText.removeProductText}
+                    modalButtonText={UIText.removeButtonText}
+                    modalCloseButtonText={UIText.closeButtonText}
+                  />
+                )}
+                {auth.isSet(auth.PERMS.restore_product) && (
+                  <ProductUserModal
+                    bind="product"
+                    iconMode={iconMode}
+                    itemIdsNamesToProcess={[
+                      [product.id, product.name, product.shortId],
+                    ]}
+                    areThereMultipleProducts={false}
+                    modalType="Restore"
+                    deleteBTNClass="btn btn-danger p-2 me-2"
+                    didItemComeFromItself={true}
+                    modalTitle={UIText.restoreProductTitle}
+                    modalText={UIText.restoreProductText}
+                    modalButtonText={UIText.restoreButtonText}
+                    modalCloseButtonText={UIText.closeButtonText}
+                  />
+                )}
               </>
             )}
           </>

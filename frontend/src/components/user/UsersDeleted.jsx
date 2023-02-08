@@ -12,6 +12,7 @@ import { TbTrash, TbTrashOff } from "react-icons/tb";
 import { IconModeContext } from "../../App";
 import Searchbar from "../Searchbar";
 import useCustomError from "../../helper/hooks/useCustomError";
+import { auth } from "../../helper/helper";
 
 export default function UsersDeleted() {
   const { loading, error, data } = useQuery(GET_DELETEDUSERS);
@@ -58,43 +59,70 @@ export default function UsersDeleted() {
     // loop through validProducts
     // if validProduct is in the deletedProducts then add +1 to a counter
     // after the loop if counter == validProducts.length -> it means all of the validProducts has already in the deletedProducts -> remove them from the deletedProducts
+
+    // BETTER EXPLANATION INSIDE UsersValid.jsx
     let counter = 0;
-    deletedUsers.forEach((item) => {
-      const user = idsNamesToDelete.find(
-        (idNameToDelete) => idNameToDelete[0] === item.id
-      );
-      if (user) {
-        counter++;
-      }
-    });
-    if (counter === deletedUsers.length) {
+    deletedUsers
+      .filter(
+        (deletedUser) =>
+          !auth.isReadingOwnUser(deletedUser.id) &&
+          !deletedUser.permissions.includes("protected")
+      )
+      .forEach((item) => {
+        const user = idsNamesToDelete.find(
+          (idNameToDelete) => idNameToDelete[0] === item.id
+        );
+        if (user) {
+          counter++;
+        }
+      });
+    if (
+      counter ===
+      deletedUsers.filter(
+        (deletedUser) =>
+          !auth.isReadingOwnUser(deletedUser.id) &&
+          !deletedUser.permissions.includes("protected")
+      ).length
+    ) {
       // console.log(
       //   "all validProducts have already in the idsNamesToDelete list, REMOVE THEM!"
       // );
 
-      deletedUsers.forEach((deletedUser) => {
-        setIdsNamesToDelete((oldIdsNamesToDelete) =>
-          oldIdsNamesToDelete.filter(
-            (idNameToDelete) => deletedUser.id !== idNameToDelete[0]
-          )
-        );
-      });
+      deletedUsers
+        .filter(
+          (deletedUser) =>
+            !auth.isReadingOwnUser(deletedUser.id) &&
+            !deletedUser.permissions.includes("protected")
+        )
+        .forEach((deletedUser) => {
+          setIdsNamesToDelete((oldIdsNamesToDelete) =>
+            oldIdsNamesToDelete.filter(
+              (idNameToDelete) => deletedUser.id !== idNameToDelete[0]
+            )
+          );
+        });
     }
 
     // else add the validProducts which is not in the idsNamesToDelete
-    deletedUsers.forEach((deletedUser) => {
-      // check if the product has already set for delete
-      const selectedProduct = idsNamesToDelete.find(
-        (item) => item[0] === deletedUser.id
-      );
-      // if not then add to the array
-      if (!selectedProduct) {
-        setIdsNamesToDelete((oldValues) => [
-          ...oldValues,
-          [deletedUser.id, deletedUser.username, deletedUser.email],
-        ]);
-      }
-    });
+    deletedUsers
+      .filter(
+        (deletedUser) =>
+          !auth.isReadingOwnUser(deletedUser.id) &&
+          !deletedUser.permissions.includes("protected")
+      )
+      .forEach((deletedUser) => {
+        // check if the product has already set for delete
+        const selectedProduct = idsNamesToDelete.find(
+          (item) => item[0] === deletedUser.id
+        );
+        // if not then add to the array
+        if (!selectedProduct) {
+          setIdsNamesToDelete((oldValues) => [
+            ...oldValues,
+            [deletedUser.id, deletedUser.username, deletedUser.email],
+          ]);
+        }
+      });
   };
 
   if (loading) return <Spinner />;
@@ -112,7 +140,9 @@ export default function UsersDeleted() {
           {data && data.deletedUsers.length > 0 ? (
             <>
               <div className="mt-5">
-                {!showDeleteCBs ? (
+                {!showDeleteCBs &&
+                (auth.isSet(auth.PERMS.restore_user) ||
+                  auth.isSet(auth.PERMS.remove_user)) ? (
                   <Button
                     className="btn btn-light p-2 ms-1 me-2 mb-2"
                     onClick={handleShow}
@@ -135,63 +165,70 @@ export default function UsersDeleted() {
                     )}
                   </Button>
                 ) : (
-                  <Button
-                    className="btn btn-light p-2 ms-1 me-2 mb-2"
-                    onClick={handleShow}
-                  >
-                    {iconMode ? (
-                      <GrClose style={{ fontSize: "1.4rem" }} />
-                    ) : (
-                      UIText.closeButtonText
-                    )}
-                  </Button>
+                  (auth.isSet(auth.PERMS.restore_user) ||
+                    auth.isSet(auth.PERMS.remove_user)) && (
+                    <Button
+                      className="btn btn-light p-2 ms-1 me-2 mb-2"
+                      onClick={handleShow}
+                    >
+                      {iconMode ? (
+                        <GrClose style={{ fontSize: "1.4rem" }} />
+                      ) : (
+                        UIText.closeButtonText
+                      )}
+                    </Button>
+                  )
                 )}
 
                 {showDeleteCBs && (
                   <>
-                    <ProductUserModal
-                      bind="user"
-                      iconMode={iconMode}
-                      itemIdsNamesToProcess={idsNamesToDelete}
-                      areThereMultipleProducts={idsNamesToDelete?.length > 1}
-                      modalType="Remove"
-                      deleteBTNClass={deleteBTNClass}
-                      handleShow={handleShow}
-                      modalTitle={
-                        idsNamesToDelete?.length > 1
-                          ? UIText.removeUsersTitle
-                          : UIText.removeUserTitle
-                      }
-                      modalText={
-                        idsNamesToDelete?.length > 1
-                          ? UIText.removeUsersText
-                          : UIText.removeUserText
-                      }
-                      modalButtonText={UIText.removeButtonText}
-                      modalCloseButtonText={UIText.closeButtonText}
-                    />
+                    {auth.isSet(auth.PERMS.remove_user) && (
+                      <ProductUserModal
+                        bind="user"
+                        iconMode={iconMode}
+                        itemIdsNamesToProcess={idsNamesToDelete}
+                        areThereMultipleProducts={idsNamesToDelete?.length > 1}
+                        modalType="Remove"
+                        deleteBTNClass={deleteBTNClass}
+                        handleShow={handleShow}
+                        modalTitle={
+                          idsNamesToDelete?.length > 1
+                            ? UIText.removeUsersTitle
+                            : UIText.removeUserTitle
+                        }
+                        modalText={
+                          idsNamesToDelete?.length > 1
+                            ? UIText.removeUsersText
+                            : UIText.removeUserText
+                        }
+                        modalButtonText={UIText.removeButtonText}
+                        modalCloseButtonText={UIText.closeButtonText}
+                      />
+                    )}
+                    {auth.isSet(auth.PERMS.restore_user) && (
+                      <ProductUserModal
+                        bind="user"
+                        iconMode={iconMode}
+                        itemIdsNamesToProcess={idsNamesToDelete}
+                        areThereMultipleProducts={idsNamesToDelete?.length > 1}
+                        modalType="Restore"
+                        deleteBTNClass={deleteBTNClass}
+                        handleShow={handleShow}
+                        modalTitle={
+                          idsNamesToDelete?.length > 1
+                            ? UIText.restoreUsersTitle
+                            : UIText.restoreUserTitle
+                        }
+                        modalText={
+                          idsNamesToDelete?.length > 1
+                            ? UIText.restoreUsersText
+                            : UIText.restoreUserText
+                        }
+                        modalButtonText={UIText.restoreButtonText}
+                        modalCloseButtonText={UIText.closeButtonText}
+                      />
+                    )}
 
-                    <ProductUserModal
-                      bind="user"
-                      iconMode={iconMode}
-                      itemIdsNamesToProcess={idsNamesToDelete}
-                      areThereMultipleProducts={idsNamesToDelete?.length > 1}
-                      modalType="Restore"
-                      deleteBTNClass={deleteBTNClass}
-                      handleShow={handleShow}
-                      modalTitle={
-                        idsNamesToDelete?.length > 1
-                          ? UIText.restoreUsersTitle
-                          : UIText.restoreUserTitle
-                      }
-                      modalText={
-                        idsNamesToDelete?.length > 1
-                          ? UIText.restoreUsersText
-                          : UIText.restoreUserText
-                      }
-                      modalButtonText={UIText.restoreButtonText}
-                      modalCloseButtonText={UIText.closeButtonText}
-                    />
                     <Button
                       className="btn btn-light p-2 ms-1 me-2 mb-2"
                       onClick={handleSelectAllUsers}

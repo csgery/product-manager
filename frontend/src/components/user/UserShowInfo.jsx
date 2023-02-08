@@ -1,24 +1,17 @@
-import React, {
-  useState,
-  createRef,
-  useRef,
-  useEffect,
-  useContext,
-} from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useQuery, useLazyQuery } from "@apollo/client";
 import { GET_USER } from "../../queries/userQueries";
 // import { GET_PRODUCT } from "../queries/productQueries";
 import Spinner from "../Spinner";
 import UserEditForm from "./UserEditForm";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPenToSquare } from "@fortawesome/free-regular-svg-icons";
 import moment from "moment";
 import ProductUserModal from "../modals/ProductUserModal";
 import { UITextContext } from "../TranslationWrapper";
 import { TbEdit } from "react-icons/tb";
-import { Button, Modal } from "react-bootstrap";
+import { Button } from "react-bootstrap";
 import { IconModeContext } from "../../App";
+import { auth } from "../../helper/helper";
 
 export default function UserShowInfo() {
   const [toggleEditForm, setToggleEditForm] = useState(false);
@@ -140,22 +133,26 @@ export default function UserShowInfo() {
 
                 {!toggleEditForm && (
                   <div className="mt-2">
-                    {data.user.valid && (
-                      <>
-                        <Button
-                          className="btn btn-dark me-1 mb-2 "
-                          onClick={handleFormToggle}
-                        >
-                          {iconMode ? (
-                            <TbEdit
-                              style={{ fontSize: "1.6rem" }}
-                              //className="btn btn-light"
-                            />
-                          ) : (
-                            UIText.editButtonText
-                          )}
-                        </Button>
-                        {/* delete form */}
+                    {auth.isReadingOwnUser(id) && (
+                      <Button
+                        className="btn btn-dark me-1 mb-2 "
+                        onClick={handleFormToggle}
+                      >
+                        {iconMode ? (
+                          <TbEdit
+                            style={{ fontSize: "1.6rem" }}
+                            //className="btn btn-light"
+                          />
+                        ) : (
+                          UIText.editButtonText
+                        )}
+                      </Button>
+                    )}
+
+                    {/* delete form */}
+                    {auth.isSet(auth.PERMS.delete_user) &&
+                      !auth.isReadingOwnUser(data.user.id) &&
+                      !data.user.permissions.includes("protected") && (
                         <ProductUserModal
                           bind="product"
                           iconMode={iconMode}
@@ -172,47 +169,7 @@ export default function UserShowInfo() {
                           modalButtonText={UIText.deleteButtonText}
                           modalCloseButtonText={UIText.closeButtonText}
                         />
-                      </>
-                    )}
-                    {!data.user?.valid && (
-                      <>
-                        <ProductUserModal
-                          bind="product"
-                          iconMode={iconMode}
-                          itemIdsNamesToProcess={[
-                            [data.user.id, data.user.username, data.user.email],
-                          ]}
-                          didProductComeFromItself={true}
-                          redirectPathAfterSuccess={"/products/deleted"}
-                          areThereMultipleProducts={false}
-                          modalType="Remove"
-                          deleteBTNClass={"btn btn-danger p-2 me-2 mb-2 mt-2 "}
-                          modalTitle={UIText.removeProductTitle}
-                          modalText={UIText.removeProductText}
-                          modalButtonText={UIText.removeButtonText}
-                          modalCloseButtonText={UIText.closeButtonText}
-                        />
-                        {/* restore form */}
-                        <ProductUserModal
-                          bind="product"
-                          iconMode={iconMode}
-                          itemIdsNamesToProcess={[
-                            [data.user.id, data.user.username, data.user.email],
-                          ]}
-                          didItemComeFromItself={true}
-                          redirectPathAfterSuccess={"/products/deleted"}
-                          areThereMultipleProducts={false}
-                          modalType="Restore"
-                          deleteBTNClass={
-                            "btn btn-primary p-2 ms-1 me-2 mb-2 mt-2 "
-                          }
-                          modalTitle={UIText.restoreProductTitle}
-                          modalText={UIText.restoreProductText}
-                          modalButtonText={UIText.restoreButtonText}
-                          modalCloseButtonText={UIText.closeButtonText}
-                        />
-                      </>
-                    )}
+                      )}
                   </div>
                 )}
               </div>

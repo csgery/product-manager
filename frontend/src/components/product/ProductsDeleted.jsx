@@ -12,6 +12,7 @@ import { TbTrash, TbTrashOff } from "react-icons/tb";
 import { IconModeContext } from "../../App";
 import Searchbar from "../Searchbar";
 import useCustomError from "../../helper/hooks/useCustomError";
+import { auth } from "../../helper/helper";
 
 export default function ProductsDeleted() {
   const { loading, error, data } = useQuery(GET_DELETEDPRODUCTS);
@@ -112,7 +113,10 @@ export default function ProductsDeleted() {
           {data && data.deletedProducts.length > 0 ? (
             <>
               <div className="mt-5">
-                {!showDeleteCBs ? (
+                {/* if its not delete selection mode and user has at least one right */}
+                {!showDeleteCBs &&
+                (auth.isSet(auth.PERMS.restore_product) ||
+                  auth.isSet(auth.PERMS.remove_product)) ? (
                   <Button
                     className="btn btn-light p-2 ms-1 me-2 mb-2"
                     onClick={handleShow}
@@ -135,63 +139,71 @@ export default function ProductsDeleted() {
                     )}
                   </Button>
                 ) : (
-                  <Button
-                    className="btn btn-light p-2 ms-1 me-2 mb-2"
-                    onClick={handleShow}
-                  >
-                    {iconMode ? (
-                      <GrClose style={{ fontSize: "1.4rem" }} />
-                    ) : (
-                      UIText.closeButtonText
-                    )}
-                  </Button>
+                  (auth.isSet(auth.PERMS.restore_product) ||
+                    auth.isSet(auth.PERMS.remove_product)) && (
+                    <Button
+                      className="btn btn-light p-2 ms-1 me-2 mb-2"
+                      onClick={handleShow}
+                    >
+                      {iconMode ? (
+                        <GrClose style={{ fontSize: "1.4rem" }} />
+                      ) : (
+                        UIText.closeButtonText
+                      )}
+                    </Button>
+                  )
                 )}
 
                 {showDeleteCBs && (
                   <>
-                    <ProductUserModal
-                      bind="product"
-                      iconMode={iconMode}
-                      itemIdsNamesToProcess={idsNamesToDelete}
-                      areThereMultipleProducts={idsNamesToDelete?.length > 1}
-                      modalType="Remove"
-                      deleteBTNClass={deleteBTNClass}
-                      handleShow={handleShow}
-                      modalTitle={
-                        idsNamesToDelete?.length > 1
-                          ? UIText.removeProductsTitle
-                          : UIText.removeProductTitle
-                      }
-                      modalText={
-                        idsNamesToDelete?.length > 1
-                          ? UIText.removeProductsText
-                          : UIText.removeProductText
-                      }
-                      modalButtonText={UIText.removeButtonText}
-                      modalCloseButtonText={UIText.closeButtonText}
-                    />
+                    {auth.isSet(auth.PERMS.remove_product) && (
+                      <ProductUserModal
+                        bind="product"
+                        iconMode={iconMode}
+                        itemIdsNamesToProcess={idsNamesToDelete}
+                        areThereMultipleProducts={idsNamesToDelete?.length > 1}
+                        modalType="Remove"
+                        deleteBTNClass={deleteBTNClass}
+                        handleShow={handleShow}
+                        modalTitle={
+                          idsNamesToDelete?.length > 1
+                            ? UIText.removeProductsTitle
+                            : UIText.removeProductTitle
+                        }
+                        modalText={
+                          idsNamesToDelete?.length > 1
+                            ? UIText.removeProductsText
+                            : UIText.removeProductText
+                        }
+                        modalButtonText={UIText.removeButtonText}
+                        modalCloseButtonText={UIText.closeButtonText}
+                      />
+                    )}
 
-                    <ProductUserModal
-                      bind="product"
-                      iconMode={iconMode}
-                      itemIdsNamesToProcess={idsNamesToDelete}
-                      areThereMultipleProducts={idsNamesToDelete?.length > 1}
-                      modalType="Restore"
-                      deleteBTNClass={deleteBTNClass}
-                      handleShow={handleShow}
-                      modalTitle={
-                        idsNamesToDelete?.length > 1
-                          ? UIText.restoreProductsTitle
-                          : UIText.restoreProductTitle
-                      }
-                      modalText={
-                        idsNamesToDelete?.length > 1
-                          ? UIText.restoreProductsText
-                          : UIText.restoreProductText
-                      }
-                      modalButtonText={UIText.restoreButtonText}
-                      modalCloseButtonText={UIText.closeButtonText}
-                    />
+                    {auth.isSet(auth.PERMS.restore_product) && (
+                      <ProductUserModal
+                        bind="product"
+                        iconMode={iconMode}
+                        itemIdsNamesToProcess={idsNamesToDelete}
+                        areThereMultipleProducts={idsNamesToDelete?.length > 1}
+                        modalType="Restore"
+                        deleteBTNClass={deleteBTNClass}
+                        handleShow={handleShow}
+                        modalTitle={
+                          idsNamesToDelete?.length > 1
+                            ? UIText.restoreProductsTitle
+                            : UIText.restoreProductTitle
+                        }
+                        modalText={
+                          idsNamesToDelete?.length > 1
+                            ? UIText.restoreProductsText
+                            : UIText.restoreProductText
+                        }
+                        modalButtonText={UIText.restoreButtonText}
+                        modalCloseButtonText={UIText.closeButtonText}
+                      />
+                    )}
+
                     <Button
                       className="btn btn-light p-2 ms-1 me-2 mb-2"
                       onClick={handleSelectAllProducts}

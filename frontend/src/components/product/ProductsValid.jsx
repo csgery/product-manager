@@ -15,6 +15,7 @@ import { GrClose } from "react-icons/gr";
 import { BiSelectMultiple } from "react-icons/bi";
 import { IconModeContext } from "../../App";
 import Searchbar from "../Searchbar";
+import { auth } from "../../helper/helper";
 
 export default function ProductsDeleted() {
   const { loading, error, data } = useQuery(GET_VALIDPRODUCTS);
@@ -114,10 +115,11 @@ export default function ProductsDeleted() {
       {!loading && !error && (
         <>
           <div className="mt-5">
-            <ProductCreateModal />
+            {auth.isSet(auth.PERMS.insert_product) && <ProductCreateModal />}
+
             {data && data.validProducts.length > 0 ? (
               <>
-                {!showDeleteCBs ? (
+                {!showDeleteCBs && auth.isSet(auth.PERMS.delete_product) ? (
                   <Button
                     className="btn btn-danger p-2 ms-1 me-2 mb-2"
                     onClick={handleShow}
@@ -130,49 +132,55 @@ export default function ProductsDeleted() {
                   </Button>
                 ) : (
                   <div>
-                    <Button
-                      className="btn btn-light p-2 ms-1 me-2 mb-2"
-                      onClick={handleShow}
-                    >
-                      {iconMode ? (
-                        <GrClose style={{ fontSize: "1.4rem" }} />
-                      ) : (
-                        UIText.closeButtonText
-                      )}
-                    </Button>
-                    <ProductUserModal
-                      bind="product"
-                      iconMode={iconMode}
-                      itemIdsNamesToProcess={idsNamesToDelete}
-                      areThereMultipleProducts={idsNamesToDelete?.length > 1}
-                      modalType="Delete"
-                      deleteBTNClass={deleteBTNClass}
-                      handleShow={handleShow}
-                      modalTitle={UIText.deleteProductTitle}
-                      modalText={
-                        idsNamesToDelete?.length > 1
-                          ? UIText.deleteProductsText
-                          : UIText.deleteProductText
-                      }
-                      modalButtonText={UIText.deleteButtonText}
-                      modalCloseButtonText={UIText.closeButtonText}
-                    />
-                    <Button
-                      className="btn btn-light p-2 ms-1 me-2 mb-2"
-                      onClick={handleSelectAllProducts}
-                    >
-                      {iconMode ? (
-                        <BiSelectMultiple style={{ fontSize: "1.6rem" }} />
-                      ) : (
-                        UIText.selectAllButtonText
-                      )}
-                    </Button>
+                    {auth.isSet(auth.PERMS.delete_product) && (
+                      <>
+                        <Button
+                          className="btn btn-light p-2 ms-1 me-2 mb-2"
+                          onClick={handleShow}
+                        >
+                          {iconMode ? (
+                            <GrClose style={{ fontSize: "1.4rem" }} />
+                          ) : (
+                            UIText.closeButtonText
+                          )}
+                        </Button>
+                        <ProductUserModal
+                          bind="product"
+                          iconMode={iconMode}
+                          itemIdsNamesToProcess={idsNamesToDelete}
+                          areThereMultipleProducts={
+                            idsNamesToDelete?.length > 1
+                          }
+                          modalType="Delete"
+                          deleteBTNClass={deleteBTNClass}
+                          handleShow={handleShow}
+                          modalTitle={UIText.deleteProductTitle}
+                          modalText={
+                            idsNamesToDelete?.length > 1
+                              ? UIText.deleteProductsText
+                              : UIText.deleteProductText
+                          }
+                          modalButtonText={UIText.deleteButtonText}
+                          modalCloseButtonText={UIText.closeButtonText}
+                        />
+                        <Button
+                          className="btn btn-light p-2 ms-1 me-2 mb-2"
+                          onClick={handleSelectAllProducts}
+                        >
+                          {iconMode ? (
+                            <BiSelectMultiple style={{ fontSize: "1.6rem" }} />
+                          ) : (
+                            UIText.selectAllButtonText
+                          )}
+                        </Button>
+                      </>
+                    )}
                   </div>
                 )}
-                {console.log(
+                {/* {console.log(
                   "validProducts BEFORE searchbar:",
                   data.validProducts
-                )}
+                )} */}
                 <Searchbar
                   allItemsFromDB={data.validProducts}
                   setItemsToView={setValidProducts}
