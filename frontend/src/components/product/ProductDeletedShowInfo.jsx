@@ -5,13 +5,11 @@ import { GET_USER } from "../../queries/userQueries";
 import { useState } from "react";
 import { GET_PRODUCT } from "../../queries/productQueries";
 import Spinner from "./../Spinner";
-import ProductEditForm from "./ProductEditForm";
 import moment from "moment";
 import ProductUserModal from "./../modals/ProductUserModal";
 import { UITextContext } from "./../TranslationWrapper";
-import { TbEdit } from "react-icons/tb";
-import { Button } from "react-bootstrap";
 import { IconModeContext } from "../../App";
+import { auth } from "../../helper/helper";
 
 export default function ProductDeletedShowInfo() {
   const [toggleEditForm, setToggleEditForm] = useState(false);
@@ -77,7 +75,7 @@ export default function ProductDeletedShowInfo() {
   if (!data.product.valid) {
     return (
       <>
-        {console.log("data:", data)}
+        {/*console.log("data:", data)*/}
         {!loading && !error && data && (
           <>
             {" "}
@@ -135,104 +133,60 @@ export default function ProductDeletedShowInfo() {
                   )}
                 </div>
 
-                {!toggleEditForm && (
-                  <div className="mt-2">
-                    {data.product.valid && (
-                      <>
-                        <Button
-                          className="btn btn-dark me-1 mb-2 "
-                          onClick={handleFormToggle}
-                        >
-                          {iconMode ? (
-                            <TbEdit
-                              style={{ fontSize: "1.6rem" }}
-                              //className="btn btn-light"
-                            />
-                          ) : (
-                            UIText.editButtonText
-                          )}
-                        </Button>
-                        {/* delete form */}
-                        <ProductUserModal
-                          bind="product"
-                          iconMode={iconMode}
-                          itemIdsNamesToProcess={[
-                            [
-                              data.product.id,
-                              data.product.name,
-                              data.product.shortId,
-                            ],
-                          ]}
-                          didItemComeFromItself={true}
-                          redirectPathAfterSuccess={"/products/"}
-                          areThereMultipleProducts={false}
-                          modalType="Delete"
-                          deleteBTNClass={"btn btn-danger p-2 ms-1 me-2 mb-2 "}
-                          modalTitle={UIText.deleteProductTitle}
-                          modalText={UIText.deleteProductText}
-                          modalButtonText={UIText.deleteButtonText}
-                          modalCloseButtonText={UIText.closeButtonText}
-                        />
-                      </>
+                <div className="mt-2">
+                  <>
+                    {auth.isSet(auth.PERMS.remove_product) && (
+                      <ProductUserModal
+                        bind="product"
+                        iconMode={iconMode}
+                        itemIdsNamesToProcess={[
+                          [
+                            data.product.id,
+                            data.product.name,
+                            data.product.shortId,
+                          ],
+                        ]}
+                        didProductComeFromItself={true}
+                        redirectPathAfterSuccess={"/products/deleted"}
+                        areThereMultipleProducts={false}
+                        modalType="Remove"
+                        deleteBTNClass={"btn btn-danger p-2 me-2 mb-2 mt-2 "}
+                        modalTitle={UIText.removeProductTitle}
+                        modalText={UIText.removeProductText}
+                        modalButtonText={UIText.removeButtonText}
+                        modalCloseButtonText={UIText.closeButtonText}
+                      />
                     )}
-                    {!data.product?.valid && (
-                      <>
-                        <ProductUserModal
-                          bind="product"
-                          iconMode={iconMode}
-                          itemIdsNamesToProcess={[
-                            [
-                              data.product.id,
-                              data.product.name,
-                              data.product.shortId,
-                            ],
-                          ]}
-                          didProductComeFromItself={true}
-                          redirectPathAfterSuccess={"/products/deleted"}
-                          areThereMultipleProducts={false}
-                          modalType="Remove"
-                          deleteBTNClass={"btn btn-danger p-2 me-2 mb-2 mt-2 "}
-                          modalTitle={UIText.removeProductTitle}
-                          modalText={UIText.removeProductText}
-                          modalButtonText={UIText.removeButtonText}
-                          modalCloseButtonText={UIText.closeButtonText}
-                        />
-                        {/* restore form */}
-                        <ProductUserModal
-                          bind="product"
-                          iconMode={iconMode}
-                          itemIdsNamesToProcess={[
-                            [
-                              data.product.id,
-                              data.product.name,
-                              data.product.shortId,
-                            ],
-                          ]}
-                          didProductComeFromItself={true}
-                          redirectPathAfterSuccess={"/products/deleted"}
-                          areThereMultipleProducts={false}
-                          modalType="Restore"
-                          deleteBTNClass={
-                            "btn btn-primary p-2 ms-1 me-2 mb-2 mt-2 "
-                          }
-                          modalTitle={UIText.restoreProductTitle}
-                          modalText={UIText.restoreProductText}
-                          modalButtonText={UIText.restoreButtonText}
-                          modalCloseButtonText={UIText.closeButtonText}
-                        />
-                      </>
+
+                    {auth.isSet(auth.PERMS.restore_product) && (
+                      /* restore form */
+                      <ProductUserModal
+                        bind="product"
+                        iconMode={iconMode}
+                        itemIdsNamesToProcess={[
+                          [
+                            data.product.id,
+                            data.product.name,
+                            data.product.shortId,
+                          ],
+                        ]}
+                        didProductComeFromItself={true}
+                        redirectPathAfterSuccess={"/products/deleted"}
+                        areThereMultipleProducts={false}
+                        modalType="Restore"
+                        deleteBTNClass={
+                          "btn btn-primary p-2 ms-1 me-2 mb-2 mt-2 "
+                        }
+                        modalTitle={UIText.restoreProductTitle}
+                        modalText={UIText.restoreProductText}
+                        modalButtonText={UIText.restoreButtonText}
+                        modalCloseButtonText={UIText.closeButtonText}
+                      />
                     )}
-                  </div>
-                )}
+                  </>
+                </div>
               </div>
             </div>
-            {data.product.valid && toggleEditForm && (
-              <ProductEditForm
-                product={data.product}
-                setToggleEditForm={setToggleEditForm}
-                iconMode={iconMode}
-              />
-            )}
           </>
         )}
       </>

@@ -10,8 +10,9 @@ import moment from "moment";
 import ProductUserModal from "../modals/ProductUserModal";
 import { UITextContext } from "../TranslationWrapper";
 import { TbEdit } from "react-icons/tb";
-import { Button, Modal } from "react-bootstrap";
+import { Button } from "react-bootstrap";
 import { IconModeContext } from "../../App";
+import { auth } from "../../helper/helper";
 
 export default function ProductShowInfo() {
   const [toggleEditForm, setToggleEditForm] = useState(false);
@@ -137,96 +138,50 @@ export default function ProductShowInfo() {
 
                 {!toggleEditForm && (
                   <div className="mt-2">
-                    {data.product.valid && (
-                      <>
-                        <Button
-                          className="btn btn-dark me-1 mb-2 "
-                          onClick={handleFormToggle}
-                        >
-                          {iconMode ? (
-                            <TbEdit
-                              style={{ fontSize: "1.6rem" }}
-                              //className="btn btn-light"
-                            />
-                          ) : (
-                            UIText.editButtonText
-                          )}
-                        </Button>
-                        {/* delete form */}
-                        <ProductUserModal
-                          bind="product"
-                          iconMode={iconMode}
-                          itemIdsNamesToProcess={[
-                            [
-                              data.product.id,
-                              data.product.name,
-                              data.product.shortId,
-                            ],
-                          ]}
-                          didItemComeFromItself={true}
-                          redirectPathAfterSuccess={"/products/"}
-                          areThereMultipleProducts={false}
-                          modalType="Delete"
-                          deleteBTNClass={"btn btn-danger p-2 ms-1 me-2 mb-2 "}
-                          modalTitle={UIText.deleteProductTitle}
-                          modalText={UIText.deleteProductText}
-                          modalButtonText={UIText.deleteButtonText}
-                          modalCloseButtonText={UIText.closeButtonText}
-                        />
-                      </>
+                    {auth.isSet(auth.PERMS.update_product) && (
+                      <Button
+                        className="btn btn-dark me-1 mb-2 "
+                        onClick={handleFormToggle}
+                      >
+                        {iconMode ? (
+                          <TbEdit
+                            style={{ fontSize: "1.6rem" }}
+                            //className="btn btn-light"
+                          />
+                        ) : (
+                          UIText.editButtonText
+                        )}
+                      </Button>
                     )}
-                    {!data.product?.valid && (
-                      <>
-                        <ProductUserModal
-                          bind="product"
-                          iconMode={iconMode}
-                          itemIdsNamesToProcess={[
-                            [
-                              data.product.id,
-                              data.product.name,
-                              data.product.shortId,
-                            ],
-                          ]}
-                          didProductComeFromItself={true}
-                          redirectPathAfterSuccess={"/products/deleted"}
-                          areThereMultipleProducts={false}
-                          modalType="Remove"
-                          deleteBTNClass={"btn btn-danger p-2 me-2 mb-2 mt-2 "}
-                          modalTitle={UIText.removeProductTitle}
-                          modalText={UIText.removeProductText}
-                          modalButtonText={UIText.removeButtonText}
-                          modalCloseButtonText={UIText.closeButtonText}
-                        />
-                        {/* restore form */}
-                        <ProductUserModal
-                          bind="product"
-                          iconMode={iconMode}
-                          itemIdsNamesToProcess={[
-                            [
-                              data.product.id,
-                              data.product.name,
-                              data.product.shortId,
-                            ],
-                          ]}
-                          didProductComeFromItself={true}
-                          redirectPathAfterSuccess={"/products/deleted"}
-                          areThereMultipleProducts={false}
-                          modalType="Restore"
-                          deleteBTNClass={
-                            "btn btn-primary p-2 ms-1 me-2 mb-2 mt-2 "
-                          }
-                          modalTitle={UIText.restoreProductTitle}
-                          modalText={UIText.restoreProductText}
-                          modalButtonText={UIText.restoreButtonText}
-                          modalCloseButtonText={UIText.closeButtonText}
-                        />
-                      </>
+
+                    {/* delete form */}
+                    {auth.isSet(auth.PERMS.delete_product) && (
+                      <ProductUserModal
+                        bind="product"
+                        iconMode={iconMode}
+                        itemIdsNamesToProcess={[
+                          [
+                            data.product.id,
+                            data.product.name,
+                            data.product.shortId,
+                          ],
+                        ]}
+                        didItemComeFromItself={true}
+                        redirectPathAfterSuccess={"/products/"}
+                        areThereMultipleProducts={false}
+                        modalType="Delete"
+                        deleteBTNClass={"btn btn-danger p-2 ms-1 me-2 mb-2 "}
+                        modalTitle={UIText.deleteProductTitle}
+                        modalText={UIText.deleteProductText}
+                        modalButtonText={UIText.deleteButtonText}
+                        modalCloseButtonText={UIText.closeButtonText}
+                      />
                     )}
                   </div>
                 )}
               </div>
             </div>
-            {data.product.valid && toggleEditForm && (
+            {toggleEditForm && (
               <ProductEditForm
                 product={data.product}
                 setToggleEditForm={setToggleEditForm}

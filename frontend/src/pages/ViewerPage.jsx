@@ -3,9 +3,11 @@ import { useQuery } from "@apollo/client";
 import { VIEWER } from "../queries/userQueries";
 import Spinner from "../components/Spinner";
 import UserPermissions from "../components/user/UserPermissions";
+import { auth } from "../helper/helper";
 
 export default function ViewerPage() {
   const { id } = useParams();
+  const tokenScope = import.meta.env.VITE_BACKEND_URI;
 
   // if (!id) {
   //   return <></>;
@@ -32,7 +34,9 @@ export default function ViewerPage() {
           Registered at:{" "}
           {new Date(Number(data.viewer.createdAt)).toDateString()}
         </h3>
-        <UserPermissions permissions={data.viewer.permissions} />
+        <UserPermissions
+          permissions={auth.getTokenData()[tokenScope].permissions}
+        />
       </>
     )
   );

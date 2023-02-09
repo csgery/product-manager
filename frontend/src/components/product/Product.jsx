@@ -1,6 +1,6 @@
 import ProductUserModal from "../modals/ProductUserModal";
 import { useNavigate } from "react-router-dom";
-import { useEffect, useState, useRef, useCallback, useContext } from "react";
+import { useEffect, useState, useRef, useContext } from "react";
 import { UITextContext } from "../TranslationWrapper";
 import { IconModeContext } from "../../App";
 import { auth } from "../../helper/helper";
@@ -127,7 +127,7 @@ export default function Product({
         {!showDeleteCBs && (
           <>
             {product.valid ? (
-              auth.isSet(auth.PERMS.remove_product) && (
+              auth.isSet(auth.PERMS.delete_product) && (
                 <ProductUserModal
                   bind="product"
                   iconMode={iconMode}
@@ -146,36 +146,40 @@ export default function Product({
               )
             ) : (
               <>
-                <ProductUserModal
-                  bind="product"
-                  iconMode={iconMode}
-                  itemIdsNamesToProcess={[
-                    [product.id, product.name, product.shortId],
-                  ]}
-                  areThereMultipleProducts={false}
-                  modalType="Remove"
-                  deleteBTNClass="btn btn-danger p-2 me-2"
-                  didItemComeFromItself={true}
-                  modalTitle={UIText.removeProductTitle}
-                  modalText={UIText.removeProductText}
-                  modalButtonText={UIText.removeButtonText}
-                  modalCloseButtonText={UIText.closeButtonText}
-                />
-                <ProductUserModal
-                  bind="product"
-                  iconMode={iconMode}
-                  itemIdsNamesToProcess={[
-                    [product.id, product.name, product.shortId],
-                  ]}
-                  areThereMultipleProducts={false}
-                  modalType="Restore"
-                  deleteBTNClass="btn btn-danger p-2 me-2"
-                  didItemComeFromItself={true}
-                  modalTitle={UIText.restoreProductTitle}
-                  modalText={UIText.restoreProductText}
-                  modalButtonText={UIText.restoreButtonText}
-                  modalCloseButtonText={UIText.closeButtonText}
-                />
+                {auth.isSet(auth.PERMS.remove_product) && (
+                  <ProductUserModal
+                    bind="product"
+                    iconMode={iconMode}
+                    itemIdsNamesToProcess={[
+                      [product.id, product.name, product.shortId],
+                    ]}
+                    areThereMultipleProducts={false}
+                    modalType="Remove"
+                    deleteBTNClass="btn btn-danger p-2 me-2"
+                    didItemComeFromItself={true}
+                    modalTitle={UIText.removeProductTitle}
+                    modalText={UIText.removeProductText}
+                    modalButtonText={UIText.removeButtonText}
+                    modalCloseButtonText={UIText.closeButtonText}
+                  />
+                )}
+                {auth.isSet(auth.PERMS.restore_product) && (
+                  <ProductUserModal
+                    bind="product"
+                    iconMode={iconMode}
+                    itemIdsNamesToProcess={[
+                      [product.id, product.name, product.shortId],
+                    ]}
+                    areThereMultipleProducts={false}
+                    modalType="Restore"
+                    deleteBTNClass="btn btn-danger p-2 me-2"
+                    didItemComeFromItself={true}
+                    modalTitle={UIText.restoreProductTitle}
+                    modalText={UIText.restoreProductText}
+                    modalButtonText={UIText.restoreButtonText}
+                    modalCloseButtonText={UIText.closeButtonText}
+                  />
+                )}
               </>
             )}
           </>
