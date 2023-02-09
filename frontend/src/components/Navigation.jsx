@@ -66,9 +66,30 @@ export default function Navigation({
                     )}
 
                     {auth.isSet(auth.PERMS.readValid_users) && (
-                      <Nav.Link onClick={() => handleNavigate("/users")}>
-                        {UIText.users}
-                      </Nav.Link>
+                      <>
+                        {/* if user has updateUser_permissions than render a dropdown else a single link */}
+                        {auth.isSet(auth.PERMS.updateUser_permissions) ? (
+                          <NavDropdown
+                            title={UIText.users}
+                            id="collasible-nav-dropdown"
+                          >
+                            <NavDropdown.Item
+                              onClick={() => handleNavigate("/users")}
+                            >
+                              {UIText.users}
+                            </NavDropdown.Item>
+                            <NavDropdown.Item
+                              onClick={() => handleNavigate("/permissions")}
+                            >
+                              {UIText.permissions}
+                            </NavDropdown.Item>
+                          </NavDropdown>
+                        ) : (
+                          <Nav.Link onClick={() => handleNavigate("/users")}>
+                            {UIText.users}
+                          </Nav.Link>
+                        )}
+                      </>
                     )}
 
                     {auth.isSet(auth.PERMS.readInvalid_users) && (

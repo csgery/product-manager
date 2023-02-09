@@ -187,6 +187,7 @@ function TranslationWrapper({ children }) {
       wrongCharacters: "Wrong characters",
       searchbarSettings: "Searchbar Settings",
 
+      permissions: "Permissions",
       language: "Language",
       iconMode: "Icon Mode",
       settings: "Settings",

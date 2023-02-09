@@ -31,6 +31,7 @@ import { ReactNotifications } from "react-notifications-component";
 import "react-notifications-component/dist/theme.css";
 import DeletedProductPage from "./pages/DeletedProductPage";
 import DeletedUserPage from "./pages/DeletedUserPage";
+import UsersPermissionsPage from "./pages/UsersPermissionsPage";
 // import FAIDemo from "./components/FontAwesomeIcon_DEMO";
 export const DarkModeContext = createContext();
 export const LangContext = createContext();
@@ -322,6 +323,13 @@ function App() {
                             )}
                           />
                         </Route>
+                        <Route
+                          path="/permissions"
+                          element={checkPermsBeforeRoute(
+                            auth.PERMS.updateUser_permissions,
+                            <UsersPermissionsPage />
+                          )}
+                        />
                         <Route
                           path="/viewer/:id"
                           element={checkPermsBeforeRoute(
