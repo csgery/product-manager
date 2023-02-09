@@ -16,6 +16,7 @@ function UserUpdatePermsModal({
   originalUsers,
   affectedUsers,
   setEditMode,
+  formatPerm,
 }) {
   const [showSavePermsModal, setShowSavePermsModal] = useState(false);
 
@@ -76,11 +77,13 @@ function UserUpdatePermsModal({
       <Button
         onClick={() => setShowSavePermsModal((old) => !old)}
         disabled={JSON.stringify(users) === JSON.stringify(originalUsers)}
+        className={"mt-5 ms-2"}
       >
         Save
       </Button>
 
       <Modal
+        size="xl"
         show={showSavePermsModal}
         onHide={() => setShowSavePermsModal((old) => !old)}
       >
@@ -94,6 +97,7 @@ function UserUpdatePermsModal({
                 <th>name</th>
                 <th>added perms</th>
                 <th>removed perms</th>
+                <th>perms after edit</th>
               </tr>
             </thead>
             <tbody>
@@ -119,7 +123,14 @@ function UserUpdatePermsModal({
                         .find(
                           (originalUser) => originalUser.id === affectedUser.id
                         )
-                        .permissions.includes()}
+                        .permissions.filter(
+                          (originalPerm) =>
+                            !affectedUser.permissions.includes(originalPerm)
+                        )
+                        .map((perm) => `${perm} `)}
+                    </th>
+                    <th>
+                      {affectedUser.permissions.map((perm) => `${perm} `)}
                     </th>
                   </tr>
                 );

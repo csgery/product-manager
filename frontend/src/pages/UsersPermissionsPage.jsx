@@ -14,12 +14,48 @@ import {
 import { Spinner } from "react-bootstrap";
 import useCustomError from "../helper/hooks/useCustomError";
 import { UITextContext } from "../components/TranslationWrapper";
+import { DarkModeContext } from "../App";
 import UserUpdatePermsModal from "../components/modals/UserUpdatePermsModal";
 
 function UsersPermissionsPage() {
   const { loading, error, data } = useQuery(GET_VALIDUSERS);
 
   const UIText = useContext(UITextContext);
+  const darkMode = useContext(DarkModeContext);
+
+  let styles = {
+    // productPerm: "rgb(228, 50, 50)",
+    // productPermDark: "rgb(151, 146, 146)",
+    // userPerm: "rgb(122, 158, 23)",
+    // userPermDark: "rgb(128, 125, 125)",
+  };
+
+  useEffect(() => {
+    console.log("dark changing");
+    if (darkMode) {
+      styles = {
+        productPerm: "rgb(151, 146, 146)",
+        userPerm: "rgb(128, 125, 125)",
+      };
+    } else {
+      styles = {
+        productPerm: "rgb(228, 50, 50)",
+        userPerm: "rgb(122, 158, 23)",
+      };
+    }
+  }, [darkMode]);
+
+  // .productPermDark {
+  //   background-color: rgb(151, 146, 146);
+  // }
+
+  // .userPerm {
+  //   background-color: rgb(122, 158, 23);
+  // }
+
+  // .userPermDark {
+  //   background-color: rgb(128, 125, 125);
+  // }
 
   const [
     updatePermissions,
@@ -47,7 +83,7 @@ function UsersPermissionsPage() {
     if (data?.validUsers) setUsers(data.validUsers);
   }, [data?.validUsers, editMode]);
 
-  const formatRight = (right) => {
+  const formatPerm = (right) => {
     if (right.includes("_")) {
       const result = right.split("_");
       if (result[0].toLowerCase().includes("updateuser")) {
@@ -124,16 +160,22 @@ function UsersPermissionsPage() {
     return (
       <>
         {!editMode ? (
-          <Button onClick={() => setEditMode((oldValue) => !oldValue)}>
+          <Button
+            className={"mt-5"}
+            onClick={() => setEditMode((oldValue) => !oldValue)}
+          >
             Edit
           </Button>
         ) : (
           <>
-            <Button onClick={handlePermsEditCancel}>Cancel</Button>
+            <Button className={"mt-5"} onClick={handlePermsEditCancel}>
+              Cancel
+            </Button>
             <UserUpdatePermsModal
               users={users}
               originalUsers={data.validUsers}
               setEditMode={setEditMode}
+              formatPerm={formatPerm}
               affectedUsers={users.filter(
                 (user) =>
                   !JSON.stringify(data.validUsers).includes(
@@ -143,54 +185,69 @@ function UsersPermissionsPage() {
             />
           </>
         )}
-        <Table responsive>
+        <Table responsive striped bordered hover className={"mt-2"}>
           <thead>
             <tr>
-              <th></th>
+              <th className={"text-center"} rowSpan={3}></th>
               <th
                 colSpan={productPermsCount}
-                className={"bg-light text-center"}
+                className={"text-center"}
+                style={{ backgroundColor: styles.productPerm }}
               >
                 products
               </th>
               <th
                 colSpan={usersPermsCount}
-                className={"bg-success text-center"}
+                className={"text-center"}
+                style={{ backgroundColor: styles.userPerm }}
               >
                 users
               </th>
             </tr>
             <tr>
-              <th></th>
               <th
                 colSpan={productPermsReadCount}
-                className={"bg-primary text-center"}
+                className={"text-center"}
+                style={{ backgroundColor: styles.productPerm }}
               >
                 read
               </th>
               <th
                 colSpan={productPermsCount - productPermsReadCount}
-                className={"bg-secondary text-center"}
+                className={"text-center"}
+                style={{ backgroundColor: styles.productPerm }}
               >
                 modify
               </th>
               <th
                 colSpan={usersPermsReadCount}
-                className={"bg-primary text-center"}
+                className={"text-center"}
+                style={{ backgroundColor: styles.userPerm }}
               >
                 read
               </th>
               <th
                 colSpan={usersPermsCount - usersPermsReadCount - 1}
-                className={"bg-secondary text-center"}
+                className={"text-center"}
+                style={{ backgroundColor: styles.userPerm }}
               >
                 modify
               </th>
+              <th style={{ backgroundColor: styles.userPerm }}></th>
             </tr>
             <tr>
-              <th>#</th>
               {Object.keys(auth.PERMS).map((item, index) => (
-                <th key={index}>{formatRight(item)}</th>
+                <th
+                  // className={index < 7 ? "productPerm" : "userPerm"}
+                  key={index}
+                  style={
+                    index < 7
+                      ? { backgroundColor: styles.productPerm }
+                      : { backgroundColor: styles.userPerm }
+                  }
+                >
+                  {formatPerm(item)}
+                </th>
               ))}
             </tr>
           </thead>
@@ -200,17 +257,23 @@ function UsersPermissionsPage() {
               return (
                 <tr>
                   <td className={"text-center"}>{validUser.username}</td>
-                  {Object.keys(auth.PERMS).map((permKey) => {
+                  {Object.keys(auth.PERMS).map((permKey, index) => {
                     return (
                       <td
-                        className={"text-center"}
+                        className={
+                          /*(index < 7 ? "productPerm" : "userPerm") +*/
+                          " text-center"
+                        }
+                        style={
+                          index < 7
+                            ? { backgroundColor: styles.productPerm }
+                            : { backgroundColor: styles.userPerm }
+                        }
                         //onClick={(e) => handleClick(e)}
                       >
                         <input
+                          className="form-check-input text-center"
                           type="checkbox"
-                          // defaultChecked={validUser.permissions.includes(
-                          //   auth.PERMS[permKey]
-                          // )}
                           name={auth.PERMS[permKey]}
                           value={validUser.id}
                           onChange={(e) => handleChange(e)}
