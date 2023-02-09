@@ -1,18 +1,41 @@
-import React, { useState, useEffect } from "react";
-import { useQuery } from "@apollo/client";
+import React, { useState, useEffect, useContext } from "react";
+import { useQuery, useMutation } from "@apollo/client";
 import { GET_VALIDUSERS } from "../queries/userQueries";
+import { UPDATE_PERMISSIONS } from "../mutations/userMutations";
 import Table from "react-bootstrap/Table";
 import Button from "react-bootstrap/Button";
+import Modal from "react-bootstrap/Modal";
 import {
   auth,
   addDependedPermissions,
   removeDependedPermissions,
+  createNotification,
 } from "../helper/helper";
 import { Spinner } from "react-bootstrap";
 import useCustomError from "../helper/hooks/useCustomError";
+import { UITextContext } from "../components/TranslationWrapper";
+import UserUpdatePermsModal from "../components/modals/UserUpdatePermsModal";
 
 function UsersPermissionsPage() {
-  let { data, loading, error } = useQuery(GET_VALIDUSERS);
+  const { loading, error, data } = useQuery(GET_VALIDUSERS);
+
+  const UIText = useContext(UITextContext);
+
+  const [
+    updatePermissions,
+    { data: permsData, loading: permsLoading, error: permsError },
+  ] = useMutation(UPDATE_PERMISSIONS, {
+    refetchQueries: [GET_VALIDUSERS],
+    // variables: { arrayString },
+    // update(cache, { data: { data } }) {
+    //   const { validProducts } = cache.readQuery({ query: GET_VALIDPRODUCTS });
+    //   console.log("addProduct:", addProduct);
+    //   cache.writeQuery({
+    //     query: GET_VALIDPRODUCTS,
+    //     data: { validProducts: [...validProducts, addProduct] },
+    //   });
+    // },
+  });
 
   const [users, setUsers] = useState([]);
 
@@ -22,7 +45,7 @@ function UsersPermissionsPage() {
 
   useEffect(() => {
     if (data?.validUsers) setUsers(data.validUsers);
-  }, [data?.validUsers]);
+  }, [data?.validUsers, editMode]);
 
   const formatRight = (right) => {
     if (right.includes("_")) {
@@ -56,16 +79,7 @@ function UsersPermissionsPage() {
       item.toLowerCase().includes("user") && item.toLowerCase().includes("read")
   ).length;
 
-  // console.log(Object.keys(auth.PERMS).length);
-  // console.log(productPermsCount);
-  // console.log(usersPermsCount);
-  // console.log("read in products:", productPermsReadCount);
-  // console.log("read in users:", usersPermsReadCount);
-
-  //const handleClick = (e) => {};
-
   const handleChange = (e) => {
-    //console.log(`user: ${e.target.value} perm: ${e.target.name}`);
     console.log("users:", users);
     const userIdFromEdit = e.target.value;
     const permFromEdit = e.target.name;
@@ -95,16 +109,40 @@ function UsersPermissionsPage() {
     console.log("user after click:", user);
   };
 
+  const handlePermsEditCancel = () => {
+    setEditMode((oldValue) => !oldValue);
+    setUsers([]);
+  };
+
   if (loading) return <Spinner />;
 
-  if (error) return handleCustomError(error);
+  if (error) {
+    handleCustomError(error);
+  }
 
   if (users && !loading && !error)
     return (
       <>
-        <Button onClick={() => setEditMode((oldValue) => !oldValue)}>
-          Edit
-        </Button>
+        {!editMode ? (
+          <Button onClick={() => setEditMode((oldValue) => !oldValue)}>
+            Edit
+          </Button>
+        ) : (
+          <>
+            <Button onClick={handlePermsEditCancel}>Cancel</Button>
+            <UserUpdatePermsModal
+              users={users}
+              originalUsers={data.validUsers}
+              setEditMode={setEditMode}
+              affectedUsers={users.filter(
+                (user) =>
+                  !JSON.stringify(data.validUsers).includes(
+                    JSON.stringify(user)
+                  )
+              )}
+            />
+          </>
+        )}
         <Table responsive>
           <thead>
             <tr>

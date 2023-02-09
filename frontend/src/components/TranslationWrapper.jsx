@@ -153,6 +153,7 @@ function TranslationWrapper({ children }) {
       cancelButtonText: "Cancel",
       createButtonText: "Create",
       editButtonText: "Edit",
+      saveButtonText: "Save",
 
       // Create Product Modal
       createProductButtonText: "Create Product",
@@ -199,6 +200,7 @@ function TranslationWrapper({ children }) {
       successfullyDeleted: "Successfully Deleted!",
       successfullyRemoved: "Successfully Removed!",
       successfullyRestored: "Successfully Restored!",
+      successfullyModifiedPerms: "Successfully Modified Permissions!",
       fillOutAllField: "Please fill out all fields!",
       quantityTooLarge: "Quantity is larger than 1000!",
 

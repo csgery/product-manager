@@ -354,69 +354,67 @@ export default {
 
     updatePermission: async (
       parent,
-      { id, permissions: newPermissions },
+      // { id, permissions: newPermissions },
+      { arrayString },
       { user: userCtx, req }
     ) => {
+      console.log("arrayString", arrayString);
+      const inputArray = arrayString.map((item) => JSON.parse(item));
       const lang = req.headers.language || "en";
-      const user = await User.findById(id);
-      if (!user) {
-        throw userNotFound_Error(lang);
-      }
+      for (const actualUserObject of inputArray) {
+        const user = await User.findById(actualUserObject.id);
+        if (!user) {
+          throw userNotFound_Error(lang);
+        }
 
-      // START Add permissions
-      // const existingPermissions = user.permissions;
-      // newPermissions.forEach((newPermission) => {
-      //   if (!existingPermissions.includes(newPermission)) {
-      //     existingPermissions.push(newPermission);
-      //   }
-      // });
-      // user.permissions = existingPermissions;
-      // END Add permissions
+        let validatedPermissions = [];
+        if (actualUserObject.permissions?.length > 0) {
+          validatedPermissions = validatePermissions(
+            actualUserObject.permissions
+          );
+        }
 
-      let validatedPermissions = [];
-      if (newPermissions?.length > 0) {
-        validatedPermissions = validatePermissions(newPermissions);
-      }
+        if (
+          validatedPermissions?.length < 1 ||
+          JSON.stringify(user.permissions) ===
+            JSON.stringify(validatedPermissions)
+        ) {
+          const userLog = new UserLog({
+            userId: user.id,
+            createdBy: userCtx.sub,
+            actionType: "update-permissions",
+            message:
+              validatedPermissions?.length < 1
+                ? "unsuccessful-empty-update"
+                : "unsuccessful-update-samePermissions",
+          });
+          console.log(userLog);
+          await userLog.save();
+          throw userNotChanged_Error(lang);
+        }
 
-      if (
-        validatedPermissions?.length < 1 ||
-        JSON.stringify(user.permissions) ===
-          JSON.stringify(validatedPermissions)
-      ) {
+        const fieldsToLog = {};
+        fieldsToLog.oldPermissions = user.permissions;
+        fieldsToLog.newPermissions = validatedPermissions;
+        fieldsToLog.oldCFT = user.CFT;
+        fieldsToLog.newCFT = user.CFT + 1;
         const userLog = new UserLog({
+          ...fieldsToLog,
           userId: user.id,
           createdBy: userCtx.sub,
           actionType: "update-permissions",
-          message:
-            validatedPermissions?.length < 1
-              ? "unsuccessful-empty-update"
-              : "unsuccessful-update-samePermissions",
         });
-        console.log(userLog);
         await userLog.save();
-        throw userNotChanged_Error(lang);
+        //user.permissions = newPermissions;
+        await user.update({
+          CFT: user.CFT + 1,
+          permissions: validatedPermissions,
+          shouldUserReLogin: true,
+          updatedBy: userCtx.sub,
+        });
+        return user.id;
       }
-
-      const fieldsToLog = {};
-      fieldsToLog.oldPermissions = user.permissions;
-      fieldsToLog.newPermissions = validatedPermissions;
-      fieldsToLog.oldCFT = user.CFT;
-      fieldsToLog.newCFT = user.CFT + 1;
-      const userLog = new UserLog({
-        ...fieldsToLog,
-        userId: user.id,
-        createdBy: userCtx.sub,
-        actionType: "update-permissions",
-      });
-      await userLog.save();
-      //user.permissions = newPermissions;
-      await user.update({
-        CFT: user.CFT + 1,
-        permissions: validatedPermissions,
-        shouldUserReLogin: true,
-        updatedBy: userCtx.sub,
-      });
-      return user.id;
+      return "ok";
     },
 
     deleteUser: async (parent, { id }, { user: userCtx, req }) => {

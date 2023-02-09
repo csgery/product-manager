@@ -61,6 +61,9 @@ export const PERMS_DEPENDENCIES = {
 
 async function checkPermission(user, permission, lang) {
   // TODO: copy-paste START
+  if (!lang) {
+    lang = "en";
+  }
   if (!user) {
     return userLoginFirst_Error(lang);
   }
@@ -91,7 +94,7 @@ const shouldUserReLogin = async (user) => {
 
 const isAuthenticated = rule()(async (parent, args, { user, req }) => {
   // TODO: copy-paste START
-  const lang = req.headers.language || "en";
+  const lang = req?.headers?.language || "en";
   if (!user) {
     return userLoginFirst_Error(lang);
   }
@@ -129,7 +132,7 @@ const canReadInvalidUsers = rule()((parent, args, { user, req }) => {
 });
 
 const canReadOwnUser = rule()((parent, args, { user, req }) => {
-  const lang = req.headers.language || "en";
+  const lang = req?.headers?.language || "en";
   return checkPermission(user, PERMS.readOwn_user, lang);
 });
 
@@ -138,33 +141,33 @@ const isReadingOwnUser = rule()((parent, { id }, { user }) => {
 });
 
 const canCreateUser = rule()((parent, args, { user, req }) => {
-  const lang = req.headers.language || "en";
+  const lang = req?.headers?.language || "en";
   return checkPermission(user, PERMS.insert_user, lang);
 });
 
 const canUpdateUserPermissions = rule()((parent, args, { user, req }) => {
-  const lang = req.headers.language || "en";
+  const lang = req?.headers?.language || "en";
   return checkPermission(user, PERMS.updateUser_permissions, lang);
 });
 
 const canDeleteUser = rule()((parent, args, { user, req }) => {
-  const lang = req.headers.language || "en";
+  const lang = req?.headers?.language || "en";
   return checkPermission(user, PERMS.delete_user, lang);
 });
 
 const canRestoreUser = rule()((parent, args, { user, req }) => {
-  const lang = req.headers.language || "en";
+  const lang = req?.headers?.language || "en";
   return checkPermission(user, PERMS.restore_user, lang);
 });
 
 const canRemoveUser = rule()((parent, args, { user, req }) => {
-  const lang = req.headers.language || "en";
+  const lang = req?.headers?.language || "en";
   return checkPermission(user, PERMS.remove_user, lang);
 });
 
 // Products
 const canReadInvalidProducts = rule()((parent, args, { user, req }) => {
-  const lang = req.headers.language || "en";
+  const lang = req?.headers?.language || "en";
   return checkPermission(user, PERMS.readInvalid_products, lang);
 });
 
@@ -177,22 +180,22 @@ const isOwnProduct = rule()(async (parent, { id }, { user }) => {
 });
 
 const canUpdateProduct = rule()((parent, args, { user, req }) => {
-  const lang = req.headers.language || "en";
+  const lang = req?.headers?.language || "en";
   return checkPermission(user, PERMS.update_product, lang);
 });
 
 const canDeleteProduct = rule()((parent, args, { user, req }) => {
-  const lang = req.headers.language || "en";
+  const lang = req?.headers?.language || "en";
   return checkPermission(user, PERMS.delete_product, lang);
 });
 
 const canRestoreProduct = rule()((parent, args, { user, req }) => {
-  const lang = req.headers.language || "en";
+  const lang = req?.headers?.language || "en";
   return checkPermission(user, PERMS.restore_product, lang);
 });
 
 const canRemoveProduct = rule()((parent, args, { user, req }) => {
-  const lang = req.headers.language || "en";
+  const lang = req?.headers?.language || "en";
   return checkPermission(user, PERMS.remove_product, lang);
 });
 

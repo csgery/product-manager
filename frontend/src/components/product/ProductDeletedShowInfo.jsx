@@ -10,9 +10,12 @@ import ProductUserModal from "./../modals/ProductUserModal";
 import { UITextContext } from "./../TranslationWrapper";
 import { IconModeContext } from "../../App";
 import { auth } from "../../helper/helper";
+import useCustomError from "../../helper/hooks/useCustomError";
 
 export default function ProductDeletedShowInfo() {
   const [toggleEditForm, setToggleEditForm] = useState(false);
+
+  const [handleCustomError] = useCustomError();
 
   const UIText = useContext(UITextContext);
   const iconMode = useContext(IconModeContext);
@@ -51,10 +54,9 @@ export default function ProductDeletedShowInfo() {
 
   if (loading) return <Spinner />;
 
-  if (error /*|| userError*/)
-    return (
-      <p>Something Went Wrong {error?.message /*, userError?.message*/}</p>
-    );
+  if (error) {
+    handleCustomError(error);
+  }
 
   const handleFormToggle = (e) => {
     setToggleEditForm(!toggleEditForm);

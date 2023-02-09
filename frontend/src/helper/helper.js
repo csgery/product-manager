@@ -100,6 +100,7 @@ const auth = {
 const PERMS_DEPENDENCIES = {
   // users
   [auth.PERMS.readOwn_user]: [],
+  [auth.PERMS.protected]: [],
   [auth.PERMS.readValid_users]: [auth.PERMS.readOwn_user],
   [auth.PERMS.readInvalid_users]: [auth.PERMS.readValid_users],
 
@@ -184,16 +185,14 @@ const removeDependedPermissions = (permissions) => {
       */
   // Check if the given permissions is in the PERMS obj
   let validatedPermissions = permissions.filter(
-    (permission) =>
-      Object.values(auth.PERMS).includes(permission) &&
-      permission !== auth.PERMS.protected
+    (permission) => Object.values(auth.PERMS).includes(permission) /*&&
+      permission !== auth.PERMS.protected*/
     // because only the main super admin can be protected (it will be created in the project's init. state)
   );
 
   const validatedPermissionsCopy = permissions.filter(
-    (permission) =>
-      Object.values(auth.PERMS).includes(permission) &&
-      permission !== auth.PERMS.protected
+    (permission) => Object.values(auth.PERMS).includes(permission) /*&&
+      permission !== auth.PERMS.protected*/
     // because only the main super admin can be protected (it will be created in the project's init. state)
   );
 
