@@ -4,7 +4,7 @@ import { useQuery, useLazyQuery } from "@apollo/client";
 import { GET_USER } from "../../queries/userQueries";
 import { useState } from "react";
 import { GET_PRODUCT } from "../../queries/productQueries";
-import Spinner from "../Spinner";
+import SpinnerCustom from "../SpinnerCustom";
 import ProductEditForm from "./ProductEditForm";
 import moment from "moment";
 import ProductUserModal from "../modals/ProductUserModal";
@@ -55,7 +55,7 @@ export default function ProductShowInfo() {
     }
   }, [data?.product.createdBy, data?.product.updatedBy]);
 
-  if (loading) return <Spinner />;
+  if (loading) return <SpinnerCustom />;
 
   if (error) {
     handleCustomError(error);

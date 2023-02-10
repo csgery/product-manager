@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom";
 import { useQuery } from "@apollo/client";
 import { VIEWER } from "../queries/userQueries";
-import Spinner from "../components/Spinner";
+import SpinnerCustom from "../components/SpinnerCustom";
 import UserPermissions from "../components/user/UserPermissions";
 import { auth } from "../helper/helper";
 
@@ -17,7 +17,7 @@ export default function ViewerPage() {
     variables: { id },
   });
 
-  if (loading) return <Spinner />;
+  if (loading) return <SpinnerCustom />;
 
   if (error) return <div>Something went wrong {error.message}</div>;
 

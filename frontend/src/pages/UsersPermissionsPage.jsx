@@ -11,7 +11,7 @@ import {
   removeDependedPermissions,
   createNotification,
 } from "../helper/helper";
-import { Spinner } from "react-bootstrap";
+import SpinnerCustom from "../components/SpinnerCustom";
 import useCustomError from "../helper/hooks/useCustomError";
 import { UITextContext } from "../components/TranslationWrapper";
 import { DarkModeContext } from "../App";
@@ -150,7 +150,7 @@ function UsersPermissionsPage() {
     setUsers([]);
   };
 
-  if (loading) return <Spinner />;
+  if (loading) return <SpinnerCustom />;
 
   if (error) {
     handleCustomError(error);

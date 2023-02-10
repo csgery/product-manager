@@ -10,6 +10,7 @@ import { Spinner } from "react-bootstrap";
 import useCustomError from "../../helper/hooks/useCustomError";
 import { UITextContext } from "../../components/TranslationWrapper";
 import { DarkModeContext, IconModeContext } from "../../App";
+import { MdOutlineCancel, MdOutlineDoneOutline } from "react-icons/md";
 
 function UserUpdatePermsModal({
   users,
@@ -86,6 +87,8 @@ function UserUpdatePermsModal({
         size="xl"
         show={showSavePermsModal}
         onHide={() => setShowSavePermsModal((old) => !old)}
+        backdrop="static"
+        //keyboard={false}
       >
         <Modal.Header closeButton className={darkMode && "bg-dark text-white"}>
           <Modal.Title>{UIText.createProductButtonText}</Modal.Title>

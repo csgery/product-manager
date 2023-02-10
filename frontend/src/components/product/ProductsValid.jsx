@@ -1,6 +1,6 @@
 import { useState, useEffect, useContext } from "react";
 import { useQuery } from "@apollo/client";
-import Spinner from "../Spinner";
+import SpinnerCustom from "../SpinnerCustom";
 import Product from "./Product";
 import ProductCreateModal from "../modals/ProductCreateModal";
 import ProductUserModal from "../modals/ProductUserModal";
@@ -58,7 +58,7 @@ export default function ProductsDeleted() {
     setShowDeleteCBs(!showDeleteCBs);
   };
 
-  if (loading) return <Spinner />;
+  if (loading) return <SpinnerCustom />;
 
   // if (error) return <p>Something Went Wrong {error.message}</p>;
   if (error) {

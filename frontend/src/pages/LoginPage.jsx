@@ -3,7 +3,7 @@ import { /*React,*/ useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useMutation } from "@apollo/client";
 import { LOGIN_USER } from "../mutations/userMutations";
-import Spinner from "../components/Spinner";
+import SpinnerCustom from "../components/SpinnerCustom";
 import { auth } from "../helper/helper";
 
 export default function LoginPage({
@@ -31,7 +31,7 @@ export default function LoginPage({
 
   // useEffect();
 
-  if (loading) return <Spinner />;
+  if (loading) return <SpinnerCustom />;
 
   const handleSubmit = (e) => {
     e.preventDefault();

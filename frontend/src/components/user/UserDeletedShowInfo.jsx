@@ -3,7 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import { useQuery, useLazyQuery } from "@apollo/client";
 import { GET_USER } from "../../queries/userQueries";
 // import { GET_PRODUCT } from "../queries/productQueries";
-import Spinner from "./../Spinner";
+import SpinnerCustom from "../SpinnerCustom";
 import UserEditForm from "./UserEditForm";
 import moment from "moment";
 import ProductUserModal from "../modals/ProductUserModal";
@@ -54,7 +54,7 @@ export default function UserDeletedShowInfo() {
     }
   }, [data?.user.createdBy, data?.user.updatedBy]);
 
-  if (loading) return <Spinner />;
+  if (loading) return <SpinnerCustom />;
 
   if (error) {
     handleCustomError(error);
