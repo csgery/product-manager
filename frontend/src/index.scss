@@ -89,6 +89,10 @@ body {
   max-width: 90px;
 }
 
+.display-linebreak {
+  white-space: pre-line;
+}
+
 @media (max-width: 900px) {
   // .product-card-row {
   //   display: flex;

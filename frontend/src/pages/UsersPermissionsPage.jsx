@@ -162,7 +162,9 @@ function UsersPermissionsPage() {
         >
           <thead>
             <tr>
-              <th className={"text-center"} rowSpan={3}></th>
+              <th className={"text-center align-middle"} rowSpan={3}>
+                Username
+              </th>
               <th colSpan={productPermsCount} className={"text-center"}>
                 products
               </th>
@@ -210,7 +212,9 @@ function UsersPermissionsPage() {
               console.log(validUser);
               return (
                 <tr>
-                  <td className={"text-center"}>{validUser.username}</td>
+                  <td className={"text-center align-middle"}>
+                    {validUser.username}
+                  </td>
                   {Object.keys(auth.PERMS).map((permKey, index) => {
                     return (
                       <td

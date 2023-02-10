@@ -169,6 +169,9 @@ function TranslationWrapper({ children }) {
       usernameTooShort: "Username should be at least 5 character!",
       usernameTooLong: "Username should be maximum 32 character!",
 
+      // User Permissions Update Modal
+      updatePermissionsModalTitle: "Update Permissions",
+
       // Searchbar
       wholeWordButtonText: "Whole Word",
       matchCaseButtonText: "Match Case",

@@ -22,11 +22,34 @@ function UserUpdatePermsModal({
   const [showSavePermsModal, setShowSavePermsModal] = useState(false);
 
   //const { loading, error, data } = useQuery(GET_VALIDUSERS);
+  console.log("affectedUsers", affectedUsers);
+  console.log("users", users);
 
   const UIText = useContext(UITextContext);
   const darkMode = useContext(DarkModeContext);
   const iconMode = useContext(IconModeContext);
   const [handleCustomError] = useCustomError();
+
+  const addedPermissions = (affectedUser) =>
+    affectedUser.permissions
+      .filter(
+        (perm) =>
+          !originalUsers
+            .find((originalUser) => originalUser.id === affectedUser.id)
+            .permissions.includes(perm)
+      )
+      .map((perm) => `${perm}\n`);
+
+  const deletedPermissions = (affectedUser) =>
+    originalUsers
+      .find((originalUser) => originalUser.id === affectedUser.id)
+      .permissions.filter(
+        (originalPerm) => !affectedUser.permissions.includes(originalPerm)
+      )
+      .map((perm) => `${perm}\n`);
+
+  const permissionsAfterEdit = (affectedUser) =>
+    affectedUser.permissions.map((perm) => `${perm}\n`);
 
   const [
     updatePermissions,
@@ -46,8 +69,8 @@ function UserUpdatePermsModal({
 
   const handlePermsEditSave = () => {
     const originalUsers_String = JSON.stringify(originalUsers);
-    console.log("originalUsers", originalUsers_String);
-    console.log("affectedUsers", affectedUsers);
+    // console.log("originalUsers", originalUsers_String);
+    // console.log("affectedUsers", affectedUsers);
 
     let result = [];
     affectedUsers.forEach((affectedUser) => {
@@ -56,11 +79,11 @@ function UserUpdatePermsModal({
       ).permissions;
       const newPerms = affectedUser.permissions;
       result = [...result, JSON.stringify(affectedUser)];
-      console.log(
-        `name: ${affectedUser.username}, oldPerms: ${oldPerms} newPerms: ${newPerms}`
-      );
+      // console.log(
+      //   `name: ${affectedUser.username}, oldPerms: ${oldPerms} newPerms: ${newPerms}`
+      // );
     });
-    console.log("result", result);
+    // console.log("result", result);
     updatePermissions({ variables: { arrayString: result } })
       .then((res) => {
         createNotification({
@@ -91,50 +114,47 @@ function UserUpdatePermsModal({
         //keyboard={false}
       >
         <Modal.Header closeButton className={darkMode && "bg-dark text-white"}>
-          <Modal.Title>{UIText.createProductButtonText}</Modal.Title>
+          <Modal.Title>{UIText.updatePermissionsModalTitle}</Modal.Title>
         </Modal.Header>
         <Modal.Body className={darkMode && "bg-dark text-white"}>
-          <Table responsive>
+          <Table
+            responsive
+            hover
+            bordered
+            className={`table-sm table-${
+              darkMode ? "dark" : "secondary"
+            } mt-2 border-${darkMode ? "secondary" : "dark"}`}
+          >
             <thead>
-              <tr>
+              <tr className="text-center">
                 <th>name</th>
                 <th>added perms</th>
                 <th>removed perms</th>
                 <th>perms after edit</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="table-group-divider">
               {affectedUsers.map((affectedUser) => {
                 return (
                   <tr>
-                    <th>{affectedUser.username}</th>
-                    <th>
-                      {affectedUser.permissions
-                        .filter(
-                          (perm) =>
-                            !originalUsers
-                              .find(
-                                (originalUser) =>
-                                  originalUser.id === affectedUser.id
-                              )
-                              .permissions.includes(perm)
-                        )
-                        .map((perm) => `${perm} `)}
-                    </th>
-                    <th>
-                      {originalUsers
-                        .find(
-                          (originalUser) => originalUser.id === affectedUser.id
-                        )
-                        .permissions.filter(
-                          (originalPerm) =>
-                            !affectedUser.permissions.includes(originalPerm)
-                        )
-                        .map((perm) => `${perm} `)}
-                    </th>
-                    <th>
-                      {affectedUser.permissions.map((perm) => `${perm} `)}
-                    </th>
+                    <td className="text-center align-middle">
+                      {affectedUser.username}
+                    </td>
+                    <td className="display-linebreak align-middle">
+                      {addedPermissions(affectedUser).length < 1
+                        ? "-"
+                        : addedPermissions(affectedUser)}
+                    </td>
+                    <td className="display-linebreak align-middle">
+                      {deletedPermissions(affectedUser).length < 1
+                        ? "-"
+                        : deletedPermissions(affectedUser)}
+                    </td>
+                    <td className="display-linebreak align-middle">
+                      {permissionsAfterEdit(affectedUser).length < 1
+                        ? "-"
+                        : permissionsAfterEdit(affectedUser)}
+                    </td>
                   </tr>
                 );
               })}
