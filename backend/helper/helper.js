@@ -205,6 +205,7 @@ const userErrorCodes = {
   userInvalidRefreshJWT: "USER_INVALID-REFRESHJWT",
   userNoAccessJWT: "USER_NO-ACCESSJWT",
   userNoRefreshJWT: "USER_NO-REFRESHJWT",
+  userInvalidPermissionUpdate: "USER_INVALID_PERMUPDATE",
 };
 
 const productErrorCodes = {

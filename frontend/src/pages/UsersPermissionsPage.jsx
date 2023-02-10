@@ -232,7 +232,10 @@ function UsersPermissionsPage() {
                           name={auth.PERMS[permKey]}
                           value={validUser.id}
                           onChange={(e) => handleChange(e)}
-                          disabled={!editMode}
+                          disabled={
+                            !editMode ||
+                            auth.PERMS[permKey] === auth.PERMS.readOwn_user
+                          }
                           checked={validUser.permissions.includes(
                             auth.PERMS[permKey]
                           )}

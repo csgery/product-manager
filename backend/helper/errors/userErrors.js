@@ -213,6 +213,18 @@ const userNoRefreshJWT_Error = async (lang) =>
       extensions: { code: "NO_REFRESH_TOKEN" },
     }
   );
+const userBadPermissionUpdating_Error = async (lang, permission) =>
+  new GraphQLError(
+    (await translateError(
+      `Trying to modify a forbidden permission: ${permission}`,
+      lang
+    )) +
+      prefix +
+      errorCodes.userInvalidPermissionUpdate,
+    {
+      extensions: { code: "NO_REFRESH_TOKEN" },
+    }
+  );
 
 export {
   userNotFound_Error,
@@ -237,4 +249,5 @@ export {
   userInvalidRefreshJWT_Error,
   userNoAccessJWT_Error,
   userNoRefreshJWT_Error,
+  userBadPermissionUpdating_Error,
 };

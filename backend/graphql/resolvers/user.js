@@ -25,6 +25,7 @@ import {
   userNoAccessJWT_Error,
   userNoRefreshJWT_Error,
   userUsernameAlreadyExist_Error,
+  userBadPermissionUpdating_Error,
 } from "../../helper/errors/userErrors.js";
 import {
   checkEmailRegex,
@@ -33,6 +34,7 @@ import {
   validatePermissionsOLD,
 } from "../../helper/helper.js";
 import { PERMS } from "./../permissions.js";
+import userLog from "../../models/userLog.js";
 /*
   id: ID!
     name: String!
@@ -367,6 +369,20 @@ export default {
           throw userNotFound_Error(lang);
         }
 
+        // check if there is any forbidden permission
+        if (!actualUserObject.permissions.includes(PERMS.readOwn_user)) {
+          const userLog = new UserLog({
+            userId: user.id,
+            createdBy: userCtx.sub,
+            actionType: "update-permissions",
+            message: `invalid-permission-update: ${PERMS.readOwn_user}`,
+            securityLevel: "severe_frontend-modifying",
+          });
+          console.log(userLog);
+          await userLog.save();
+          throw userBadPermissionUpdating_Error(lang, PERMS.readOwn_user);
+        }
+
         let validatedPermissions = [];
         if (actualUserObject.permissions?.length > 0) {
           validatedPermissions = validatePermissions(
@@ -387,6 +403,7 @@ export default {
               validatedPermissions?.length < 1
                 ? "unsuccessful-empty-update"
                 : "unsuccessful-update-samePermissions",
+            securityLevel: "severe_frontend-modifying",
           });
           console.log(userLog);
           await userLog.save();
