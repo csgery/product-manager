@@ -5,6 +5,7 @@ import { UPDATE_PERMISSIONS } from "../mutations/userMutations";
 import Table from "react-bootstrap/Table";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
+import { FcCancel } from "react-icons/fc";
 import {
   auth,
   addDependedPermissions,
@@ -82,15 +83,15 @@ function UsersPermissionsPage() {
   ).length;
 
   const handleChange = (e) => {
-    console.log("users:", users);
+    // console.log("users:", users);
     const userIdFromEdit = e.target.value;
     const permFromEdit = e.target.name;
     let usersDeepCopy = structuredClone(users);
-    console.log("usersDeepCopy:", usersDeepCopy);
+    //console.log("usersDeepCopy:", usersDeepCopy);
     let user = usersDeepCopy.find((user) => user.id === userIdFromEdit);
 
-    console.log("user BEFORE click:", user);
-    console.log(user);
+    //console.log("user BEFORE click:", user);
+    //console.log(user);
 
     if (user.permissions.includes(permFromEdit)) {
       // console.log(
@@ -108,7 +109,7 @@ function UsersPermissionsPage() {
       ]);
     }
     setUsers(usersDeepCopy);
-    console.log("user after click:", user);
+    //console.log("user after click:", user);
   };
 
   const handlePermsEditCancel = () => {
@@ -197,7 +198,7 @@ function UsersPermissionsPage() {
                 products
               </th>
               <th
-                colSpan={usersPermsCount}
+                colSpan={usersPermsCount + 1}
                 className={"table-active text-center"}
               >
                 users
@@ -225,7 +226,7 @@ function UsersPermissionsPage() {
               >
                 modify
               </th>
-              <th className={"table-active"}></th>
+              <th colSpan={2} className={"table-active"}></th>
             </tr>
             <tr key={"subHeaderKey"}>
               {Object.keys(auth.PERMS).map((item, index) => (
@@ -237,25 +238,32 @@ function UsersPermissionsPage() {
           </thead>
           <tbody className="table-group-divider">
             {users.map((validUser, uindex) => {
-              console.log(validUser);
+              // console.log(validUser);
               return (
                 <tr key={uindex}>
                   <td key={uindex} className={"text-center align-middle"}>
                     {validUser.username}
+                    {validUser.canLogin && (
+                      <FcCancel
+                        //className="ms-2"
+                        style={{ fontSize: "1.4rem" }}
+                      />
+                    )}
                   </td>
                   {Object.keys(auth.PERMS).map((permKey, pindex) => {
                     return (
                       <td
                         key={pindex}
                         className={
-                          (pindex < 7 ? "" : "table-active") + " text-center"
+                          (pindex < 7 ? "" : "table-active") +
+                          " text-center align-middle"
                         }
                         //onClick={(e) => handleClick(e)}
                       >
                         <input
                           className={
                             (pindex < 7 ? "" : "table-active ") +
-                            "form-check-input text-center"
+                            "form-check-input text-center "
                           }
                           type="checkbox"
                           name={auth.PERMS[permKey]}

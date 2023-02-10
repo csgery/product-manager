@@ -57,7 +57,11 @@ export default function UserShowInfo() {
   if (loading) return <SpinnerCustom />;
 
   if (error) {
+    // if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+
+    // } else {
     handleCustomError(error);
+    //}
   }
 
   const handleFormToggle = (e) => {
@@ -76,7 +80,7 @@ export default function UserShowInfo() {
   // you have validusers reading rights, so you can read users/ID
   // and you dont have invalidusers reading right, so you CANT read users/deleted/ID
   // BUT there was an exploit: if you copy the deleteduser ID and use user/ID, you can read the deleted user with validusers reading right...)
-  if (data.user.valid) {
+  if (data?.user?.valid) {
     return (
       <>
         {console.log("data:", data)}
