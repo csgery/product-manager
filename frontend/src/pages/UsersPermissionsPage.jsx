@@ -23,40 +23,6 @@ function UsersPermissionsPage() {
   const UIText = useContext(UITextContext);
   const darkMode = useContext(DarkModeContext);
 
-  let styles = {
-    // productPerm: "rgb(228, 50, 50)",
-    // productPermDark: "rgb(151, 146, 146)",
-    // userPerm: "rgb(122, 158, 23)",
-    // userPermDark: "rgb(128, 125, 125)",
-  };
-
-  useEffect(() => {
-    console.log("dark changing");
-    if (darkMode) {
-      styles = {
-        productPerm: "rgb(151, 146, 146)",
-        userPerm: "rgb(128, 125, 125)",
-      };
-    } else {
-      styles = {
-        productPerm: "rgb(228, 50, 50)",
-        userPerm: "rgb(122, 158, 23)",
-      };
-    }
-  }, [darkMode]);
-
-  // .productPermDark {
-  //   background-color: rgb(151, 146, 146);
-  // }
-
-  // .userPerm {
-  //   background-color: rgb(122, 158, 23);
-  // }
-
-  // .userPermDark {
-  //   background-color: rgb(128, 125, 125);
-  // }
-
   const [
     updatePermissions,
     { data: permsData, loading: permsLoading, error: permsError },
@@ -185,73 +151,61 @@ function UsersPermissionsPage() {
             />
           </>
         )}
-        <Table responsive striped bordered hover className={"mt-2"}>
+        <Table
+          responsive
+          //striped
+          hover
+          bordered
+          className={`table-sm table-${
+            darkMode ? "dark" : "secondary"
+          } mt-2 border-${darkMode ? "secondary" : "dark"}`}
+        >
           <thead>
             <tr>
               <th className={"text-center"} rowSpan={3}></th>
-              <th
-                colSpan={productPermsCount}
-                className={"text-center"}
-                style={{ backgroundColor: styles.productPerm }}
-              >
+              <th colSpan={productPermsCount} className={"text-center"}>
                 products
               </th>
               <th
                 colSpan={usersPermsCount}
-                className={"text-center"}
-                style={{ backgroundColor: styles.userPerm }}
+                className={"table-active text-center"}
               >
                 users
               </th>
             </tr>
             <tr>
-              <th
-                colSpan={productPermsReadCount}
-                className={"text-center"}
-                style={{ backgroundColor: styles.productPerm }}
-              >
+              <th colSpan={productPermsReadCount} className={"text-center"}>
                 read
               </th>
               <th
                 colSpan={productPermsCount - productPermsReadCount}
                 className={"text-center"}
-                style={{ backgroundColor: styles.productPerm }}
               >
                 modify
               </th>
               <th
                 colSpan={usersPermsReadCount}
-                className={"text-center"}
-                style={{ backgroundColor: styles.userPerm }}
+                className={"table-active text-center"}
               >
                 read
               </th>
               <th
                 colSpan={usersPermsCount - usersPermsReadCount - 1}
-                className={"text-center"}
-                style={{ backgroundColor: styles.userPerm }}
+                className={"table-active text-center"}
               >
                 modify
               </th>
-              <th style={{ backgroundColor: styles.userPerm }}></th>
+              <th className={"table-active"}></th>
             </tr>
             <tr>
               {Object.keys(auth.PERMS).map((item, index) => (
-                <th
-                  // className={index < 7 ? "productPerm" : "userPerm"}
-                  key={index}
-                  style={
-                    index < 7
-                      ? { backgroundColor: styles.productPerm }
-                      : { backgroundColor: styles.userPerm }
-                  }
-                >
+                <th className={index < 7 ? "" : "table-active"} key={index}>
                   {formatPerm(item)}
                 </th>
               ))}
             </tr>
           </thead>
-          <tbody>
+          <tbody className="table-group-divider">
             {users.map((validUser, i) => {
               console.log(validUser);
               return (
@@ -261,18 +215,15 @@ function UsersPermissionsPage() {
                     return (
                       <td
                         className={
-                          /*(index < 7 ? "productPerm" : "userPerm") +*/
-                          " text-center"
-                        }
-                        style={
-                          index < 7
-                            ? { backgroundColor: styles.productPerm }
-                            : { backgroundColor: styles.userPerm }
+                          (index < 7 ? "" : "table-active") + " text-center"
                         }
                         //onClick={(e) => handleClick(e)}
                       >
                         <input
-                          className="form-check-input text-center"
+                          className={
+                            (index < 7 ? "" : "table-active ") +
+                            "form-check-input text-center"
+                          }
                           type="checkbox"
                           name={auth.PERMS[permKey]}
                           value={validUser.id}
