@@ -189,7 +189,7 @@ app.use(
         );
         // return to (permissions file)(?) and check there
         // redirecting and try to get a new acces token from refresh token is not a good idea here, because at this point the refresh token is invalid too
-        return { user: { expiredAccessToken_ReLogin: true } };
+        return { user: { expiredAccessToken_ReLogin: true }, req };
       }
 
       return { user: userFromToken, req, res };

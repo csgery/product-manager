@@ -34,6 +34,12 @@ const UPDATE_USER = gql`
   }
 `;
 
+const UPDATE_PERMISSIONS = gql`
+  mutation UpdatePermission($arrayString: [String!]!) {
+    updatePermission(arrayString: $arrayString)
+  }
+`;
+
 const DELETE_USER = gql`
   mutation DeleteUser($id: ID!) {
     deleteUser(id: $id)
@@ -55,6 +61,7 @@ export {
   REFRESH_TOKEN,
   CREATE_USER,
   UPDATE_USER,
+  UPDATE_PERMISSIONS,
   DELETE_USER,
   RESTORE_USER,
   REMOVE_USER,

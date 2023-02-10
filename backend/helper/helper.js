@@ -1,5 +1,5 @@
 import Dict from "../models/dict.js";
-import { PERMS, PERMS_DEPENDENCIES } from "../graphql/permissions.js";
+import { auth, PERMS_DEPENDENCIES } from "../graphql/permissions.js";
 import {
   userPWRegex_Error,
   userEmailRegex_Error,
@@ -72,11 +72,10 @@ const checkEmailRegex = (email, lang) => {
  * @returns {[String]} [string] validated permissions with dependencies
  */
 const validatePermissions = (permissions) => {
-  // Check if the given permissions is in the PERMS obj
+  // Check if the given permissions is in the auth.PERMS obj
   const validatedPermissions = permissions.filter(
-    (permission) =>
-      Object.values(PERMS).includes(permission) &&
-      permission !== PERMS.protected
+    (permission) => Object.values(auth.PERMS).includes(permission) /*&&
+      permission !== auth.PERMS.protected*/
     // because only the main super admin can be protected (it will be created in the project's init. state)
   );
   // Get the valid perms dependencies
@@ -102,13 +101,13 @@ const validatePermissions = (permissions) => {
 };
 
 const validatePermissionsOLD = (permissions) => {
-  // Check if the given permissions is in the PERMS obj
+  // Check if the given permissions is in the auth.PERMS obj
   const validatedPermissions = permissions.filter(
     (permission) =>
-      Object.values(PERMS).includes(permission) &&
-      permission !== PERMS.protected
+      Object.values(auth.PERMS).includes(permission) &&
+      permission !== auth.PERMS.protected
   );
-  // Get the valid perms dependencies
+  // Get the valid auth.PERMS dependencies
   let dependencies = [];
   const getDependencies = (value) => {
     // Loop through the PERMS_DEPENDENCIES object
@@ -205,6 +204,7 @@ const userErrorCodes = {
   userInvalidRefreshJWT: "USER_INVALID-REFRESHJWT",
   userNoAccessJWT: "USER_NO-ACCESSJWT",
   userNoRefreshJWT: "USER_NO-REFRESHJWT",
+  userInvalidPermissionUpdate: "USER_INVALID_PERMUPDATE",
 };
 
 const productErrorCodes = {

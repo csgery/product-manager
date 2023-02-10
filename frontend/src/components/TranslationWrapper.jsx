@@ -153,6 +153,7 @@ function TranslationWrapper({ children }) {
       cancelButtonText: "Cancel",
       createButtonText: "Create",
       editButtonText: "Edit",
+      saveButtonText: "Save",
 
       // Create Product Modal
       createProductButtonText: "Create Product",
@@ -167,6 +168,9 @@ function TranslationWrapper({ children }) {
       password: "Password",
       usernameTooShort: "Username should be at least 5 character!",
       usernameTooLong: "Username should be maximum 32 character!",
+
+      // User Permissions Update Modal
+      updatePermissionsModalTitle: "Update Permissions",
 
       // Searchbar
       wholeWordButtonText: "Whole Word",
@@ -187,6 +191,7 @@ function TranslationWrapper({ children }) {
       wrongCharacters: "Wrong characters",
       searchbarSettings: "Searchbar Settings",
 
+      permissions: "Permissions",
       language: "Language",
       iconMode: "Icon Mode",
       settings: "Settings",
@@ -198,6 +203,7 @@ function TranslationWrapper({ children }) {
       successfullyDeleted: "Successfully Deleted!",
       successfullyRemoved: "Successfully Removed!",
       successfullyRestored: "Successfully Restored!",
+      successfullyModifiedPerms: "Successfully Modified Permissions!",
       fillOutAllField: "Please fill out all fields!",
       quantityTooLarge: "Quantity is larger than 1000!",
 

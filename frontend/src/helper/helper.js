@@ -10,8 +10,14 @@ import { Store } from "react-notifications-component";
 
 const auth = {
   PERMS: {
-    // basic permission
-    protected: "protected",
+    // products
+    readValid_products: "read:valid_products",
+    readInvalid_products: "read:invalid_products",
+    insert_product: "insert:product",
+    update_product: "update:product",
+    delete_product: "delete:product",
+    restore_product: "restore:product",
+    remove_product: "remove:product",
 
     // users
     readOwn_user: "read:own_user",
@@ -23,18 +29,12 @@ const auth = {
     delete_user: "delete:user",
     restore_user: "restore:user",
     remove_user: "remove:user",
-
-    // products
-    readValid_products: "read:valid_products",
-    readInvalid_products: "read:invalid_products",
-    insert_product: "insert:product",
-    update_product: "update:product",
-    delete_product: "delete:product",
-    restore_product: "restore:product",
-    remove_product: "remove:product",
+    // basic permission
+    protected: "protected",
+    owner: "owner",
   },
   isAuthenticated: () => {
-    const tokenScope = import.meta.env.VITE_BACKEND_URI;
+    const tokenScope = import.meta.env.VITE_JWT_TOKEN_SCOPE;
     try {
       const tokenData = auth.getTokenData();
       if (!tokenData) {
@@ -56,7 +56,7 @@ const auth = {
     return jwt(localStorage.getItem("accesstoken")).sub;
   },
   isSet: (permission) => {
-    const tokenScope = import.meta.env.VITE_BACKEND_URI;
+    const tokenScope = import.meta.env.VITE_JWT_TOKEN_SCOPE;
     const tokenData = auth.getTokenData();
     if (!tokenData) {
       return false;
@@ -97,6 +97,128 @@ const auth = {
   // getUserPermissions: () => {
   //   return jwt(localStorage.getItem("accesstoken")) backend.permissions;
   // },
+};
+const PERMS_DEPENDENCIES = {
+  // users
+  [auth.PERMS.readOwn_user]: [],
+  [auth.PERMS.protected]: [],
+  [auth.PERMS.owner]: [auth.PERMS.protected],
+  [auth.PERMS.readValid_users]: [auth.PERMS.readOwn_user],
+  [auth.PERMS.readInvalid_users]: [auth.PERMS.readValid_users],
+
+  // [auth.PERMS.insertAny_user]: [auth.PERMS.readAny_user],
+  //update only yourself
+  //[auth.PERMS.updateAny_user]: [auth.PERMS.insertAny_user],
+  [auth.PERMS.insert_user]: [auth.PERMS.readValid_users],
+  [auth.PERMS.delete_user]: [auth.PERMS.readInvalid_users],
+  [auth.PERMS.restore_user]: [auth.PERMS.delete_user],
+  [auth.PERMS.remove_user]: [auth.PERMS.delete_user],
+
+  [auth.PERMS.updateUser_permissions]: [auth.PERMS.readInvalid_users],
+
+  // products
+  [auth.PERMS.readValid_products]: [],
+  [auth.PERMS.readInvalid_products]: [auth.PERMS.readValid_products],
+  [auth.PERMS.insert_product]: [auth.PERMS.readValid_products],
+  [auth.PERMS.update_product]: [auth.PERMS.insert_product],
+  [auth.PERMS.delete_product]: [auth.PERMS.readInvalid_products],
+  [auth.PERMS.restore_product]: [auth.PERMS.delete_product],
+  [auth.PERMS.remove_product]: [auth.PERMS.delete_product],
+};
+
+// ADD PERMS DEPS (I NEED TO A REMOVE PERM DEPS in frontend to remove elements which dont have perms that dependents)
+/**
+ *  Validate the given permissions array and return back the validated permissions array with its dependencies
+ * @param {[String]} permissions [string]
+ * @returns {[String]} [string] validated permissions with dependencies
+ */
+const addDependedPermissions = (permissions) => {
+  // Check if the given permissions is in the auth.PERMS obj
+  console.log("validatePermissions | permissions:", permissions);
+  const validatedPermissions = permissions.filter(
+    (permission) => Object.values(auth.PERMS).includes(permission) /*&&
+      permission !== auth.PERMS.protected*/
+    // because only the main super admin can be protected (it will be created in the project's init. state)
+  );
+
+  console.log(
+    "validatePermissions | validatedPermissions:",
+    validatedPermissions
+  );
+
+  // Get the valid auth.PERMS dependencies
+  let dependencies = [];
+  const getDependencies = (value) => {
+    console.log("validatePermissions | value:", value);
+
+    if (
+      !dependencies.includes(value) &&
+      Object.keys(PERMS_DEPENDENCIES).includes(value)
+    ) {
+      const depKey = value;
+      const depValue = PERMS_DEPENDENCIES[depKey];
+      dependencies.push(depKey);
+      depValue.map((actual) => getDependencies(actual));
+    }
+    return false;
+  };
+  // Entry point of the get dependencies
+  // Loop through the validated pemrs and call the function each element recursively
+  validatedPermissions.map((validatedPerm) => getDependencies(validatedPerm));
+
+  return dependencies;
+};
+
+// IT ONLY WORKS WITH SINGLE DEPENDENCY VALUES, SO IF A PERM HAS MULTIPLE DEPS THAN IT IS NOT WORKING YET
+const removeDependedPermissions = (permissions) => {
+  /*
+      permissions = ['update', 'insert', 'asd']
+    
+      filter all permissions and remove perms that not in the PERMS obj (so they're not valid permission for our case)
+    
+      valid permissions = ['update', 'insert']
+    
+      loop through valid permissions and check each element's deps if in the valid permissions
+      if not, remove that permission from valid permissions
+      
+      after the loop, return valid permissions
+      
+      */
+  // Check if the given permissions is in the PERMS obj
+  let validatedPermissions = permissions.filter(
+    (permission) => Object.values(auth.PERMS).includes(permission) /*&&
+      permission !== auth.PERMS.protected*/
+    // because only the main super admin can be protected (it will be created in the project's init. state)
+  );
+
+  const validatedPermissionsCopy = permissions.filter(
+    (permission) => Object.values(auth.PERMS).includes(permission) /*&&
+      permission !== auth.PERMS.protected*/
+    // because only the main super admin can be protected (it will be created in the project's init. state)
+  );
+
+  const check = (array) => {
+    array.forEach((perm) => {
+      console.log("perm", perm);
+      const actualDependencies = PERMS_DEPENDENCIES[perm];
+      console.log("actualDependencies", actualDependencies);
+      actualDependencies.forEach((actualDep) => {
+        if (!validatedPermissions.includes(actualDep)) {
+          validatedPermissions = validatedPermissions.filter(
+            (item) => item !== perm
+          );
+          check(validatedPermissions);
+        } else return;
+      });
+    });
+  };
+  check(validatedPermissionsCopy);
+
+  // Entry point of the get dependencies
+  // Loop through the validated pemrs and call the function each element recursively
+  //validatedPermissions.map((validatedPerm) => getDependencies(validatedPerm));
+
+  return validatedPermissions;
 };
 
 // const isLoggedIn = () => {
@@ -391,6 +513,7 @@ const userErrorCodes = {
   userInvalidRefreshJWT: "USER_INVALID-REFRESHJWT",
   userNoAccessJWT: "USER_NO-ACCESSJWT",
   userNoRefreshJWT: "USER_NO-REFRESHJWT",
+  userInvalidPermissionUpdate: "USER_INVALID_PERMUPDATE",
 };
 
 const productErrorCodes = {
@@ -438,6 +561,8 @@ const validateUserPasswordInput = (input, UIText) => {
 
 export {
   auth,
+  addDependedPermissions,
+  removeDependedPermissions,
   translate,
   getDict,
   createDict,

@@ -1,6 +1,6 @@
 import { useState, useEffect, useContext } from "react";
 import { useQuery } from "@apollo/client";
-import Spinner from "../Spinner";
+import SpinnerCustom from "../SpinnerCustom";
 import Product from "./Product";
 import ProductUserModal from "../modals/ProductUserModal";
 import { GET_DELETEDPRODUCTS } from "../../queries/productQueries";
@@ -98,7 +98,7 @@ export default function ProductsDeleted() {
     });
   };
 
-  if (loading) return <Spinner />;
+  if (loading) return <SpinnerCustom />;
 
   if (error) {
     handleCustomError(error);

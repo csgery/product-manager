@@ -63,6 +63,9 @@ const userLogSchema = new Schema(
     message: {
       type: String,
     },
+    securityLevel: {
+      type: String,
+    },
   },
   { timestamps: { createdAt: true, updatedAt: false } }
 );

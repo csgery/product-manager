@@ -30,7 +30,7 @@ export default `#graphql
       id: ID!
       email: String!
     ): String!
-    updatePermission(id: ID!, permissions: [String!]): String!
+    updatePermission(arrayString: [String!]!): String!
     deleteUser(id: ID!): String!
     restoreUser(id: ID!): String!
     blockUser(id: ID!): String!

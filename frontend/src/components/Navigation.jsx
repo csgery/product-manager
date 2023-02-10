@@ -50,6 +50,7 @@ export default function Navigation({
                   <>
                     {auth.isSet(auth.PERMS.readValid_products) && (
                       <Nav.Link
+                        className="text-center align-self-center "
                         onClick={() => handleNavigate("/products")}
                         // href="#products"
                       >
@@ -58,6 +59,7 @@ export default function Navigation({
                     )}
                     {auth.isSet(auth.PERMS.readInvalid_products) && (
                       <Nav.Link
+                        className="text-center align-self-center "
                         onClick={() => handleNavigate("/products/deleted")}
                         // href="#deletedproducts"
                       >
@@ -66,13 +68,41 @@ export default function Navigation({
                     )}
 
                     {auth.isSet(auth.PERMS.readValid_users) && (
-                      <Nav.Link onClick={() => handleNavigate("/users")}>
-                        {UIText.users}
-                      </Nav.Link>
+                      <>
+                        {/* if user has updateUser_permissions than render a dropdown else a single link */}
+                        {auth.isSet(auth.PERMS.updateUser_permissions) ? (
+                          <NavDropdown
+                            className="text-center align-self-center "
+                            title={UIText.users}
+                            id="collasible-nav-dropdown"
+                          >
+                            <NavDropdown.Item
+                              className="align-self-center "
+                              onClick={() => handleNavigate("/users")}
+                            >
+                              {UIText.users}
+                            </NavDropdown.Item>
+                            <NavDropdown.Item
+                              className="align-self-center "
+                              onClick={() => handleNavigate("/permissions")}
+                            >
+                              {UIText.permissions}
+                            </NavDropdown.Item>
+                          </NavDropdown>
+                        ) : (
+                          <Nav.Link
+                            className="align-self-center "
+                            onClick={() => handleNavigate("/users")}
+                          >
+                            {UIText.users}
+                          </Nav.Link>
+                        )}
+                      </>
                     )}
 
                     {auth.isSet(auth.PERMS.readInvalid_users) && (
                       <Nav.Link
+                        className="text-center align-self-center "
                         onClick={() => handleNavigate("/users/deleted")}
                       >
                         {UIText.deletedUsers}

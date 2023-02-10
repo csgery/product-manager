@@ -25,6 +25,7 @@ import {
   userNoAccessJWT_Error,
   userNoRefreshJWT_Error,
   userUsernameAlreadyExist_Error,
+  userBadPermissionUpdating_Error,
 } from "../../helper/errors/userErrors.js";
 import {
   checkEmailRegex,
@@ -32,7 +33,8 @@ import {
   validatePermissions,
   validatePermissionsOLD,
 } from "../../helper/helper.js";
-import { PERMS } from "./../permissions.js";
+import { auth } from "./../permissions.js";
+import userLog from "../../models/userLog.js";
 /*
   id: ID!
     name: String!
@@ -163,7 +165,7 @@ export default {
         valid: true,
       });
       // grant all permissions
-      for (const [actualKey, actualValue] of Object.entries(PERMS)) {
+      for (const [actualKey, actualValue] of Object.entries(auth.PERMS)) {
         user.permissions.push(actualValue);
       }
       await user.save();
@@ -189,7 +191,7 @@ export default {
         throw new Error("The given count is less than 1 or larger than 10000!");
       }
       const perms = [];
-      for (const [elemKey, elemValue] of Object.entries(PERMS)) {
+      for (const [elemKey, elemValue] of Object.entries(auth.PERMS)) {
         perms.push(elemValue);
       }
       // to test the time of get all entries dependencies
@@ -259,7 +261,7 @@ export default {
           permissions:
             validatedPermissions?.length > 0
               ? validatedPermissions
-              : [PERMS.readOwn_user],
+              : [auth.PERMS.readOwn_user],
           valid: true,
         });
 
@@ -354,69 +356,155 @@ export default {
 
     updatePermission: async (
       parent,
-      { id, permissions: newPermissions },
+      // { id, permissions: newPermissions },
+      { arrayString },
       { user: userCtx, req }
     ) => {
+      //console.log("userCtx", userCtx);
+
+      const inputArray = arrayString.map((item) => JSON.parse(item));
       const lang = req.headers.language || "en";
-      const user = await User.findById(id);
-      if (!user) {
-        throw userNotFound_Error(lang);
-      }
+      const reqUserPermissions =
+        userCtx[process.env.JWT_TOKEN_SCOPE].permissions;
+      //console.log("reqUserPermissions", reqUserPermissions);
+      console.log("reqUserPermissions", reqUserPermissions);
 
-      // START Add permissions
-      // const existingPermissions = user.permissions;
-      // newPermissions.forEach((newPermission) => {
-      //   if (!existingPermissions.includes(newPermission)) {
-      //     existingPermissions.push(newPermission);
-      //   }
-      // });
-      // user.permissions = existingPermissions;
-      // END Add permissions
+      for (const userToEdit of inputArray) {
+        const originalUser = await User.findById(userToEdit.id);
+        if (!originalUser) {
+          throw userNotFound_Error(lang);
+        }
+        //console.log("userCtx", userCtx);
 
-      let validatedPermissions = [];
-      if (newPermissions?.length > 0) {
-        validatedPermissions = validatePermissions(newPermissions);
-      }
+        // check if there is any forbidden permission
+        // TODO: implement try cache instead of this.....
+        let isError = false;
+        let errorDataForLog = {
+          message: "",
+          perm: "",
+          securityLevel: "severe_frontend-modifying",
+        };
+        console.log("userToEdit.id", userToEdit.id);
+        console.log("userCtx.sub", userCtx.sub);
+        // if try update ourself
+        if (userToEdit.id === userCtx.sub) {
+          isError = true;
+          errorDataForLog.message = `invalid-permission-update: self-updating`;
+          errorDataForLog.perm = "self-update";
+        }
+        // revoke readOwn_user
+        else if (!userToEdit.permissions.includes(auth.PERMS.readOwn_user)) {
+          isError = true;
+          errorDataForLog.message = `invalid-permission-revoke: ${auth.PERMS.readOwn_user}`;
+          errorDataForLog.perm = auth.PERMS.readOwn_user;
+        }
+        // grant owner perm
+        else if (
+          userToEdit.permissions.includes(auth.PERMS.owner) &&
+          !originalUser.permissions.includes(auth.PERMS.owner)
+        ) {
+          isError = true;
+          errorDataForLog.message = `invalid-permission-provide: ${auth.PERMS.owner}`;
+          errorDataForLog.perm = auth.PERMS.owner;
+        }
+        // revoke owner perm
+        else if (
+          !userToEdit.permissions.includes(auth.PERMS.owner) &&
+          originalUser.permissions.includes(auth.PERMS.owner)
+        ) {
+          isError = true;
+          errorDataForLog.message = `invalid-permission-revoke: ${auth.PERMS.owner}`;
+          errorDataForLog.perm = auth.PERMS.owner;
+        }
+        // revoke protected if reqUser not owner (original is protected and edited is not)
+        else if (
+          originalUser.permissions.includes(auth.PERMS.protected) &&
+          !userToEdit.permissions.includes(auth.PERMS.protected) &&
+          !reqUserPermissions.includes(auth.PERMS.owner)
+        ) {
+          isError = true;
+          errorDataForLog.message = `invalid-permission-revoke: ${auth.PERMS.protected}`;
+          errorDataForLog.perm = auth.PERMS.protected;
+        }
+        // grant protected if reqUser not owner
+        else if (
+          userToEdit.permissions.includes(auth.PERMS.protected) &&
+          !reqUserPermissions.includes(auth.PERMS.owner)
+        ) {
+          isError = true;
+          errorDataForLog.message = `invalid-permission-provide: ${auth.PERMS.protected}`;
+          errorDataForLog.perm = auth.PERMS.protected;
+        }
+        // revoke protected if original owner
+        else if (
+          !userToEdit.permissions.includes(auth.PERMS.protected) &&
+          originalUser.permissions.includes(auth.PERMS.owner)
+        ) {
+          isError = true;
+          errorDataForLog.message = `invalid-permission-revoke: ${auth.PERMS.protected}`;
+          errorDataForLog.perm = auth.PERMS.protected;
+        }
 
-      if (
-        validatedPermissions?.length < 1 ||
-        JSON.stringify(user.permissions) ===
-          JSON.stringify(validatedPermissions)
-      ) {
+        if (isError) {
+          const userLog = new UserLog({
+            userId: originalUser.id,
+            createdBy: userCtx.sub,
+            actionType: "update-permissions",
+            message: errorDataForLog.message,
+            securityLevel: errorDataForLog.securityLevel,
+          });
+          //console.log(userLog);
+          await userLog.save();
+          throw userBadPermissionUpdating_Error(lang, errorDataForLog.perm);
+        }
+
+        let validatedPermissions = [];
+        if (userToEdit.permissions?.length > 0) {
+          validatedPermissions = validatePermissions(userToEdit.permissions);
+        }
+
+        if (
+          validatedPermissions?.length < 1 ||
+          JSON.stringify(originalUser.permissions) ===
+            JSON.stringify(validatedPermissions)
+        ) {
+          const userLog = new UserLog({
+            userId: originalUser.id,
+            createdBy: userCtx.sub,
+            actionType: "update-permissions",
+            message:
+              validatedPermissions?.length < 1
+                ? "unsuccessful-empty-update"
+                : "unsuccessful-update-samePermissions",
+            securityLevel: "severe_frontend-modifying",
+          });
+          console.log(userLog);
+          await userLog.save();
+          throw userNotChanged_Error(lang);
+        }
+
+        const fieldsToLog = {};
+        fieldsToLog.oldPermissions = originalUser.permissions;
+        fieldsToLog.newPermissions = validatedPermissions;
+        fieldsToLog.oldCFT = originalUser.CFT;
+        fieldsToLog.newCFT = originalUser.CFT + 1;
         const userLog = new UserLog({
-          userId: user.id,
+          ...fieldsToLog,
+          userId: originalUser.id,
           createdBy: userCtx.sub,
           actionType: "update-permissions",
-          message:
-            validatedPermissions?.length < 1
-              ? "unsuccessful-empty-update"
-              : "unsuccessful-update-samePermissions",
         });
-        console.log(userLog);
         await userLog.save();
-        throw userNotChanged_Error(lang);
+        //user.permissions = newPermissions;
+        await originalUser.update({
+          CFT: originalUser.CFT + 1,
+          permissions: validatedPermissions,
+          shouldUserReLogin: true,
+          updatedBy: userCtx.sub,
+        });
+        //return originalUser.id;
       }
-
-      const fieldsToLog = {};
-      fieldsToLog.oldPermissions = user.permissions;
-      fieldsToLog.newPermissions = validatedPermissions;
-      fieldsToLog.oldCFT = user.CFT;
-      fieldsToLog.newCFT = user.CFT + 1;
-      const userLog = new UserLog({
-        ...fieldsToLog,
-        userId: user.id,
-        createdBy: userCtx.sub,
-        actionType: "update-permissions",
-      });
-      await userLog.save();
-      //user.permissions = newPermissions;
-      await user.update({
-        CFT: user.CFT + 1,
-        permissions: validatedPermissions,
-        shouldUserReLogin: true,
-        updatedBy: userCtx.sub,
-      });
-      return user.id;
+      return "ok";
     },
 
     deleteUser: async (parent, { id }, { user: userCtx, req }) => {
@@ -426,7 +514,7 @@ export default {
         if (!user) {
           throw userNotFound_Error(lang);
         }
-        if (user.permissions.includes(PERMS.protected)) {
+        if (user.permissions.includes(auth.PERMS.protected)) {
           const userLog = new UserLog({
             userId: user.id,
             oldUsername: user.username,
@@ -490,7 +578,7 @@ export default {
         if (!user) {
           throw userNotFound_Error(lang);
         }
-        if (user.permissions.includes(PERMS.protected)) {
+        if (user.permissions.includes(auth.PERMS.protected)) {
           const userLog = new UserLog({
             userId: user.id,
             oldUsername: user.username,
@@ -550,7 +638,7 @@ export default {
       if (!user) {
         throw userNotFound_Error(lang);
       }
-      if (user.permissions.includes(PERMS.protected)) {
+      if (user.permissions.includes(auth.PERMS.protected)) {
         throw userIsProtected();
       }
       if (!user.canLogin) {
@@ -582,7 +670,7 @@ export default {
       if (!user) {
         throw userNotFound_Error(lang);
       }
-      if (user.permissions.includes(PERMS.protected)) {
+      if (user.permissions.includes(auth.PERMS.protected)) {
         throw userIsProtected();
       }
       if (user.canLogin) {
