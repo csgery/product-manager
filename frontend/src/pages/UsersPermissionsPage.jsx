@@ -116,6 +116,34 @@ function UsersPermissionsPage() {
     setUsers([]);
   };
 
+  const isInputCBDisabled = (actualValidUser, actualPermKey) => {
+    if (!editMode) {
+      return true;
+    }
+    if (auth.PERMS[actualPermKey] === auth.PERMS.readOwn_user) {
+      return true;
+    }
+    if (auth.PERMS[actualPermKey] === auth.PERMS.owner) {
+      return true;
+    }
+    if (actualValidUser.id === auth.getUserId()) {
+      return true;
+    }
+    if (
+      actualValidUser.permissions.includes(auth.PERMS.owner) &&
+      auth.PERMS[actualPermKey] === auth.PERMS.protected
+    ) {
+      return true;
+    }
+    if (
+      !auth.isSet("owner") &&
+      auth.PERMS[actualPermKey] === auth.PERMS.protected
+    ) {
+      return true;
+    }
+    return false;
+  };
+
   if (loading) return <SpinnerCustom />;
 
   if (error) {
@@ -233,10 +261,7 @@ function UsersPermissionsPage() {
                           name={auth.PERMS[permKey]}
                           value={validUser.id}
                           onChange={(e) => handleChange(e)}
-                          disabled={
-                            !editMode ||
-                            auth.PERMS[permKey] === auth.PERMS.readOwn_user
-                          }
+                          disabled={isInputCBDisabled(validUser, permKey)}
                           checked={validUser.permissions.includes(
                             auth.PERMS[permKey]
                           )}

@@ -31,9 +31,10 @@ const auth = {
     remove_user: "remove:user",
     // basic permission
     protected: "protected",
+    owner: "owner",
   },
   isAuthenticated: () => {
-    const tokenScope = import.meta.env.VITE_BACKEND_URI;
+    const tokenScope = import.meta.env.VITE_JWT_TOKEN_SCOPE;
     try {
       const tokenData = auth.getTokenData();
       if (!tokenData) {
@@ -55,7 +56,7 @@ const auth = {
     return jwt(localStorage.getItem("accesstoken")).sub;
   },
   isSet: (permission) => {
-    const tokenScope = import.meta.env.VITE_BACKEND_URI;
+    const tokenScope = import.meta.env.VITE_JWT_TOKEN_SCOPE;
     const tokenData = auth.getTokenData();
     if (!tokenData) {
       return false;
@@ -101,6 +102,7 @@ const PERMS_DEPENDENCIES = {
   // users
   [auth.PERMS.readOwn_user]: [],
   [auth.PERMS.protected]: [],
+  [auth.PERMS.owner]: [auth.PERMS.protected],
   [auth.PERMS.readValid_users]: [auth.PERMS.readOwn_user],
   [auth.PERMS.readInvalid_users]: [auth.PERMS.readValid_users],
 
@@ -134,9 +136,8 @@ const addDependedPermissions = (permissions) => {
   // Check if the given permissions is in the auth.PERMS obj
   console.log("validatePermissions | permissions:", permissions);
   const validatedPermissions = permissions.filter(
-    (permission) =>
-      Object.values(auth.PERMS).includes(permission) &&
-      permission !== auth.PERMS.protected
+    (permission) => Object.values(auth.PERMS).includes(permission) /*&&
+      permission !== auth.PERMS.protected*/
     // because only the main super admin can be protected (it will be created in the project's init. state)
   );
 
@@ -512,6 +513,7 @@ const userErrorCodes = {
   userInvalidRefreshJWT: "USER_INVALID-REFRESHJWT",
   userNoAccessJWT: "USER_NO-ACCESSJWT",
   userNoRefreshJWT: "USER_NO-REFRESHJWT",
+  userInvalidPermissionUpdate: "USER_INVALID_PERMUPDATE",
 };
 
 const productErrorCodes = {

@@ -1,5 +1,3 @@
-// import dotenv from "dotenv";
-// dotenv.config();
 import React, { useState, createContext, useEffect } from "react";
 import {
   InMemoryCache,
