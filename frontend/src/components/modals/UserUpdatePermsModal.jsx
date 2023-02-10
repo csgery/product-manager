@@ -126,31 +126,40 @@ function UserUpdatePermsModal({
             } mt-2 border-${darkMode ? "secondary" : "dark"}`}
           >
             <thead>
-              <tr className="text-center">
-                <th>name</th>
-                <th>added perms</th>
-                <th>removed perms</th>
-                <th>perms after edit</th>
+              <tr key={"mainHeader"} className="text-center">
+                <th key={"name"}>name</th>
+                <th key={"addedperms"}>added perms</th>
+                <th key={"removedperms"}>removed perms</th>
+                <th key={"permsafteredit"}>perms after edit</th>
               </tr>
             </thead>
             <tbody className="table-group-divider">
-              {affectedUsers.map((affectedUser) => {
+              {affectedUsers.map((affectedUser, uindex) => {
                 return (
-                  <tr>
-                    <td className="text-center align-middle">
+                  <tr key={uindex}>
+                    <td key={uindex} className="text-center align-middle">
                       {affectedUser.username}
                     </td>
-                    <td className="display-linebreak align-middle">
+                    <td
+                      key={uindex + "addedPerms"}
+                      className="display-linebreak align-middle"
+                    >
                       {addedPermissions(affectedUser).length < 1
                         ? "-"
                         : addedPermissions(affectedUser)}
                     </td>
-                    <td className="display-linebreak align-middle">
+                    <td
+                      key={uindex + "deletedPerms"}
+                      className="display-linebreak align-middle"
+                    >
                       {deletedPermissions(affectedUser).length < 1
                         ? "-"
                         : deletedPermissions(affectedUser)}
                     </td>
-                    <td className="display-linebreak align-middle">
+                    <td
+                      key={uindex + "permsAfterEdit"}
+                      className="display-linebreak align-middle"
+                    >
                       {permissionsAfterEdit(affectedUser).length < 1
                         ? "-"
                         : permissionsAfterEdit(affectedUser)}

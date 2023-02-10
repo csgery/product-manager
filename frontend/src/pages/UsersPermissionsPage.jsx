@@ -161,7 +161,7 @@ function UsersPermissionsPage() {
           } mt-2 border-${darkMode ? "secondary" : "dark"}`}
         >
           <thead>
-            <tr>
+            <tr key={"mainHeaderKey"}>
               <th className={"text-center align-middle"} rowSpan={3}>
                 Username
               </th>
@@ -199,7 +199,7 @@ function UsersPermissionsPage() {
               </th>
               <th className={"table-active"}></th>
             </tr>
-            <tr>
+            <tr key={"subHeaderKey"}>
               {Object.keys(auth.PERMS).map((item, index) => (
                 <th className={index < 7 ? "" : "table-active"} key={index}>
                   {formatPerm(item)}
@@ -208,24 +208,25 @@ function UsersPermissionsPage() {
             </tr>
           </thead>
           <tbody className="table-group-divider">
-            {users.map((validUser, i) => {
+            {users.map((validUser, uindex) => {
               console.log(validUser);
               return (
-                <tr>
-                  <td className={"text-center align-middle"}>
+                <tr key={uindex}>
+                  <td key={uindex} className={"text-center align-middle"}>
                     {validUser.username}
                   </td>
-                  {Object.keys(auth.PERMS).map((permKey, index) => {
+                  {Object.keys(auth.PERMS).map((permKey, pindex) => {
                     return (
                       <td
+                        key={pindex}
                         className={
-                          (index < 7 ? "" : "table-active") + " text-center"
+                          (pindex < 7 ? "" : "table-active") + " text-center"
                         }
                         //onClick={(e) => handleClick(e)}
                       >
                         <input
                           className={
-                            (index < 7 ? "" : "table-active ") +
+                            (pindex < 7 ? "" : "table-active ") +
                             "form-check-input text-center"
                           }
                           type="checkbox"
