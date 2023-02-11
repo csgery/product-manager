@@ -141,6 +141,9 @@ function TranslationWrapper({ children }) {
       removeUsersText: "Are you sure to remove the following users?",
       removeUserText: "Are you sure to remove the following user?",
 
+      blockUserText: "Are you sure to block the following user?",
+      unblockUserText: "Are you sure to unblock the following user?",
+
       // Modal buttons text
       deleteButtonText: "Delete",
       restoreButtonText: "Restore",
@@ -206,8 +209,12 @@ function TranslationWrapper({ children }) {
       successfullyModifiedPerms: "Successfully Modified Permissions!",
       fillOutAllField: "Please fill out all fields!",
       quantityTooLarge: "Quantity is larger than 1000!",
-
-      // some frontend validation
+      blockUser: "Blocking User",
+      unblockUser: "Unblocking User",
+      protected: "Protected",
+      owner: "Owner",
+      blocked: "Blocked",
+      unblocked: "Active/Unblocked",
     };
     const fetchMoreData = async () => {
       //console.log(await getMoreText(UITextToTranslate));

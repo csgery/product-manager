@@ -26,6 +26,8 @@ import {
   userNoRefreshJWT_Error,
   userUsernameAlreadyExist_Error,
   userBadPermissionUpdating_Error,
+  userUserBlocking_Error,
+  userUserUnblocking_Error,
 } from "../../helper/errors/userErrors.js";
 import {
   checkEmailRegex,
@@ -638,12 +640,48 @@ export default {
       if (!user) {
         throw userNotFound_Error(lang);
       }
-      if (user.permissions.includes(auth.PERMS.protected)) {
-        throw userIsProtected();
-      }
       if (!user.canLogin) {
         throw userAlreadyBlocked_Error(lang);
       }
+      const reqUserPermissions =
+        userCtx[process.env.JWT_TOKEN_SCOPE].permissions;
+
+      // check if there is any forbidden situation
+      // TODO: implement try cache instead of this.....
+      let isError = false;
+      let errorDataForLog = {
+        message: "",
+        securityLevel: "severe_frontend-modifying",
+      };
+      if (!reqUserPermissions.includes(auth.PERMS.updateUser_permissions)) {
+        isError = true;
+        errorDataForLog.message =
+          "try to block without required permission: " +
+          auth.PERMS.updateUser_permissions;
+      } else if (user.permissions.includes(auth.PERMS.owner)) {
+        isError = true;
+        errorDataForLog.message = "try to block owner user";
+      } else if (
+        user.permissions.includes(auth.PERMS.protected) &&
+        !reqUserPermissions.includes(auth.PERMS.owner)
+      ) {
+        isError = true;
+        errorDataForLog.message =
+          "try to block protected user without owner right";
+      }
+      if (isError) {
+        const userLog = new UserLog({
+          userId: originalUser.id,
+          createdBy: userCtx.sub,
+          actionType: "user-block-login",
+          message: errorDataForLog.message,
+          securityLevel: errorDataForLog.securityLevel,
+        });
+        //console.log(userLog);
+        await userLog.save();
+        throw userUserBlocking_Error(lang);
+      }
+
       await user.update({
         shouldUserReLogin: true,
         canLogin: false,
@@ -670,12 +708,49 @@ export default {
       if (!user) {
         throw userNotFound_Error(lang);
       }
-      if (user.permissions.includes(auth.PERMS.protected)) {
-        throw userIsProtected();
-      }
       if (user.canLogin) {
         throw userAlreadyUnblocked_Error(lang);
       }
+
+      const reqUserPermissions =
+        userCtx[process.env.JWT_TOKEN_SCOPE].permissions;
+
+      // check if there is any forbidden situation
+      // TODO: implement try cache instead of this.....
+      let isError = false;
+      let errorDataForLog = {
+        message: "",
+        securityLevel: "severe_frontend-modifying",
+      };
+      if (!reqUserPermissions.includes(auth.PERMS.updateUser_permissions)) {
+        isError = true;
+        errorDataForLog.message =
+          "try to unblock without required permission: " +
+          auth.PERMS.updateUser_permissions;
+      } else if (user.permissions.includes(auth.PERMS.owner)) {
+        isError = true;
+        errorDataForLog.message = "try to unblock owner user";
+      } else if (
+        user.permissions.includes(auth.PERMS.protected) &&
+        !reqUserPermissions.includes(auth.PERMS.owner)
+      ) {
+        isError = true;
+        errorDataForLog.message =
+          "try to unblock protected user without owner right";
+      }
+      if (isError) {
+        const userLog = new UserLog({
+          userId: originalUser.id,
+          createdBy: userCtx.sub,
+          actionType: "user-block-login",
+          message: errorDataForLog.message,
+          securityLevel: errorDataForLog.securityLevel,
+        });
+        //console.log(userLog);
+        await userLog.save();
+        throw userUserUnblocking_Error(lang);
+      }
+
       await user.update({ canLogin: true });
 
       const userLog = new UserLog({

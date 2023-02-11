@@ -226,6 +226,32 @@ const userBadPermissionUpdating_Error = async (lang, permission) =>
     }
   );
 
+const userUserBlocking_Error = async (lang) =>
+  new GraphQLError(
+    (await translateError(
+      `An error occured when tried to block the user`,
+      lang
+    )) +
+      prefix +
+      errorCodes.userUserBlocking,
+    {
+      extensions: { code: "NO_REFRESH_TOKEN" },
+    }
+  );
+
+const userUserUnblocking_Error = async (lang) =>
+  new GraphQLError(
+    (await translateError(
+      `An error occured when tried to unblock the user`,
+      lang
+    )) +
+      prefix +
+      errorCodes.userUserUnblocking,
+    {
+      extensions: { code: "NO_REFRESH_TOKEN" },
+    }
+  );
+
 export {
   userNotFound_Error,
   userSoftDeleteFirst_Error,
@@ -250,4 +276,6 @@ export {
   userNoAccessJWT_Error,
   userNoRefreshJWT_Error,
   userBadPermissionUpdating_Error,
+  userUserBlocking_Error,
+  userUserUnblocking_Error,
 };

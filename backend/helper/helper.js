@@ -205,6 +205,8 @@ const userErrorCodes = {
   userNoAccessJWT: "USER_NO-ACCESSJWT",
   userNoRefreshJWT: "USER_NO-REFRESHJWT",
   userInvalidPermissionUpdate: "USER_INVALID_PERMUPDATE",
+  userUserBlocking: "USER_INVALID_USERBLOCKING",
+  userUserUnblocking: "USER_INVALID_USERUNBLOCKING",
 };
 
 const productErrorCodes = {
