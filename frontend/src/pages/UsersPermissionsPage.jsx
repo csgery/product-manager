@@ -6,6 +6,8 @@ import Table from "react-bootstrap/Table";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import { FcCancel } from "react-icons/fc";
+import { BsShieldShaded } from "react-icons/bs";
+
 import {
   auth,
   addDependedPermissions,
@@ -188,10 +190,13 @@ function UsersPermissionsPage() {
           className={`table-sm table-${
             darkMode ? "dark" : "secondary"
           } mt-2 border-${darkMode ? "secondary" : "dark"}`}
+          data-toggle="table"
+          data-fixed-columns="true"
+          data-fixed-number="1"
         >
           <thead>
             <tr key={"mainHeaderKey"}>
-              <th className={"text-center align-middle"} rowSpan={3}>
+              <th className={"text-center align-middle "} rowSpan={3}>
                 Username
               </th>
               <th colSpan={productPermsCount} className={"text-center"}>
@@ -241,12 +246,22 @@ function UsersPermissionsPage() {
               // console.log(validUser);
               return (
                 <tr key={uindex}>
-                  <td key={uindex} className={"text-center align-middle"}>
-                    {validUser.username}
+                  <td
+                    key={uindex}
+                    className={"text-center align-middle prevent-linebreak "}
+                    //style={{ whiteSpace: "nowrap;" }}
+                  >
+                    <span className={"text-danger"}>{validUser.username}</span>
                     {validUser.canLogin && (
                       <FcCancel
-                        //className="ms-2"
-                        style={{ fontSize: "1.4rem" }}
+                        className="ms-1 align-middle"
+                        style={{ fontSize: "1.3rem" }}
+                      />
+                    )}
+                    {validUser.permissions.includes(auth.PERMS.protected) && (
+                      <BsShieldShaded
+                        className="ms-1 align-middle text-success"
+                        style={{ fontSize: "1.3rem" }}
                       />
                     )}
                   </td>

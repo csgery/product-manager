@@ -93,6 +93,25 @@ body {
   white-space: pre-line;
 }
 
+.prevent-linebreak {
+  white-space: nowrap;
+}
+
+.fixed-column {
+  position: sticky;
+  left: 0px;
+  background-color: grey;
+}
+
+.react-bootstrap-table table > tbody > tr > td:nth-child(1),
+.react-bootstrap-table table > thead > tr:nth-child(1) > th:nth-child(1) {
+  background-color: #661616;
+  position: sticky;
+  position: -webkit-sticky;
+  left: 0;
+  z-index: 1;
+}
+
 @media (max-width: 900px) {
   // .product-card-row {
   //   display: flex;
