@@ -105,15 +105,15 @@ body {
   overflow-y: scroll;
 }
 
-Table thead {
-  position: sticky;
-  top: 0px;
-  margin: 0 0 0 0;
-  overflow: hidden;
-  overflow-y: hidden;
-  overflow-x: hidden;
-  border: 2px solid black;
-}
+// Table thead {
+//   position: sticky;
+//   top: 0px;
+//   margin: 0 0 0 0;
+//   overflow: hidden;
+//   overflow-y: hidden;
+//   overflow-x: hidden;
+//   border: 2px solid black;
+// }
 
 .overflowHidden {
   overflow: hidden;

@@ -20,6 +20,7 @@ function UserUpdatePermsModal({
   formatPerm,
 }) {
   const [showSavePermsModal, setShowSavePermsModal] = useState(false);
+  const [showBTNLoadingSpinner, setShowBTNLoadingSpinner] = useState(false);
 
   //const { loading, error, data } = useQuery(GET_VALIDUSERS);
   console.log("affectedUsers", affectedUsers);
@@ -68,6 +69,7 @@ function UserUpdatePermsModal({
   });
 
   const handlePermsEditSave = () => {
+    setShowBTNLoadingSpinner(true);
     const originalUsers_String = JSON.stringify(originalUsers);
     // console.log("originalUsers", originalUsers_String);
     // console.log("affectedUsers", affectedUsers);
@@ -93,7 +95,10 @@ function UserUpdatePermsModal({
         });
         setEditMode((oldValue) => !oldValue);
       })
-      .catch((err) => handleCustomError(err));
+      .catch((err) => handleCustomError(err))
+      .finally(() => {
+        setShowBTNLoadingSpinner(false);
+      });
   };
 
   return (
@@ -111,9 +116,12 @@ function UserUpdatePermsModal({
         show={showSavePermsModal}
         onHide={() => setShowSavePermsModal((old) => !old)}
         backdrop="static"
-        //keyboard={false}
+        keyboard={false}
       >
-        <Modal.Header closeButton className={darkMode && "bg-dark text-white"}>
+        <Modal.Header
+          closeButton={showBTNLoadingSpinner ? false : true}
+          className={darkMode && "bg-dark text-white"}
+        >
           <Modal.Title>{UIText.updatePermissionsModalTitle}</Modal.Title>
         </Modal.Header>
         <Modal.Body className={darkMode && "bg-dark text-white"}>
@@ -174,6 +182,7 @@ function UserUpdatePermsModal({
           <Button
             variant="danger"
             onClick={() => setShowSavePermsModal((old) => !old)}
+            className={showBTNLoadingSpinner && "disabled"}
           >
             {iconMode ? (
               <MdOutlineCancel style={{ fontSize: "1.6rem" }} />
@@ -181,8 +190,15 @@ function UserUpdatePermsModal({
               UIText.closeButtonText
             )}
           </Button>
-          <Button variant="primary" onClick={handlePermsEditSave}>
-            {iconMode ? (
+          <Button
+            variant="primary"
+            onClick={showBTNLoadingSpinner ? () => {} : handlePermsEditSave}
+          >
+            {showBTNLoadingSpinner ? (
+              <div className="text-center d-flex spinnerbox-customsize">
+                <div className="text-center align-self-center spinner-border spinner-customsize"></div>
+              </div>
+            ) : iconMode ? (
               <MdOutlineDoneOutline style={{ fontSize: "1.6rem" }} />
             ) : (
               UIText.createButtonText

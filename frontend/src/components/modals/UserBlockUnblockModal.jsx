@@ -18,6 +18,7 @@ function UserBlockUnblockModal({
 }) {
   const [show, setShow] = useState(false);
   const [canUserLogin, setCanUserLogin] = useState(userToModify.canLogin);
+  const [showBTNLoadingSpinner, setShowBTNLoadingSpinner] = useState(false);
 
   const darkMode = useContext(DarkModeContext);
   const UIText = useContext(UITextContext);
@@ -34,9 +35,9 @@ function UserBlockUnblockModal({
     if (!editMode) {
       return true;
     }
-    // if (!auth.isSet(auth.PERMS.updateUser_permissions)) {
-    //   return true;
-    // }
+    if (userToModify.id === auth.getUserId()) {
+      return true;
+    }
     if (userToModify.permissions.includes(auth.PERMS.owner)) {
       return true;
     }
@@ -51,6 +52,7 @@ function UserBlockUnblockModal({
 
   const handleModifying = () => {
     // we have to deeply copy the object in order to modify that because the original is read-only
+    setShowBTNLoadingSpinner(true);
     let pendingUsersDeepCopy = structuredClone(pendingUsers);
     let userRefFromUsers = pendingUsersDeepCopy.find(
       (user) => user.id === userToModify.id
@@ -69,9 +71,12 @@ function UserBlockUnblockModal({
               userToModify.username + " " + UIText.successfullyBlockedUser,
             type: "success",
           });
+          setShow(false);
         })
         .catch((err) => handleCustomError(err))
-        .finally(() => setShow(false));
+        .finally(() => {
+          setShowBTNLoadingSpinner(false);
+        });
     } else {
       unblockUser({ variables: { id: userToModify.id } })
         .then(() => {
@@ -85,18 +90,21 @@ function UserBlockUnblockModal({
               userToModify.username + " " + UIText.successfullyUnblockedUser,
             type: "success",
           });
+          setShow(false);
         })
         .catch((err) => handleCustomError(err))
-        .finally(() => setShow(false));
+        .finally(() => {
+          setShowBTNLoadingSpinner(false);
+        });
     }
   };
 
   const iconMode = useContext(IconModeContext);
   return (
     <>
-      {console.log(
+      {/* {console.log(
         `username: ${userToModify.username} username.canlogin: ${userToModify.canLogin} canUserLogin: ${canUserLogin}`
-      )}
+      )} */}
 
       <span
         data-toggle="tooltip"
@@ -119,8 +127,16 @@ function UserBlockUnblockModal({
           />
         </Button>
       </span>
-      <Modal show={show} onHide={() => setShow(false)}>
-        <Modal.Header closeButton className={darkMode && "bg-dark text-white"}>
+      <Modal
+        show={show}
+        onHide={() => setShow(false)}
+        backdrop="static"
+        keyboard={false}
+      >
+        <Modal.Header
+          closeButton={showBTNLoadingSpinner ? false : true}
+          className={darkMode && "bg-dark text-white"}
+        >
           <Modal.Title>
             {canUserLogin ? UIText.blockUser : UIText.unblockUser}
           </Modal.Title>
@@ -132,15 +148,26 @@ function UserBlockUnblockModal({
           <h4>{userToModify.username}</h4>
         </Modal.Body>
         <Modal.Footer className={darkMode && "bg-dark text-white"}>
-          <Button variant="danger" onClick={() => setShow(false)}>
+          <Button
+            variant="danger"
+            onClick={() => setShow(false)}
+            className={showBTNLoadingSpinner && "disabled"}
+          >
             {iconMode ? (
               <MdOutlineCancel style={{ fontSize: "1.6rem" }} />
             ) : (
               UIText.closeButtonText
             )}
           </Button>
-          <Button variant="primary" onClick={handleModifying}>
-            {iconMode ? (
+          <Button
+            variant="primary"
+            onClick={showBTNLoadingSpinner ? () => {} : handleModifying}
+          >
+            {showBTNLoadingSpinner ? (
+              <div className="text-center d-flex spinnerbox-customsize">
+                <div className="text-center align-self-center spinner-border spinner-customsize"></div>
+              </div>
+            ) : iconMode ? (
               <MdOutlineDoneOutline style={{ fontSize: "1.6rem" }} />
             ) : canUserLogin ? (
               UIText.blockUser

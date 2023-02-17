@@ -142,20 +142,28 @@ export default function ProductUserModal({
   const handleClick = async (e) => {
     e.preventDefault();
     setShowBTNLoadingSpinner(true);
+    let error = false;
     if (bind === "product") {
       if (modalType === "Delete") {
         //console.log("items to delete BEFORE delete:", itemIdsNamesToProcess);
         for (const item of itemIdsNamesToProcess) {
           try {
             await deleteProduct({ variables: { id: item[0] } });
-            createNotification({
-              title: UIText.successfulOperation,
-              message: `${item[1]} ${UIText.successfullyDeleted}`,
-              type: "success",
-            });
           } catch (err) {
+            error = true;
             handleCustomError(err);
           }
+        }
+        if (!error) {
+          createNotification({
+            title: UIText.successfulOperation,
+            message: `${
+              itemIdsNamesToProcess.length > 1
+                ? UIText.products
+                : UIText.product
+            } ${UIText.successfullyDeleted}`,
+            type: "success",
+          });
         }
         // itemIdsNamesToProcess.forEach((item) => {
         //   deleteProduct({ variables: { id: item[0] } })
@@ -166,14 +174,21 @@ export default function ProductUserModal({
         for (const item of itemIdsNamesToProcess) {
           try {
             await restoreDeletedProduct({ variables: { id: item[0] } });
-            createNotification({
-              title: UIText.successfulOperation,
-              message: `${item[1]} ${UIText.successfullyRestored}`,
-              type: "success",
-            });
           } catch (err) {
+            error = true;
             handleCustomError(err);
           }
+        }
+        if (!error) {
+          createNotification({
+            title: UIText.successfulOperation,
+            message: `${
+              itemIdsNamesToProcess.length > 1
+                ? UIText.products
+                : UIText.product
+            } ${UIText.successfullyRestored}`,
+            type: "success",
+          });
         }
         // itemIdsNamesToProcess.forEach((item) => {
         //   restoreDeletedProduct({ variables: { id: item[0] } });
@@ -184,14 +199,21 @@ export default function ProductUserModal({
         for (const item of itemIdsNamesToProcess) {
           try {
             await removeProduct({ variables: { id: item[0] } });
-            createNotification({
-              title: UIText.successfulOperation,
-              message: `${item[1]} ${UIText.successfullyRemoved}`,
-              type: "success",
-            });
           } catch (err) {
+            error = true;
             handleCustomError(err);
           }
+        }
+        if (!error) {
+          createNotification({
+            title: UIText.successfulOperation,
+            message: `${
+              itemIdsNamesToProcess.length > 1
+                ? UIText.products
+                : UIText.product
+            } ${UIText.successfullyRemoved}`,
+            type: "success",
+          });
         }
         // itemIdsNamesToProcess.forEach((item) => {
         //   removeProduct({ variables: { id: item[0] } });
@@ -205,14 +227,19 @@ export default function ProductUserModal({
         for (const item of itemIdsNamesToProcess) {
           try {
             await deleteUser({ variables: { id: item[0] } });
-            createNotification({
-              title: UIText.successfulOperation,
-              message: `${item[1]} ${UIText.successfullyDeleted}`,
-              type: "success",
-            });
           } catch (err) {
+            error = true;
             handleCustomError(err);
           }
+        }
+        if (!error) {
+          createNotification({
+            title: UIText.successfulOperation,
+            message: `${
+              itemIdsNamesToProcess.length > 1 ? UIText.users : UIText.user
+            } ${UIText.successfullyDeleted}`,
+            type: "success",
+          });
         }
         // itemIdsNamesToProcess.forEach((item) => {
         //   deleteProduct({ variables: { id: item[0] } })
@@ -223,14 +250,19 @@ export default function ProductUserModal({
         for (const item of itemIdsNamesToProcess) {
           try {
             await restoreUser({ variables: { id: item[0] } });
-            createNotification({
-              title: UIText.successfulOperation,
-              message: `${item[1]} ${UIText.successfullyRestored}`,
-              type: "success",
-            });
           } catch (err) {
+            error = true;
             handleCustomError(err);
           }
+        }
+        if (!error) {
+          createNotification({
+            title: UIText.successfulOperation,
+            message: `${
+              itemIdsNamesToProcess.length > 1 ? UIText.users : UIText.user
+            } ${UIText.successfullyRestored}`,
+            type: "success",
+          });
         }
         // itemIdsNamesToProcess.forEach((item) => {
         //   restoreDeletedProduct({ variables: { id: item[0] } });
@@ -241,14 +273,19 @@ export default function ProductUserModal({
         for (const item of itemIdsNamesToProcess) {
           try {
             await removeUser({ variables: { id: item[0] } });
-            createNotification({
-              title: UIText.successfulOperation,
-              message: `${item[1]} ${UIText.successfullyRemoved}`,
-              type: "success",
-            });
           } catch (err) {
+            error = true;
             handleCustomError(err);
           }
+        }
+        if (!error) {
+          createNotification({
+            title: UIText.successfulOperation,
+            message: `${
+              itemIdsNamesToProcess.length > 1 ? UIText.users : UIText.user
+            } ${UIText.successfullyRemoved}`,
+            type: "success",
+          });
         }
         // itemIdsNamesToProcess.forEach((item) => {
         //   removeProduct({ variables: { id: item[0] } });
@@ -333,7 +370,7 @@ export default function ProductUserModal({
           </Button>
           <Button
             variant={modalType === "Restore" ? "primary" : "danger"}
-            onClick={handleClick}
+            onClick={showBTNLoadingSpinner ? () => {} : handleClick}
           >
             {showBTNLoadingSpinner ? (
               <div className="text-center d-flex spinnerbox-customsize">

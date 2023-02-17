@@ -102,8 +102,10 @@ function TranslationWrapper({ children }) {
     const UITextToTranslate = {
       // Navbar texts
       productManager: "Product Manager",
+      product: "Product",
       products: "Products",
       deletedProducts: "Deleted Products",
+      user: "User",
       users: "Users",
       deletedUsers: "Deleted Users",
       viewer: "Viewer",

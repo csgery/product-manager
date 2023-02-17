@@ -21,6 +21,7 @@ import { UITextContext } from "../components/TranslationWrapper";
 import { DarkModeContext } from "../App";
 import UserUpdatePermsModal from "../components/modals/UserUpdatePermsModal";
 import UserBlockUnblockModal from "../components/modals/UserBlockUnblockModal";
+import UserPermsRow from "../components/user/UserPermsRow";
 
 function UsersPermissionsPage() {
   const { loading, error, data } = useQuery(GET_VALIDUSERS);
@@ -51,7 +52,9 @@ function UsersPermissionsPage() {
   const [handleCustomError] = useCustomError();
 
   useEffect(() => {
-    if (data?.validUsers) setPendingUsers(data.validUsers);
+    if (data?.validUsers) {
+      setPendingUsers(data.validUsers);
+    }
   }, [data?.validUsers, editMode]);
 
   const formatPerm = (right) => {
@@ -155,10 +158,10 @@ function UsersPermissionsPage() {
     handleCustomError(error);
   }
 
-  if (pendingUsers && !loading && !error)
+  if (pendingUsers && data && !loading && !error)
     return (
       <>
-        {console.log("users:", pendingUsers)}
+        {/* {console.log("users:", pendingUsers)} */}
         {!editMode ? (
           <Button
             className={"mt-5"}
@@ -252,86 +255,17 @@ function UsersPermissionsPage() {
               </tr>
             </thead>
             <tbody className="table-group-divider">
-              {pendingUsers.map((validUser, uindex) => {
-                console.log("inside view:", validUser);
+              {pendingUsers.map((pendingUser, uindex) => {
+                // console.log("inside view:", pendingUser);
                 return (
-                  <tr key={uindex} className={"text-center align-middle "}>
-                    <td
-                      key={uindex}
-                      className={"text-center align-middle prevent-linebreak "}
-                      //style={{ whiteSpace: "nowrap;" }}
-                    >
-                      <span
-                        className={
-                          !validUser.canLogin ? "text-danger" : "text-dark"
-                        }
-                      >
-                        {validUser.username}
-                      </span>
-                      {
-                        <UserBlockUnblockModal
-                          data-toggle="tooltip"
-                          data-placement="top"
-                          title={UIText.owner}
-                          userToModify={validUser}
-                          editMode={editMode}
-                          pendingUsers={pendingUsers}
-                          setPendingUsers={setPendingUsers}
-                        />
-                      }
-                      {data.validUsers
-                        .find((user) => user.id === validUser.id)
-                        .permissions.includes(auth.PERMS.protected) && (
-                        <BsShieldShaded
-                          data-toggle="tooltip"
-                          data-placement="top"
-                          title={UIText.protected}
-                          className="ms-1 align-middle text-success"
-                          style={{ fontSize: "1.3rem", marginBottom: "3px" }}
-                        />
-                      )}
-                      {data.validUsers
-                        .find((user) => user.id === validUser.id)
-                        .permissions.includes(auth.PERMS.owner) && (
-                        <TbCrown
-                          data-toggle="tooltip"
-                          data-placement="top"
-                          title={UIText.owner}
-                          className="ms-1 text-warning"
-                          style={{ fontSize: "1.8rem", marginBottom: "3px" }}
-                        />
-                      )}
-                    </td>
-                    {Object.keys(auth.PERMS).map((permKey, pindex) => {
-                      return (
-                        <td
-                          key={pindex}
-                          className={
-                            (pindex < 7 ? "" : "table-active overflowHidden ") +
-                            " text-center align-middle overflowHidden "
-                          }
-                          //onClick={(e) => handleClick(e)}
-                        >
-                          <input
-                            className={
-                              (pindex < 7
-                                ? ""
-                                : "table-active overflowHidden ") +
-                              "form-check-input text-center overflowHidden "
-                            }
-                            type="checkbox"
-                            name={auth.PERMS[permKey]}
-                            value={validUser.id}
-                            onChange={(e) => handleChange(e)}
-                            disabled={isInputCBDisabled(validUser, permKey)}
-                            checked={validUser.permissions.includes(
-                              auth.PERMS[permKey]
-                            )}
-                          />
-                        </td>
-                      );
-                    })}
-                  </tr>
+                  <UserPermsRow
+                    data={data}
+                    pendingUser={pendingUser}
+                    pendingUsers={pendingUsers}
+                    setPendingUsers={setPendingUsers}
+                    editMode={editMode}
+                    uindex={uindex}
+                  />
                 );
               })}
             </tbody>

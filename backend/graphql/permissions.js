@@ -203,6 +203,16 @@ const canRemoveProduct = rule()((parent, args, { user, req }) => {
   return checkPermission(user, auth.PERMS.remove_product, lang);
 });
 
+const canBlockUser = rule()((parent, args, { user, req }) => {
+  const lang = req?.headers?.language || "en";
+  return checkPermission(user, auth.PERMS.updateUser_permissions, lang);
+});
+
+const canUnblockUser = rule()((parent, args, { user, req }) => {
+  const lang = req?.headers?.language || "en";
+  return checkPermission(user, auth.PERMS.updateUser_permissions, lang);
+});
+
 export default shield(
   {
     Query: {
@@ -226,6 +236,8 @@ export default shield(
       restoreUser: and(canRestoreUser, not(isReadingOwnUser)),
       removeUser: and(canRemoveUser, not(isReadingOwnUser)),
       invalidateTokens: isAuthenticated,
+      blockUser: canBlockUser,
+      unblockUser: canUnblockUser,
       //refreshToken: isAuthenticated,
 
       createProduct: isAuthenticated,
