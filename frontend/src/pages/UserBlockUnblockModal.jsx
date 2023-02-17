@@ -11,7 +11,12 @@ import { IconModeContext } from "../App";
 import { TiCancel } from "react-icons/ti";
 import { MdOutlineCancel, MdOutlineDoneOutline } from "react-icons/md";
 
-function UserBlockUnblockModal({ userToModify, editMode, users, setUsers }) {
+function UserBlockUnblockModal({
+  userToModify,
+  editMode,
+  pendingUsers,
+  setPendingUsers,
+}) {
   const [show, setShow] = useState(false);
   const [canUserLogin, setCanUserLogin] = useState(userToModify.canLogin);
 
@@ -22,7 +27,9 @@ function UserBlockUnblockModal({ userToModify, editMode, users, setUsers }) {
   const [blockUser, { data: blockUserData }] = useMutation(BLOCK_USER, {
     refetchQueries: [GET_VALIDUSERS, GET_DELETEDUSERS],
   });
-  const [unblockUser, { data: unblockUserData }] = useMutation(UNBLOCK_USER);
+  const [unblockUser, { data: unblockUserData }] = useMutation(UNBLOCK_USER, {
+    refetchQueries: [GET_VALIDUSERS, GET_DELETEDUSERS],
+  });
 
   const isModificationDisabled = () => {
     if (!editMode) {
@@ -44,36 +51,41 @@ function UserBlockUnblockModal({ userToModify, editMode, users, setUsers }) {
   };
 
   const handleModifying = () => {
-    let usersDeepCopy = structuredClone(users);
-    let userRefFromUsers = usersDeepCopy.find(
+    // we have to deeply copy the object in order to modify that because the original is read-only
+    let pendingUsersDeepCopy = structuredClone(pendingUsers);
+    let userRefFromUsers = pendingUsersDeepCopy.find(
       (user) => user.id === userToModify.id
     );
 
-    if (userToModify.canLogin) {
+    if (canUserLogin) {
       blockUser({ variables: { id: userToModify.id } })
         .then(() => {
+          userRefFromUsers.canLogin = false;
+          // setCanUserLogin((old) => !old);
+          setCanUserLogin(false);
+          setPendingUsers(pendingUsersDeepCopy);
           createNotification({
-            title: "ok",
-            message: "blocked",
+            title: UIText.successfulOperation,
+            message:
+              userToModify.username + " " + UIText.successfullyBlockedUser,
             type: "success",
           });
-          userRefFromUsers.canLogin = !userRefFromUsers.canLogin;
-          setCanUserLogin((old) => !old);
-          setUsers(usersDeepCopy);
         })
         .catch((err) => handleCustomError(err))
         .finally(() => setShow(false));
     } else {
       unblockUser({ variables: { id: userToModify.id } })
         .then(() => {
+          userRefFromUsers.canLogin = true;
+          // setCanUserLogin((old) => !old);
+          setCanUserLogin(true);
+          setPendingUsers(pendingUsersDeepCopy);
           createNotification({
-            title: "ok",
-            message: "unblocked",
+            title: UIText.successfulOperation,
+            message:
+              userToModify.username + " " + UIText.successfullyUnblockedUser,
             type: "success",
           });
-          userRefFromUsers.canLogin = !userRefFromUsers.canLogin;
-          setCanUserLogin((old) => !old);
-          setUsers(usersDeepCopy);
         })
         .catch((err) => handleCustomError(err))
         .finally(() => setShow(false));
@@ -83,6 +95,10 @@ function UserBlockUnblockModal({ userToModify, editMode, users, setUsers }) {
   const iconMode = useContext(IconModeContext);
   return (
     <>
+      {console.log(
+        `username: ${userToModify.username} username.canlogin: ${userToModify.canLogin} canUserLogin: ${canUserLogin}`
+      )}
+
       <span
         data-toggle="tooltip"
         data-placement="top"
@@ -107,14 +123,12 @@ function UserBlockUnblockModal({ userToModify, editMode, users, setUsers }) {
       <Modal show={show} onHide={() => setShow(false)}>
         <Modal.Header closeButton className={darkMode && "bg-dark text-white"}>
           <Modal.Title>
-            {userToModify.canLogin ? UIText.blockUser : UIText.unblockUser}
+            {canUserLogin ? UIText.blockUser : UIText.unblockUser}
           </Modal.Title>
         </Modal.Header>
         <Modal.Body className={darkMode && "bg-dark text-white"}>
           <h3>
-            {userToModify.canLogin
-              ? UIText.blockUserText
-              : UIText.unblockUserText}
+            {canUserLogin ? UIText.blockUserText : UIText.unblockUserText}
           </h3>
           <h4>{userToModify.username}</h4>
         </Modal.Body>
@@ -129,8 +143,10 @@ function UserBlockUnblockModal({ userToModify, editMode, users, setUsers }) {
           <Button variant="primary" onClick={handleModifying}>
             {iconMode ? (
               <MdOutlineDoneOutline style={{ fontSize: "1.6rem" }} />
+            ) : canUserLogin ? (
+              UIText.blockUser
             ) : (
-              UIText.createButtonText
+              UIText.unblockUser
             )}
           </Button>
         </Modal.Footer>

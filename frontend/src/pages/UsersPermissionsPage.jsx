@@ -44,14 +44,14 @@ function UsersPermissionsPage() {
     // },
   });
 
-  const [users, setUsers] = useState([]);
+  const [pendingUsers, setPendingUsers] = useState([]);
 
   const [editMode, setEditMode] = useState(false);
 
   const [handleCustomError] = useCustomError();
 
   useEffect(() => {
-    if (data?.validUsers) setUsers(data.validUsers);
+    if (data?.validUsers) setPendingUsers(data.validUsers);
   }, [data?.validUsers, editMode]);
 
   const formatPerm = (right) => {
@@ -90,7 +90,7 @@ function UsersPermissionsPage() {
     // console.log("users:", users);
     const userIdFromEdit = e.target.value;
     const permFromEdit = e.target.name;
-    let usersDeepCopy = structuredClone(users);
+    let usersDeepCopy = structuredClone(pendingUsers);
     //console.log("usersDeepCopy:", usersDeepCopy);
     let user = usersDeepCopy.find((user) => user.id === userIdFromEdit);
 
@@ -112,13 +112,13 @@ function UsersPermissionsPage() {
         permFromEdit,
       ]);
     }
-    setUsers(usersDeepCopy);
+    setPendingUsers(usersDeepCopy);
     //console.log("user after click:", user);
   };
 
   const handlePermsEditCancel = () => {
     setEditMode((oldValue) => !oldValue);
-    setUsers([]);
+    setPendingUsers([]);
   };
 
   const isInputCBDisabled = (actualValidUser, actualPermKey) => {
@@ -155,9 +155,10 @@ function UsersPermissionsPage() {
     handleCustomError(error);
   }
 
-  if (users && !loading && !error)
+  if (pendingUsers && !loading && !error)
     return (
       <>
+        {console.log("users:", pendingUsers)}
         {!editMode ? (
           <Button
             className={"mt-5"}
@@ -176,11 +177,11 @@ function UsersPermissionsPage() {
               Cancel
             </Button>
             <UserUpdatePermsModal
-              users={users}
+              users={pendingUsers}
               originalUsers={data.validUsers}
               setEditMode={setEditMode}
               formatPerm={formatPerm}
-              affectedUsers={users.filter(
+              affectedUsers={pendingUsers.filter(
                 (user) =>
                   !JSON.stringify(data.validUsers).includes(
                     JSON.stringify(user)
@@ -189,7 +190,7 @@ function UsersPermissionsPage() {
             />
           </>
         )}
-        <div className="table-responsive mh-25 " style={{ height: "300px" }}>
+        <div className="table-responsive h-50 " style={{ maxHeight: "600px" }}>
           {/* tableContainer */}
           <Table
             //responsive
@@ -198,7 +199,7 @@ function UsersPermissionsPage() {
             bordered
             className={`table table-sm table-${
               darkMode ? "dark" : "secondary"
-            } mt-2 border-${darkMode ? "secondary" : "dark"} mh-25 `}
+            } mt-2 border-${darkMode ? "secondary" : "dark"} h-75 `}
           >
             <thead>
               <tr key={"mainHeaderKey"}>
@@ -251,8 +252,8 @@ function UsersPermissionsPage() {
               </tr>
             </thead>
             <tbody className="table-group-divider">
-              {users.map((validUser, uindex) => {
-                // console.log(validUser);
+              {pendingUsers.map((validUser, uindex) => {
+                console.log("inside view:", validUser);
                 return (
                   <tr key={uindex} className={"text-center align-middle "}>
                     <td
@@ -260,7 +261,11 @@ function UsersPermissionsPage() {
                       className={"text-center align-middle prevent-linebreak "}
                       //style={{ whiteSpace: "nowrap;" }}
                     >
-                      <span className={!validUser.canLogin && "text-danger"}>
+                      <span
+                        className={
+                          !validUser.canLogin ? "text-danger" : "text-dark"
+                        }
+                      >
                         {validUser.username}
                       </span>
                       {
@@ -270,8 +275,8 @@ function UsersPermissionsPage() {
                           title={UIText.owner}
                           userToModify={validUser}
                           editMode={editMode}
-                          users={users}
-                          setUsers={setUsers}
+                          pendingUsers={pendingUsers}
+                          setPendingUsers={setPendingUsers}
                         />
                       }
                       {data.validUsers

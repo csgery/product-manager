@@ -207,6 +207,8 @@ function TranslationWrapper({ children }) {
       successfullyRemoved: "Successfully Removed!",
       successfullyRestored: "Successfully Restored!",
       successfullyModifiedPerms: "Successfully Modified Permissions!",
+      successfullyBlockedUser: "Successfully Blocked!",
+      successfullyUnblockedUser: "Successfully Unblocked!",
       fillOutAllField: "Please fill out all fields!",
       quantityTooLarge: "Quantity is larger than 1000!",
       blockUser: "Blocking User",
