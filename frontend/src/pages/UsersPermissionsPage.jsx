@@ -20,7 +20,7 @@ import useCustomError from "../helper/hooks/useCustomError";
 import { UITextContext } from "../components/TranslationWrapper";
 import { DarkModeContext } from "../App";
 import UserUpdatePermsModal from "../components/modals/UserUpdatePermsModal";
-import UserBlockUnblockModal from "./UserBlockUnblockModal";
+import UserBlockUnblockModal from "../components/modals/UserBlockUnblockModal";
 
 function UsersPermissionsPage() {
   const { loading, error, data } = useQuery(GET_VALIDUSERS);

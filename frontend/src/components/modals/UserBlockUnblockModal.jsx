@@ -1,13 +1,12 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useContext } from "react";
 import { useMutation } from "@apollo/client";
 import { Button, Modal } from "react-bootstrap";
-import { BLOCK_USER, UNBLOCK_USER } from "../mutations/userMutations";
-import { GET_VALIDUSERS, GET_DELETEDUSERS } from "../queries/userQueries";
-import useCustomError from "../helper/hooks/useCustomError";
-import { DarkModeContext } from "../App";
-import { createNotification, auth } from "../helper/helper";
-import { UITextContext } from "../components/TranslationWrapper";
-import { IconModeContext } from "../App";
+import { BLOCK_USER, UNBLOCK_USER } from "../../mutations/userMutations";
+import { GET_VALIDUSERS, GET_DELETEDUSERS } from "../../queries/userQueries";
+import useCustomError from "../../helper/hooks/useCustomError";
+import { DarkModeContext, IconModeContext } from "../../App";
+import { createNotification, auth } from "../../helper/helper";
+import { UITextContext } from "../TranslationWrapper";
 import { TiCancel } from "react-icons/ti";
 import { MdOutlineCancel, MdOutlineDoneOutline } from "react-icons/md";
 
