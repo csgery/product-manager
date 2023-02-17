@@ -56,6 +56,18 @@ const REMOVE_USER = gql`
   }
 `;
 
+const BLOCK_USER = gql`
+  mutation BlockUser($id: ID!) {
+    blockUser(id: $id)
+  }
+`;
+
+const UNBLOCK_USER = gql`
+  mutation UnblockUser($id: ID!) {
+    unblockUser(id: $id)
+  }
+`;
+
 export {
   LOGIN_USER,
   REFRESH_TOKEN,
@@ -65,4 +77,6 @@ export {
   DELETE_USER,
   RESTORE_USER,
   REMOVE_USER,
+  BLOCK_USER,
+  UNBLOCK_USER,
 };

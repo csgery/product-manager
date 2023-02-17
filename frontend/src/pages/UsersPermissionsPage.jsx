@@ -6,6 +6,9 @@ import Table from "react-bootstrap/Table";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import { FcCancel } from "react-icons/fc";
+import { BsShieldShaded } from "react-icons/bs";
+import { TbCrown } from "react-icons/tb";
+
 import {
   auth,
   addDependedPermissions,
@@ -17,6 +20,8 @@ import useCustomError from "../helper/hooks/useCustomError";
 import { UITextContext } from "../components/TranslationWrapper";
 import { DarkModeContext } from "../App";
 import UserUpdatePermsModal from "../components/modals/UserUpdatePermsModal";
+import UserBlockUnblockModal from "../components/modals/UserBlockUnblockModal";
+import UserPermsRow from "../components/user/UserPermsRow";
 
 function UsersPermissionsPage() {
   const { loading, error, data } = useQuery(GET_VALIDUSERS);
@@ -40,14 +45,16 @@ function UsersPermissionsPage() {
     // },
   });
 
-  const [users, setUsers] = useState([]);
+  const [pendingUsers, setPendingUsers] = useState([]);
 
   const [editMode, setEditMode] = useState(false);
 
   const [handleCustomError] = useCustomError();
 
   useEffect(() => {
-    if (data?.validUsers) setUsers(data.validUsers);
+    if (data?.validUsers) {
+      setPendingUsers(data.validUsers);
+    }
   }, [data?.validUsers, editMode]);
 
   const formatPerm = (right) => {
@@ -86,7 +93,7 @@ function UsersPermissionsPage() {
     // console.log("users:", users);
     const userIdFromEdit = e.target.value;
     const permFromEdit = e.target.name;
-    let usersDeepCopy = structuredClone(users);
+    let usersDeepCopy = structuredClone(pendingUsers);
     //console.log("usersDeepCopy:", usersDeepCopy);
     let user = usersDeepCopy.find((user) => user.id === userIdFromEdit);
 
@@ -108,13 +115,13 @@ function UsersPermissionsPage() {
         permFromEdit,
       ]);
     }
-    setUsers(usersDeepCopy);
+    setPendingUsers(usersDeepCopy);
     //console.log("user after click:", user);
   };
 
   const handlePermsEditCancel = () => {
     setEditMode((oldValue) => !oldValue);
-    setUsers([]);
+    setPendingUsers([]);
   };
 
   const isInputCBDisabled = (actualValidUser, actualPermKey) => {
@@ -151,27 +158,33 @@ function UsersPermissionsPage() {
     handleCustomError(error);
   }
 
-  if (users && !loading && !error)
+  if (pendingUsers && data && !loading && !error)
     return (
       <>
+        {/* {console.log("users:", pendingUsers)} */}
         {!editMode ? (
           <Button
             className={"mt-5"}
             onClick={() => setEditMode((oldValue) => !oldValue)}
+            style={{ width: "100%" }}
           >
             Edit
           </Button>
         ) : (
           <>
-            <Button className={"mt-5"} onClick={handlePermsEditCancel}>
+            <Button
+              className={"mt-5"}
+              onClick={handlePermsEditCancel}
+              style={{ width: "50%" }}
+            >
               Cancel
             </Button>
             <UserUpdatePermsModal
-              users={users}
+              users={pendingUsers}
               originalUsers={data.validUsers}
               setEditMode={setEditMode}
               formatPerm={formatPerm}
-              affectedUsers={users.filter(
+              affectedUsers={pendingUsers.filter(
                 (user) =>
                   !JSON.stringify(data.validUsers).includes(
                     JSON.stringify(user)
@@ -180,108 +193,84 @@ function UsersPermissionsPage() {
             />
           </>
         )}
-        <Table
-          responsive
-          //striped
-          hover
-          bordered
-          className={`table-sm table-${
-            darkMode ? "dark" : "secondary"
-          } mt-2 border-${darkMode ? "secondary" : "dark"}`}
-        >
-          <thead>
-            <tr key={"mainHeaderKey"}>
-              <th className={"text-center align-middle"} rowSpan={3}>
-                Username
-              </th>
-              <th colSpan={productPermsCount} className={"text-center"}>
-                products
-              </th>
-              <th
-                colSpan={usersPermsCount + 1}
-                className={"table-active text-center"}
-              >
-                users
-              </th>
-            </tr>
-            <tr>
-              <th colSpan={productPermsReadCount} className={"text-center"}>
-                read
-              </th>
-              <th
-                colSpan={productPermsCount - productPermsReadCount}
-                className={"text-center"}
-              >
-                modify
-              </th>
-              <th
-                colSpan={usersPermsReadCount}
-                className={"table-active text-center"}
-              >
-                read
-              </th>
-              <th
-                colSpan={usersPermsCount - usersPermsReadCount - 1}
-                className={"table-active text-center"}
-              >
-                modify
-              </th>
-              <th colSpan={2} className={"table-active"}></th>
-            </tr>
-            <tr key={"subHeaderKey"}>
-              {Object.keys(auth.PERMS).map((item, index) => (
-                <th className={index < 7 ? "" : "table-active"} key={index}>
-                  {formatPerm(item)}
+        <div className="table-responsive h-50 " style={{ maxHeight: "600px" }}>
+          {/* tableContainer */}
+          <Table
+            //responsive
+            //striped
+            hover
+            bordered
+            className={`table table-sm table-${
+              darkMode ? "dark" : "secondary"
+            } mt-2 border-${darkMode ? "secondary" : "dark"} h-75 `}
+          >
+            <thead>
+              <tr key={"mainHeaderKey"}>
+                <th className={"text-center align-middle th"} rowSpan={3}>
+                  Username
                 </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody className="table-group-divider">
-            {users.map((validUser, uindex) => {
-              // console.log(validUser);
-              return (
-                <tr key={uindex}>
-                  <td key={uindex} className={"text-center align-middle"}>
-                    {validUser.username}
-                    {validUser.canLogin && (
-                      <FcCancel
-                        //className="ms-2"
-                        style={{ fontSize: "1.4rem" }}
-                      />
-                    )}
-                  </td>
-                  {Object.keys(auth.PERMS).map((permKey, pindex) => {
-                    return (
-                      <td
-                        key={pindex}
-                        className={
-                          (pindex < 7 ? "" : "table-active") +
-                          " text-center align-middle"
-                        }
-                        //onClick={(e) => handleClick(e)}
-                      >
-                        <input
-                          className={
-                            (pindex < 7 ? "" : "table-active ") +
-                            "form-check-input text-center "
-                          }
-                          type="checkbox"
-                          name={auth.PERMS[permKey]}
-                          value={validUser.id}
-                          onChange={(e) => handleChange(e)}
-                          disabled={isInputCBDisabled(validUser, permKey)}
-                          checked={validUser.permissions.includes(
-                            auth.PERMS[permKey]
-                          )}
-                        />
-                      </td>
-                    );
-                  })}
-                </tr>
-              );
-            })}
-          </tbody>
-        </Table>
+                <th colSpan={productPermsCount} className={"text-center th"}>
+                  products
+                </th>
+                <th
+                  colSpan={usersPermsCount + 1}
+                  className={"table-active text-center th-sm"}
+                >
+                  users
+                </th>
+              </tr>
+              <tr>
+                <th
+                  colSpan={productPermsReadCount}
+                  className={"text-center th-sm"}
+                >
+                  read
+                </th>
+                <th
+                  colSpan={productPermsCount - productPermsReadCount}
+                  className={"text-center th-sm"}
+                >
+                  modify
+                </th>
+                <th
+                  colSpan={usersPermsReadCount}
+                  className={"table-active text-center"}
+                >
+                  read
+                </th>
+                <th
+                  colSpan={usersPermsCount - usersPermsReadCount - 1}
+                  className={"table-active text-center"}
+                >
+                  modify
+                </th>
+                <th colSpan={2} className={"table-active"}></th>
+              </tr>
+              <tr key={"subHeaderKey"}>
+                {Object.keys(auth.PERMS).map((item, index) => (
+                  <th className={index < 7 ? "" : "table-active"} key={index}>
+                    {formatPerm(item)}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody className="table-group-divider">
+              {pendingUsers.map((pendingUser, uindex) => {
+                // console.log("inside view:", pendingUser);
+                return (
+                  <UserPermsRow
+                    data={data}
+                    pendingUser={pendingUser}
+                    pendingUsers={pendingUsers}
+                    setPendingUsers={setPendingUsers}
+                    editMode={editMode}
+                    uindex={uindex}
+                  />
+                );
+              })}
+            </tbody>
+          </Table>
+        </div>
       </>
     );
 }

@@ -93,6 +93,40 @@ body {
   white-space: pre-line;
 }
 
+.prevent-linebreak {
+  white-space: nowrap;
+}
+
+.tableContainer {
+  //background-color: #1e1f25;
+  //border-radius: 20px;
+  height: 500px;
+  //padding: 0 10px 10px 10px;
+  overflow-y: scroll;
+}
+
+// Table thead {
+//   position: sticky;
+//   top: 0px;
+//   margin: 0 0 0 0;
+//   overflow: hidden;
+//   overflow-y: hidden;
+//   overflow-x: hidden;
+//   border: 2px solid black;
+// }
+
+.overflowHidden {
+  overflow: hidden;
+  overflow-y: hidden;
+  overflow-x: hidden;
+}
+
+// .fixed-column {
+//   position: sticky;
+//   left: 0px;
+//   background-color: grey;
+// }
+
 @media (max-width: 900px) {
   // .product-card-row {
   //   display: flex;

@@ -62,7 +62,7 @@ const auth = {
       return false;
     }
     const permissions = tokenData[tokenScope].permissions;
-    console.log("permissions", permissions);
+    //console.log("permissions", permissions);
 
     if (!permission) return false;
     return permissions.includes(permission);
@@ -514,6 +514,8 @@ const userErrorCodes = {
   userNoAccessJWT: "USER_NO-ACCESSJWT",
   userNoRefreshJWT: "USER_NO-REFRESHJWT",
   userInvalidPermissionUpdate: "USER_INVALID_PERMUPDATE",
+  userUserBlocking: "USER_INVALID_USERBLOCKING",
+  userUserUnblocking: "USER_INVALID_USERUNBLOCKING",
 };
 
 const productErrorCodes = {

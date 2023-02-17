@@ -102,8 +102,10 @@ function TranslationWrapper({ children }) {
     const UITextToTranslate = {
       // Navbar texts
       productManager: "Product Manager",
+      product: "Product",
       products: "Products",
       deletedProducts: "Deleted Products",
+      user: "User",
       users: "Users",
       deletedUsers: "Deleted Users",
       viewer: "Viewer",
@@ -140,6 +142,9 @@ function TranslationWrapper({ children }) {
       restoreUserText: "Are you sure to restore the following user?",
       removeUsersText: "Are you sure to remove the following users?",
       removeUserText: "Are you sure to remove the following user?",
+
+      blockUserText: "Are you sure to block the following user?",
+      unblockUserText: "Are you sure to unblock the following user?",
 
       // Modal buttons text
       deleteButtonText: "Delete",
@@ -204,10 +209,16 @@ function TranslationWrapper({ children }) {
       successfullyRemoved: "Successfully Removed!",
       successfullyRestored: "Successfully Restored!",
       successfullyModifiedPerms: "Successfully Modified Permissions!",
+      successfullyBlockedUser: "Successfully Blocked!",
+      successfullyUnblockedUser: "Successfully Unblocked!",
       fillOutAllField: "Please fill out all fields!",
       quantityTooLarge: "Quantity is larger than 1000!",
-
-      // some frontend validation
+      blockUser: "Blocking User",
+      unblockUser: "Unblocking User",
+      protected: "Protected",
+      owner: "Owner",
+      blocked: "Blocked",
+      unblocked: "Active/Unblocked",
     };
     const fetchMoreData = async () => {
       //console.log(await getMoreText(UITextToTranslate));
