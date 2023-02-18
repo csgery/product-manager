@@ -99,7 +99,7 @@ app.use(function (req, res, next) {
 app.use(
   "/graphql",
 
-  bodyParser.json(),
+  bodyParser.json({ limit: "50mb" }),
   // expressjwt({
   //   // secret: process.env.JWT_SECRET,
   //   secret: process.env.JWT_ACCESSSECRET,
