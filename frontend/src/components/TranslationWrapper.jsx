@@ -165,6 +165,7 @@ function TranslationWrapper({ children }) {
       name: "Name",
       shortID: "Short ID",
       quantity: "Quantity",
+      description: "Description",
 
       // Create User Modal
       createUserButtonText: "Create User",

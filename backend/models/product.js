@@ -19,6 +19,12 @@ const productSchema = new Schema(
       min: [0, "It should be at least 0"],
       max: [999999, "It should be lower than 1.000.000"],
     },
+    description: {
+      type: String,
+    },
+    image: {
+      type: String,
+    },
     valid: {
       type: Boolean,
       required: true,

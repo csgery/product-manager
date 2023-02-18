@@ -81,7 +81,7 @@ export default {
   Mutation: {
     createProduct: async (
       parent,
-      { name, shortId, quantity },
+      { name, shortId, quantity, description, image },
       { user: userCtx, req }
     ) => {
       try {
@@ -97,6 +97,8 @@ export default {
           name,
           shortId,
           quantity,
+          description,
+          image,
           valid: true,
           createdBy: userCtx.sub,
           updatedBy: "-",
@@ -108,6 +110,8 @@ export default {
           newName: productResult.name,
           newShortId: shortId,
           newQuantity: quantity,
+          newDescription: description,
+          newImage: image,
           newValid: true,
           createdBy: userCtx.sub,
           actionType: "create",
@@ -176,6 +180,18 @@ export default {
           fieldsToUpdate.quantity = quantity;
           fieldsToLog.oldQuantity = product.quantity;
           fieldsToLog.newQuantity = quantity;
+        }
+        if (description && product.description !== description) {
+          changes = true;
+          fieldsToUpdate.description = description;
+          fieldsToLog.oldDescription = product.description;
+          fieldsToLog.newDescription = description;
+        }
+        if (image && product.image !== image) {
+          changes = true;
+          fieldsToUpdate.image = image;
+          fieldsToLog.oldImage = product.image;
+          fieldsToLog.newImage = image;
         }
 
         //TODO: Logging in the finally section????
