@@ -34,8 +34,15 @@ export default function ProductCreateModal() {
 
   const iconMode = useContext(IconModeContext);
 
-  const handleClose = () => setShow(false);
-  const handleShow = () => setShow(true);
+  const handleClose = () => {
+    setName("");
+    setShortId("");
+    setQuantity(0);
+    setDescription("");
+    setIMGFrame(defaultIMGPath);
+    setIMGBase64("");
+    setShow(false);
+  };
 
   const [addProduct, { data }] = useMutation(CREATE_PRODUCT, {
     update(cache, { data: { data } }) {
@@ -69,12 +76,6 @@ export default function ProductCreateModal() {
       variables: { name, shortId, quantity, description, image: IMGBase64 },
     })
       .then(() => {
-        setName("");
-        setShortId("");
-        setQuantity(0);
-        setDescription("");
-        setIMGFrame(defaultIMGPath);
-        setIMGBase64("");
         handleClose();
         createNotification({
           title: UIText.successfulOperation,
@@ -96,7 +97,7 @@ export default function ProductCreateModal() {
         message: `${UIText.imageTooLarge} ${imageMaxSize} B`,
         type: "warning",
       });
-      clearIMG();
+      //clearIMG();
       return;
     }
     if (!imageSupportedFileTypes.includes(e.target.files[0].type)) {
@@ -109,7 +110,7 @@ export default function ProductCreateModal() {
             .map((fileType) => " " + fileType.split("/")[1]),
         type: "warning",
       });
-      clearIMG();
+      //clearIMGInput();
       return;
     }
     previewIMG(e);
@@ -145,7 +146,10 @@ export default function ProductCreateModal() {
 
   return (
     <>
-      <Button className="btn btn-light p-2 ms-1 me-2 mb-2" onClick={handleShow}>
+      <Button
+        className="btn btn-light p-2 ms-1 me-2 mb-2"
+        onClick={() => setShow(true)}
+      >
         {iconMode ? (
           <GrAdd style={{ fontSize: "1.6rem" }} />
         ) : (
@@ -153,7 +157,7 @@ export default function ProductCreateModal() {
         )}
       </Button>
 
-      <Modal show={show} onHide={handleClose} size="lg">
+      <Modal show={show} onHide={() => setShow(false)} size="lg">
         <Modal.Header closeButton className={darkMode && "bg-dark text-white"}>
           <Modal.Title>{UIText.createProductButtonText}</Modal.Title>
         </Modal.Header>
@@ -214,6 +218,7 @@ export default function ProductCreateModal() {
               id="description"
               rows="3"
               onChange={(e) => setDescription(e.target.value)}
+              value={description}
             ></textarea>
           </div>
         </Modal.Body>
