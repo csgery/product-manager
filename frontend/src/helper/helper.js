@@ -561,6 +561,9 @@ const validateUserPasswordInput = (input, UIText) => {
   return validateInput(input, UIText, validationPattern);
 };
 
+const defaultProductIMGPath = import.meta.env.VITE_PRODUCT_DEFAULTIMAGE;
+const imageMaxSize = import.meta.env.VITE_IMAGE_MAXSIZE;
+const imageSupportedFileTypes = import.meta.env.VITE_IMAGE_SUPPORTEDFILETYPES;
 export {
   auth,
   addDependedPermissions,
@@ -581,4 +584,7 @@ export {
   validateUserEmailInput,
   validateUserUsernameInput,
   validateUserPasswordInput,
+  defaultProductIMGPath,
+  imageMaxSize,
+  imageSupportedFileTypes,
 };

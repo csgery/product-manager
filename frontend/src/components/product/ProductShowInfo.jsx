@@ -2,26 +2,29 @@ import React, { useEffect, useContext } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useQuery, useLazyQuery } from "@apollo/client";
 import { GET_USER } from "../../queries/userQueries";
+import { MdOutlineDoneOutline, MdOutlineCancel } from "react-icons/md";
 import { useState } from "react";
 import { GET_PRODUCT } from "../../queries/productQueries";
+import { Button, Modal } from "react-bootstrap";
 import SpinnerCustom from "../SpinnerCustom";
 import ProductEditForm from "./ProductEditForm";
 import moment from "moment";
 import ProductUserModal from "../modals/ProductUserModal";
 import { UITextContext } from "../TranslationWrapper";
 import { TbEdit } from "react-icons/tb";
-import { Button } from "react-bootstrap";
-import { IconModeContext } from "../../App";
-import { auth } from "../../helper/helper";
+import { IconModeContext, DarkModeContext } from "../../App";
+import { auth, defaultProductIMGPath } from "../../helper/helper";
 import useCustomError from "../../helper/hooks/useCustomError";
 
 export default function ProductShowInfo() {
   const [toggleEditForm, setToggleEditForm] = useState(false);
 
   const [handleCustomError] = useCustomError();
+  const [showIMGZoomModal, setShowIMGZoomModal] = useState(false);
 
   const UIText = useContext(UITextContext);
   const iconMode = useContext(IconModeContext);
+  const darkMode = useContext(DarkModeContext);
 
   const { id } = useParams();
 
@@ -49,7 +52,8 @@ export default function ProductShowInfo() {
     if (data?.product.createdBy) {
       console.log("data.product.createdBy:", data.product.createdBy);
       getCreatorUser({ variables: { id: data.product.createdBy } });
-    } else if (data?.product.updatedBy) {
+    }
+    if (data?.product.updatedBy) {
       console.log("data.product.updatedBy:", data.product.updatedBy);
       getEditorUser({ variables: { id: data.product.updatedBy } });
     }
@@ -88,11 +92,27 @@ export default function ProductShowInfo() {
             <div
               className={
                 (!data.product.valid ? "deletedProduct-card " : "") +
-                "card mx-auto w-75 px-1 mt-4 "
+                "card mx-auto w-50 px-1 mt-4 "
               }
               style={{ width: "18rem" }}
             >
-              <div className="card-body">
+              <div className="mt-2 text-center">
+                <img
+                  id="imgFrame"
+                  src={
+                    data.product.image || "../../../" + defaultProductIMGPath
+                  }
+                  className="img-fluid mb-2 align-self-center justify-content-center text-center"
+                  style={{ maxWidth: "500px" }}
+                  onDoubleClick={
+                    data.product.image
+                      ? () => setShowIMGZoomModal(true)
+                      : () => {}
+                  }
+                />
+              </div>
+
+              <div className="card-body ">
                 <h5 className="card-title">
                   <div>
                     <Link to={-1} className="mt-3 h6">
@@ -109,7 +129,7 @@ export default function ProductShowInfo() {
                   Quantity: {data.product.quantity}
                 </p>
                 <p className="card-text mt-1 mb-0 pt-1">
-                  Description: {data.product.description}
+                  Description: {data.product.description || "-"}
                 </p>
                 <div className="product-admin-info">
                   <p className="card-text mt-1 mb-0 pt-1">
@@ -117,7 +137,9 @@ export default function ProductShowInfo() {
                     {creatorUserData ? creatorUserData.user.username : "Hidden"}
                   </p>
                   <p className="card-text mt-1 mb-0 pt-1">
-                    Created At: {new Date(data.product.createdAt).toISOString()}
+                    Created At:{" "}
+                    {moment(data.product.createdAt).toLocaleString()}
+                    {/* {new Date(data.product.createdAt).toISOString()} */}
                   </p>
                   {data.product.createdAt !== data.product.updatedAt && (
                     <>
@@ -190,6 +212,42 @@ export default function ProductShowInfo() {
                 iconMode={iconMode}
               />
             )}
+            <Modal
+              show={showIMGZoomModal}
+              onHide={() => setShowIMGZoomModal(false)}
+              size="xl"
+            >
+              <Modal.Header
+                closeButton
+                className={darkMode && "bg-dark text-white"}
+              >
+                <Modal.Title></Modal.Title>
+              </Modal.Header>
+              <Modal.Body className={darkMode && "bg-dark text-white"}>
+                <div className="mt-2 text-center">
+                  <img
+                    id="imgFrame"
+                    src={
+                      data.product.image || "../../../" + defaultProductIMGPath
+                    }
+                    className="img-fluid mb-2 align-self-center justify-content-center text-center"
+                    //style={{ maxWidth: "500px" }}
+                  />
+                </div>
+              </Modal.Body>
+              <Modal.Footer className={darkMode && "bg-dark text-white"}>
+                <Button
+                  variant="danger"
+                  onClick={() => setShowIMGZoomModal(false)}
+                >
+                  {iconMode ? (
+                    <MdOutlineCancel style={{ fontSize: "1.6rem" }} />
+                  ) : (
+                    UIText.closeButtonText
+                  )}
+                </Button>
+              </Modal.Footer>
+            </Modal>
           </>
         )}
       </>

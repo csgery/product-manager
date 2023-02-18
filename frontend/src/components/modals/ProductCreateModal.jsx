@@ -11,18 +11,23 @@ import { createNotification } from "../../helper/helper";
 
 import { UITextContext } from "../TranslationWrapper";
 import { IconModeContext } from "../../App";
-import { validateProductInput } from "../../helper/helper";
+import {
+  validateProductInput,
+  defaultProductIMGPath,
+  imageMaxSize,
+  imageSupportedFileTypes,
+} from "../../helper/helper";
 
 export default function ProductCreateModal() {
-  const defaultIMGPath = import.meta.env.VITE_PRODUCT_DEFAULTIMAGE;
-  const imageMaxSize = import.meta.env.VITE_IMAGE_MAXSIZE;
-  const imageSupportedFileTypes = import.meta.env.VITE_IMAGE_SUPPORTEDFILETYPES;
+  // const defaultProductIMGPath = import.meta.env.VITE_PRODUCT_DEFAULTIMAGE;
+  // const imageMaxSize = import.meta.env.VITE_IMAGE_MAXSIZE;
+  // const imageSupportedFileTypes = import.meta.env.VITE_IMAGE_SUPPORTEDFILETYPES;
 
   const [name, setName] = useState("");
   const [shortId, setShortId] = useState("");
   const [quantity, setQuantity] = useState(0);
   const [description, setDescription] = useState("");
-  const [IMGFrame, setIMGFrame] = useState(defaultIMGPath);
+  const [IMGFrame, setIMGFrame] = useState(defaultProductIMGPath);
   const [IMGBase64, setIMGBase64] = useState("");
 
   const [show, setShow] = useState(false);
@@ -39,7 +44,7 @@ export default function ProductCreateModal() {
     setShortId("");
     setQuantity(0);
     setDescription("");
-    setIMGFrame(defaultIMGPath);
+    setIMGFrame(defaultProductIMGPath);
     setIMGBase64("");
     setShow(false);
   };
@@ -119,7 +124,7 @@ export default function ProductCreateModal() {
 
   const clearIMG = () => {
     document.getElementById("formFile").value = null;
-    setIMGFrame(defaultIMGPath);
+    setIMGFrame(defaultProductIMGPath);
     setIMGBase64("");
   };
 
@@ -209,7 +214,7 @@ export default function ProductCreateModal() {
               value={quantity}
             />
           </div>
-          <div class="form-group">
+          <div className="form-group">
             <label className="form-label" htmlFor="description">
               {UIText.description}
             </label>

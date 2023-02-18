@@ -125,12 +125,12 @@ export default {
     },
     updateProduct: async (
       parent,
-      { id, name, shortId, quantity },
+      { id, name, shortId, quantity, image, description },
       { user: userCtx, req }
     ) => {
       try {
         const lang = req.headers.language || "en";
-        console.log("lang:", lang);
+        console.log("image, description:", image, description);
         let product = await Product.findById(id);
         if (!product) {
           throw productNotFound_Error(lang);
@@ -187,7 +187,7 @@ export default {
           fieldsToLog.oldDescription = product.description;
           fieldsToLog.newDescription = description;
         }
-        if (image && product.image !== image) {
+        if (product.image !== image) {
           changes = true;
           fieldsToUpdate.image = image;
           fieldsToLog.oldImage = product.image;
@@ -213,6 +213,7 @@ export default {
 
         // if there is changes, update
         if (changes) {
+          //console.log(fieldsToUpdate);
           await product.update(fieldsToUpdate);
 
           return product.id;
