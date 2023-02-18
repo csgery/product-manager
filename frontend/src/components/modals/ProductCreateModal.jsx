@@ -15,6 +15,8 @@ import { validateProductInput } from "../../helper/helper";
 
 export default function ProductCreateModal() {
   const defaultIMGPath = import.meta.env.VITE_PRODUCT_DEFAULTIMAGE;
+  const imageMaxSize = import.meta.env.VITE_IMAGE_MAXSIZE;
+  const imageSupportedFileTypes = import.meta.env.VITE_IMAGE_SUPPORTEDFILETYPES;
 
   const [name, setName] = useState("");
   const [shortId, setShortId] = useState("");
@@ -54,15 +56,6 @@ export default function ProductCreateModal() {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // if (IMGFrame === defaultIMGPath) {
-    //   setIMGFrame("");
-    // }
-
-    // const img = document.getElementById("formFile");
-    // encodeImageFileAsURL(img);
-    // console.log("inside submit:", IMGBase64);
-    // return;
-
     if (name === "" || shortId === "" || quantity < 1 || quantity > 1000) {
       // error = true;
       return createNotification({
@@ -94,38 +87,61 @@ export default function ProductCreateModal() {
       });
   };
 
+  const handleIMGChange = (e) => {
+    // check file size
+    // size in byte
+    if (e.target.files[0].size > imageMaxSize) {
+      createNotification({
+        title: UIText.error,
+        message: `${UIText.imageTooLarge} ${imageMaxSize} B`,
+        type: "warning",
+      });
+      clearIMG();
+      return;
+    }
+    if (!imageSupportedFileTypes.includes(e.target.files[0].type)) {
+      createNotification({
+        title: UIText.error,
+        message:
+          UIText.imageNotSupportedType +
+          imageSupportedFileTypes
+            .split(",")
+            .map((fileType) => " " + fileType.split("/")[1]),
+        type: "warning",
+      });
+      clearIMG();
+      return;
+    }
+    previewIMG(e);
+    convertToBase64(e);
+  };
+
   const clearIMG = () => {
-    //const defaultIMGPath = import.meta.env.VITE_PRODUCT_DEFAULTIMAGE;
     document.getElementById("formFile").value = null;
     setIMGFrame(defaultIMGPath);
     setIMGBase64("");
-    //imgFrame.src = defaultIMGPath;
   };
 
   const previewIMG = (e) => {
     setIMGFrame(URL.createObjectURL(e.target.files[0]));
-    //imgFrame.src = URL.createObjectURL(e.target.files[0]);
   };
 
-  function convertToBase64(e) {
-    // check max. file size is not exceeded
-    // size is in bytes
-    console.log(e.target.files[0]);
-    if (e.target.files[0] > 2000000) {
-      console.log("File too large");
-      return;
-    }
+  const convertToBase64 = (e) => {
     var reader = new FileReader();
     reader.readAsDataURL(e.target.files[0]);
 
     reader.onload = () => {
       setIMGBase64(reader.result);
-      console.log(reader.result); //base64encoded string
     };
     reader.onerror = (error) => {
-      console.log("Error: ", error);
+      createNotification({
+        title: UIText.error,
+        message: `${UIText.pleaseTryAgainLater}\nError: ${error}`,
+        type: "danger",
+      });
+      //console.log("Error: ", error);
     };
-  }
+  };
 
   return (
     <>
@@ -142,19 +158,18 @@ export default function ProductCreateModal() {
           <Modal.Title>{UIText.createProductButtonText}</Modal.Title>
         </Modal.Header>
         <Modal.Body className={darkMode && "bg-dark text-white"}>
-          <div class="container col-md-6">
-            <div class="mb-5">
-              <img id="imgFrame" src={IMGFrame} class="img-fluid" />
-              <button onClick={clearIMG} class="btn btn-primary mt-3">
+          <div className="container col-md-6">
+            <div className="mb-5">
+              <img id="imgFrame" src={IMGFrame} className="img-fluid" />
+              <button onClick={clearIMG} className="btn btn-primary mt-3">
                 Clear IMG
               </button>
               <input
-                class="form-control"
+                className="form-control"
                 type="file"
                 id="formFile"
                 onChange={(e) => {
-                  previewIMG(e);
-                  convertToBase64(e);
+                  handleIMGChange(e);
                 }}
               />
             </div>
@@ -191,7 +206,7 @@ export default function ProductCreateModal() {
             />
           </div>
           <div class="form-group">
-            <label className="form-label" for="description">
+            <label className="form-label" htmlFor="description">
               {UIText.description}
             </label>
             <textarea
