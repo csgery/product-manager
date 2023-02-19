@@ -16,6 +16,7 @@ import {
   defaultProductIMGPath,
   imageMaxSize,
   imageSupportedFileTypes,
+  convertToBase64,
 } from "../../helper/helper";
 
 export default function ProductCreateModal() {
@@ -119,7 +120,7 @@ export default function ProductCreateModal() {
       return;
     }
     previewIMG(e);
-    convertToBase64(e);
+    convertToBase64(e, setIMGBase64, UIText);
   };
 
   const clearIMG = () => {
@@ -130,23 +131,6 @@ export default function ProductCreateModal() {
 
   const previewIMG = (e) => {
     setIMGFrame(URL.createObjectURL(e.target.files[0]));
-  };
-
-  const convertToBase64 = (e) => {
-    var reader = new FileReader();
-    reader.readAsDataURL(e.target.files[0]);
-
-    reader.onload = () => {
-      setIMGBase64(reader.result);
-    };
-    reader.onerror = (error) => {
-      createNotification({
-        title: UIText.error,
-        message: `${UIText.pleaseTryAgainLater}\nError: ${error}`,
-        type: "danger",
-      });
-      //console.log("Error: ", error);
-    };
   };
 
   return (

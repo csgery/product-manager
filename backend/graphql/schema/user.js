@@ -6,6 +6,7 @@ export default `#graphql
     createdAt: String!
     updatedAt: String!
     permissions: [String!]
+    image: String
     shouldUserReLogin: Boolean!
     CFT: Int!
     canLogin: Boolean!
@@ -24,12 +25,13 @@ export default `#graphql
   extend type Mutation {
     createAdmin: User!
     checkPermValidationTime(count: Int!): [String!]!
-    createUser(username: String!, email: String!, password: String!, permissions: [String!]): User!
+    createUser(username: String!, email: String!, password: String!, permissions: [String!], image: String): User!
     changePassword(id: ID!, currentPassword: String!, newPassword: String!): String!
-    updateUser(
-      id: ID!
-      email: String!
-    ): String!
+    # updateUser(
+    #   id: ID!
+    #   email: String!
+    # ): String!
+    updateUser(id: ID!, username: String, email: String, image: String): User!
     updatePermission(arrayString: [String!]!): String!
     deleteUser(id: ID!): String!
     restoreUser(id: ID!): String!

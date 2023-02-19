@@ -13,17 +13,24 @@ const REFRESH_TOKEN = gql`
 `;
 
 const CREATE_USER = gql`
-  mutation CreateUser($username: String!, $email: String!, $password: String!) {
+  mutation CreateUser(
+    $username: String!
+    $email: String!
+    $password: String!
+    $image: String
+  ) {
     createUser(
       username: $username
       email: $email
       password: $password
       permissions: ["read:own_user"]
+      image: $image
     ) {
       id
       username
       email
       permissions
+      image
     }
   }
 `;

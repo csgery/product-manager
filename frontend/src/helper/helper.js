@@ -561,7 +561,24 @@ const validateUserPasswordInput = (input, UIText) => {
   return validateInput(input, UIText, validationPattern);
 };
 
+const convertToBase64 = (event, setIMGBase64, UIText) => {
+  var reader = new FileReader();
+  reader.readAsDataURL(event.target.files[0]);
+
+  reader.onload = () => {
+    setIMGBase64(reader.result);
+  };
+  reader.onerror = (error) => {
+    createNotification({
+      title: UIText.error,
+      message: `${UIText.pleaseTryAgainLater}\nError: ${error}`,
+      type: "danger",
+    });
+  };
+};
+
 const defaultProductIMGPath = import.meta.env.VITE_PRODUCT_DEFAULTIMAGE;
+const defaultUserIMGPath = import.meta.env.VITE_USER_DEFAULTIMAGE;
 const imageMaxSize = import.meta.env.VITE_IMAGE_MAXSIZE;
 const imageSupportedFileTypes = import.meta.env.VITE_IMAGE_SUPPORTEDFILETYPES;
 export {
@@ -585,6 +602,8 @@ export {
   validateUserUsernameInput,
   validateUserPasswordInput,
   defaultProductIMGPath,
+  defaultUserIMGPath,
   imageMaxSize,
   imageSupportedFileTypes,
+  convertToBase64,
 };

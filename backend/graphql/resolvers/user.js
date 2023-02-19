@@ -230,7 +230,7 @@ export default {
     },
     createUser: async (
       parent,
-      { username, email, password, permissions },
+      { username, email, password, permissions, image },
       { user: userCtx, req }
     ) => {
       try {
@@ -264,6 +264,7 @@ export default {
             validatedPermissions?.length > 0
               ? validatedPermissions
               : [auth.PERMS.readOwn_user],
+          image,
           valid: true,
         });
 
@@ -273,6 +274,7 @@ export default {
           userId: userResult.id,
           newUsername: username,
           newEmail: email,
+          newImage: image,
           newValid: true,
           newCFT: 0,
           createdBy: userCtx.username,
@@ -286,7 +288,11 @@ export default {
       }
     },
 
-    updateUser: async (parent, { id, email }, { user: userCtx, req }) => {
+    updateUser: async (
+      parent,
+      { id, username, email, image },
+      { user: userCtx, req }
+    ) => {
       try {
         const lang = req.headers.language || "en";
         checkEmailRegex(email);
