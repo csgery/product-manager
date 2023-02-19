@@ -3,7 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useState, useRef, useContext } from "react";
 import { UITextContext } from "../TranslationWrapper";
 import { IconModeContext } from "../../App";
-import { auth } from "../../helper/helper";
+import {
+  auth,
+  defaultProductIMGPath as defaultIMGPath,
+  imageMaxSize,
+  imageSupportedFileTypes,
+} from "../../helper/helper";
 
 export default function Product({
   product,
@@ -15,6 +20,8 @@ export default function Product({
   const UIText = useContext(UITextContext);
 
   const iconMode = useContext(IconModeContext);
+
+  const defaultProductIMGPath = "../../" + defaultIMGPath;
 
   const navigate = useNavigate();
   const [cbState, setCbState] = useState(false);
@@ -96,57 +103,46 @@ export default function Product({
   };
 
   return (
-    <div
-      className={"card mx-1 px-01 mb-2 product " + cardBackgroundClass}
-      style={{ width: "18rem" }}
-    >
+    <>
+      {/* {console.log(product.image)} */}
       <div
-        className="card-body"
-        onDoubleClick={handleNavigate}
-        onClick={handleClick}
+        className={"card mx-1 px-01 mb-2 product " + cardBackgroundClass}
+        style={{ width: "18rem" }}
       >
-        {showDeleteCBs && (
-          <input
-            type="checkbox"
-            id="deleteCB"
-            value={!cbState}
-            onChange={handleChange}
-            onClick={(e) => stopPropagation(e)}
-            defaultChecked={setDeleteCBChecked}
-            ref={checkbox}
+        <div
+          className="card-body"
+          onDoubleClick={handleNavigate}
+          onClick={handleClick}
+        >
+          {showDeleteCBs && (
+            <input
+              type="checkbox"
+              id="deleteCB"
+              value={!cbState}
+              onChange={handleChange}
+              onClick={(e) => stopPropagation(e)}
+              defaultChecked={setDeleteCBChecked}
+              ref={checkbox}
+            />
+          )}
+          <img
+            id="imgFrame"
+            src={product.image || defaultProductIMGPath}
+            className="img-fluid mb-2"
+            style={{ maxWidth: "200px" }}
           />
-        )}
-        <h5 className="card-title">{product.name}</h5>
-        <h6 className="card-subtitle mb-2 ">{product.shortId}</h6>
-        <p className="card-text">
-          Description: Some quick example text to build on the card title and
-          make up the bulk of the card's content.
-        </p>
-        <p className="card-text">Quantity: {product.quantity}</p>
+          <h5 className="card-title">{product.name}</h5>
+          <h6 className="card-subtitle mb-2 ">{product.shortId}</h6>
+          <p className="card-text">
+            Description: Some quick example text to build on the card title and
+            make up the bulk of the card's content.
+          </p>
+          <p className="card-text">Quantity: {product.quantity}</p>
 
-        {!showDeleteCBs && (
-          <>
-            {product.valid ? (
-              auth.isSet(auth.PERMS.delete_product) && (
-                <ProductUserModal
-                  bind="product"
-                  iconMode={iconMode}
-                  itemIdsNamesToProcess={[
-                    [product.id, product.name, product.shortId],
-                  ]}
-                  areThereMultipleProducts={false}
-                  modalType="Delete"
-                  deleteBTNClass="btn btn-danger p-2 me-2"
-                  didItemComeFromItself={true}
-                  modalTitle={UIText.deleteProductTitle}
-                  modalText={UIText.deleteProductText}
-                  modalButtonText={UIText.deleteButtonText}
-                  modalCloseButtonText={UIText.closeButtonText}
-                />
-              )
-            ) : (
-              <>
-                {auth.isSet(auth.PERMS.remove_product) && (
+          {!showDeleteCBs && (
+            <>
+              {product.valid ? (
+                auth.isSet(auth.PERMS.delete_product) && (
                   <ProductUserModal
                     bind="product"
                     iconMode={iconMode}
@@ -154,37 +150,57 @@ export default function Product({
                       [product.id, product.name, product.shortId],
                     ]}
                     areThereMultipleProducts={false}
-                    modalType="Remove"
+                    modalType="Delete"
                     deleteBTNClass="btn btn-danger p-2 me-2"
                     didItemComeFromItself={true}
-                    modalTitle={UIText.removeProductTitle}
-                    modalText={UIText.removeProductText}
-                    modalButtonText={UIText.removeButtonText}
+                    modalTitle={UIText.deleteProductTitle}
+                    modalText={UIText.deleteProductText}
+                    modalButtonText={UIText.deleteButtonText}
                     modalCloseButtonText={UIText.closeButtonText}
                   />
-                )}
-                {auth.isSet(auth.PERMS.restore_product) && (
-                  <ProductUserModal
-                    bind="product"
-                    iconMode={iconMode}
-                    itemIdsNamesToProcess={[
-                      [product.id, product.name, product.shortId],
-                    ]}
-                    areThereMultipleProducts={false}
-                    modalType="Restore"
-                    deleteBTNClass="btn btn-danger p-2 me-2"
-                    didItemComeFromItself={true}
-                    modalTitle={UIText.restoreProductTitle}
-                    modalText={UIText.restoreProductText}
-                    modalButtonText={UIText.restoreButtonText}
-                    modalCloseButtonText={UIText.closeButtonText}
-                  />
-                )}
-              </>
-            )}
-          </>
-        )}
+                )
+              ) : (
+                <>
+                  {auth.isSet(auth.PERMS.remove_product) && (
+                    <ProductUserModal
+                      bind="product"
+                      iconMode={iconMode}
+                      itemIdsNamesToProcess={[
+                        [product.id, product.name, product.shortId],
+                      ]}
+                      areThereMultipleProducts={false}
+                      modalType="Remove"
+                      deleteBTNClass="btn btn-danger p-2 me-2"
+                      didItemComeFromItself={true}
+                      modalTitle={UIText.removeProductTitle}
+                      modalText={UIText.removeProductText}
+                      modalButtonText={UIText.removeButtonText}
+                      modalCloseButtonText={UIText.closeButtonText}
+                    />
+                  )}
+                  {auth.isSet(auth.PERMS.restore_product) && (
+                    <ProductUserModal
+                      bind="product"
+                      iconMode={iconMode}
+                      itemIdsNamesToProcess={[
+                        [product.id, product.name, product.shortId],
+                      ]}
+                      areThereMultipleProducts={false}
+                      modalType="Restore"
+                      deleteBTNClass="btn btn-danger p-2 me-2"
+                      didItemComeFromItself={true}
+                      modalTitle={UIText.restoreProductTitle}
+                      modalText={UIText.restoreProductText}
+                      modalButtonText={UIText.restoreButtonText}
+                      modalCloseButtonText={UIText.closeButtonText}
+                    />
+                  )}
+                </>
+              )}
+            </>
+          )}
+        </div>
       </div>
-    </div>
+    </>
   );
 }

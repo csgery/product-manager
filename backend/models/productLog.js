@@ -25,6 +25,18 @@ const productLogSchema = new Schema(
     newQuantity: {
       type: Number,
     },
+    oldDescription: {
+      type: String,
+    },
+    newDescription: {
+      type: String,
+    },
+    oldImage: {
+      type: String,
+    },
+    newImage: {
+      type: String,
+    },
     oldValid: {
       type: Boolean,
     },

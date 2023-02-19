@@ -9,6 +9,8 @@ const GET_VALIDPRODUCTS = gql`
       createdAt
       createdBy
       quantity
+      image
+      description
       updatedAt
       updatedBy
       valid
@@ -25,6 +27,8 @@ const GET_DELETEDPRODUCTS = gql`
       createdAt
       createdBy
       quantity
+      image
+      description
       updatedAt
       updatedBy
       valid
@@ -41,6 +45,8 @@ const GET_PRODUCT = gql`
       createdAt
       createdBy
       quantity
+      image
+      description
       updatedAt
       updatedBy
       valid

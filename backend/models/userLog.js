@@ -54,6 +54,12 @@ const userLogSchema = new Schema(
       type: Array,
       default: undefined,
     },
+    oldImage: {
+      type: String,
+    },
+    newImage: {
+      type: String,
+    },
     createdBy: {
       type: String,
     },

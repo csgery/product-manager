@@ -1,14 +1,28 @@
 import { gql } from "@apollo/client";
 
 const CREATE_PRODUCT = gql`
-  mutation createProduct($name: String!, $shortId: String!, $quantity: Int!) {
-    createProduct(name: $name, shortId: $shortId, quantity: $quantity) {
+  mutation createProduct(
+    $name: String!
+    $shortId: String!
+    $quantity: Int!
+    $image: String
+    $description: String
+  ) {
+    createProduct(
+      name: $name
+      shortId: $shortId
+      quantity: $quantity
+      image: $image
+      description: $description
+    ) {
       id
       name
       shortId
       createdAt
       createdBy
       quantity
+      image
+      description
       updatedAt
       updatedBy
       valid
@@ -16,8 +30,22 @@ const CREATE_PRODUCT = gql`
   }
 `;
 const UPDATE_PRODUCT = gql`
-  mutation update($id: ID!, $name: String, $shortId: String, $quantity: Int) {
-    updateProduct(id: $id, name: $name, shortId: $shortId, quantity: $quantity)
+  mutation update(
+    $id: ID!
+    $name: String
+    $shortId: String
+    $quantity: Int
+    $image: String
+    $description: String
+  ) {
+    updateProduct(
+      id: $id
+      name: $name
+      shortId: $shortId
+      quantity: $quantity
+      image: $image
+      description: $description
+    )
   }
 `;
 const DELETE_PRODUCT = gql`
@@ -29,6 +57,8 @@ const DELETE_PRODUCT = gql`
       createdAt
       createdBy
       quantity
+      image
+      description
       updatedAt
       updatedBy
       valid
@@ -44,6 +74,8 @@ const RESTOREDELETED_PRODUCT = gql`
       createdAt
       createdBy
       quantity
+      image
+      description
       updatedAt
       updatedBy
       valid
@@ -59,6 +91,8 @@ const REMOVE_PRODUCT = gql`
       createdAt
       createdBy
       quantity
+      image
+      description
       updatedAt
       updatedBy
       valid

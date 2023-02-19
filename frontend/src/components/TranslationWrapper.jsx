@@ -100,6 +100,8 @@ function TranslationWrapper({ children }) {
 
   useEffect(() => {
     const UITextToTranslate = {
+      pleaseTryAgainLater: "Please try again later",
+
       // Navbar texts
       productManager: "Product Manager",
       product: "Product",
@@ -160,11 +162,17 @@ function TranslationWrapper({ children }) {
       editButtonText: "Edit",
       saveButtonText: "Save",
 
+      // Image
+      //imageError: "Wrong image.",
+      imageTooLarge: "The image is too large. Max size is:",
+      imageNotSupportedType: "Not supported file type. Supported types are:",
+
       // Create Product Modal
       createProductButtonText: "Create Product",
       name: "Name",
       shortID: "Short ID",
       quantity: "Quantity",
+      description: "Description",
 
       // Create User Modal
       createUserButtonText: "Create User",

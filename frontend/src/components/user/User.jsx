@@ -3,7 +3,10 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useState, useRef, useContext } from "react";
 import { UITextContext } from "../TranslationWrapper";
 import { IconModeContext } from "../../App";
-import { auth } from "../../helper/helper";
+import {
+  auth,
+  defaultUserIMGPath as defaultIMGPath,
+} from "../../helper/helper";
 
 export default function User({
   user,
@@ -15,6 +18,8 @@ export default function User({
   const UIText = useContext(UITextContext);
 
   const iconMode = useContext(IconModeContext);
+
+  const defaultUserIMGPath = "../../" + defaultIMGPath;
 
   const navigate = useNavigate();
   const [cbState, setCbState] = useState(false);
@@ -129,6 +134,12 @@ export default function User({
               ref={checkbox}
             />
           )}
+        <img
+          id="imgFrame"
+          src={user.image || defaultUserIMGPath}
+          className="img-fluid mb-2"
+          style={{ maxWidth: "200px" }}
+        />
         <h5 className="card-title">{user.username}</h5>
         <h6 className="card-subtitle mb-2 ">{user.email}</h6>
 

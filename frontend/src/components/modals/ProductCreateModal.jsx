@@ -11,12 +11,26 @@ import { createNotification } from "../../helper/helper";
 
 import { UITextContext } from "../TranslationWrapper";
 import { IconModeContext } from "../../App";
-import { validateProductInput } from "../../helper/helper";
+import {
+  validateProductInput,
+  defaultProductIMGPath,
+  imageMaxSize,
+  imageSupportedFileTypes,
+  convertToBase64,
+} from "../../helper/helper";
 
 export default function ProductCreateModal() {
+  // const defaultProductIMGPath = import.meta.env.VITE_PRODUCT_DEFAULTIMAGE;
+  // const imageMaxSize = import.meta.env.VITE_IMAGE_MAXSIZE;
+  // const imageSupportedFileTypes = import.meta.env.VITE_IMAGE_SUPPORTEDFILETYPES;
+
   const [name, setName] = useState("");
   const [shortId, setShortId] = useState("");
   const [quantity, setQuantity] = useState(0);
+  const [description, setDescription] = useState("");
+  const [IMGFrame, setIMGFrame] = useState(defaultProductIMGPath);
+  const [IMGBase64, setIMGBase64] = useState("");
+
   const [show, setShow] = useState(false);
 
   const darkMode = useContext(DarkModeContext);
@@ -26,14 +40,20 @@ export default function ProductCreateModal() {
 
   const iconMode = useContext(IconModeContext);
 
-  const handleClose = () => setShow(false);
-  const handleShow = () => setShow(true);
+  const handleClose = () => {
+    setName("");
+    setShortId("");
+    setQuantity(0);
+    setDescription("");
+    setIMGFrame(defaultProductIMGPath);
+    setIMGBase64("");
+    setShow(false);
+  };
 
   const [addProduct, { data }] = useMutation(CREATE_PRODUCT, {
-    variables: { name, shortId, quantity },
     update(cache, { data: { data } }) {
       const { validProducts } = cache.readQuery({ query: GET_VALIDPRODUCTS });
-      console.log("addProduct:", addProduct);
+      //console.log("addProduct:", addProduct);
       cache.writeQuery({
         query: GET_VALIDPRODUCTS,
         data: { validProducts: [...validProducts, addProduct] },
@@ -57,12 +77,11 @@ export default function ProductCreateModal() {
         type: "warning",
       });
     }
-
-    addProduct(name, shortId, quantity)
+    console.log(IMGBase64);
+    addProduct({
+      variables: { name, shortId, quantity, description, image: IMGBase64 },
+    })
       .then(() => {
-        setName("");
-        setShortId("");
-        setQuantity(0);
         handleClose();
         createNotification({
           title: UIText.successfulOperation,
@@ -75,9 +94,51 @@ export default function ProductCreateModal() {
       });
   };
 
+  const handleIMGChange = (e) => {
+    // check file size
+    // size in byte
+    if (e.target.files[0].size > imageMaxSize) {
+      createNotification({
+        title: UIText.error,
+        message: `${UIText.imageTooLarge} ${imageMaxSize} B`,
+        type: "warning",
+      });
+      //clearIMG();
+      return;
+    }
+    if (!imageSupportedFileTypes.includes(e.target.files[0].type)) {
+      createNotification({
+        title: UIText.error,
+        message:
+          UIText.imageNotSupportedType +
+          imageSupportedFileTypes
+            .split(",")
+            .map((fileType) => " " + fileType.split("/")[1]),
+        type: "warning",
+      });
+      //clearIMGInput();
+      return;
+    }
+    previewIMG(e);
+    convertToBase64(e, setIMGBase64, UIText);
+  };
+
+  const clearIMG = () => {
+    document.getElementById("formFile").value = null;
+    setIMGFrame(defaultProductIMGPath);
+    setIMGBase64("");
+  };
+
+  const previewIMG = (e) => {
+    setIMGFrame(URL.createObjectURL(e.target.files[0]));
+  };
+
   return (
     <>
-      <Button className="btn btn-light p-2 ms-1 me-2 mb-2" onClick={handleShow}>
+      <Button
+        className="btn btn-light p-2 ms-1 me-2 mb-2"
+        onClick={() => setShow(true)}
+      >
         {iconMode ? (
           <GrAdd style={{ fontSize: "1.6rem" }} />
         ) : (
@@ -85,11 +146,28 @@ export default function ProductCreateModal() {
         )}
       </Button>
 
-      <Modal show={show} onHide={handleClose}>
+      <Modal show={show} onHide={() => setShow(false)} size="lg">
         <Modal.Header closeButton className={darkMode && "bg-dark text-white"}>
           <Modal.Title>{UIText.createProductButtonText}</Modal.Title>
         </Modal.Header>
         <Modal.Body className={darkMode && "bg-dark text-white"}>
+          <div className="container col-md-6">
+            <div className="mb-5">
+              <img id="imgFrame" src={IMGFrame} className="img-fluid" />
+              <button onClick={clearIMG} className="btn btn-primary mt-3">
+                Clear IMG
+              </button>
+              <input
+                className="form-control"
+                type="file"
+                id="formFile"
+                onChange={(e) => {
+                  handleIMGChange(e);
+                }}
+              />
+            </div>
+          </div>
+
           <div className="mb-3">
             <label className="form-label">{UIText.name}</label>
             <input
@@ -119,6 +197,18 @@ export default function ProductCreateModal() {
               onChange={(e) => setQuantity(Number(e.target.value))}
               value={quantity}
             />
+          </div>
+          <div className="form-group">
+            <label className="form-label" htmlFor="description">
+              {UIText.description}
+            </label>
+            <textarea
+              className="form-control"
+              id="description"
+              rows="3"
+              onChange={(e) => setDescription(e.target.value)}
+              value={description}
+            ></textarea>
           </div>
         </Modal.Body>
         <Modal.Footer className={darkMode && "bg-dark text-white"}>

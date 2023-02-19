@@ -4,6 +4,8 @@ export default `#graphql
     name: String!
     shortId: String!
     quantity: Int!
+    description: String
+    image: String
     createdAt: String!
     updatedAt: String!
     valid: Boolean!
@@ -31,12 +33,14 @@ export default `#graphql
   }
 
   extend type Mutation {
-    createProduct(name: String!, shortId: String!, quantity: Int!): Product!
+    createProduct(name: String!, shortId: String!, quantity: Int!, description: String, image: String): Product!
     updateProduct(
       id: ID!
       name: String
       shortId: String
       quantity: Int
+      description: String 
+      image: String
     ): String!
     deleteProduct(id: ID!): Product!
     restoreDeletedProduct(id: ID!): Product!

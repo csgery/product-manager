@@ -7,6 +7,7 @@ const VIEWER = gql`
       username
       email
       permissions
+      image
       shouldUserReLogin
       createdAt
       permissions
@@ -25,6 +26,7 @@ const GET_USER = gql`
       createdAt
       updatedAt
       permissions
+      image
       shouldUserReLogin
       CFT
       canLogin
@@ -42,6 +44,7 @@ const GET_VALIDUSERS = gql`
       username
       email
       permissions
+      image
       createdBy
       shouldUserReLogin
       canLogin
@@ -57,6 +60,7 @@ const GET_DELETEDUSERS = gql`
       username
       email
       permissions
+      image
       createdBy
       shouldUserReLogin
       canLogin

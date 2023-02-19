@@ -27,6 +27,9 @@ const userSchema = new Schema(
       type: Array,
       required: true,
     },
+    image: {
+      type: String,
+    },
     shouldUserReLogin: {
       type: Boolean,
       required: true,

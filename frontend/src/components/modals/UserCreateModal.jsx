@@ -14,13 +14,19 @@ import { IconModeContext } from "../../App";
 import {
   validateUserEmailInput,
   validateUserUsernameInput,
+  defaultUserIMGPath,
+  imageSupportedFileTypes,
+  imageMaxSize,
+  convertToBase64,
 } from "../../helper/helper";
 
 export default function UserCreateModal() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [show, setShow] = useState(false);
-  const password = "testPassword!1";
+  const [IMGFrame, setIMGFrame] = useState(defaultUserIMGPath);
+  const [IMGBase64, setIMGBase64] = useState("");
+  const password = import.meta.env.VITE_DEFAULT_USERPASSWORD;
 
   const darkMode = useContext(DarkModeContext);
   const UIText = useContext(UITextContext);
@@ -29,11 +35,7 @@ export default function UserCreateModal() {
 
   const iconMode = useContext(IconModeContext);
 
-  const handleClose = () => setShow(false);
-  const handleShow = () => setShow(true);
-
   const [addUser, { data }] = useMutation(CREATE_USER, {
-    variables: { username, email, password },
     update(cache, { data: { data } }) {
       const { validUsers } = cache.readQuery({ query: GET_VALIDUSERS });
       console.log("addUser:", addUser);
@@ -43,6 +45,14 @@ export default function UserCreateModal() {
       });
     },
   });
+
+  const handleClose = () => {
+    setUsername("");
+    setEmail("");
+    setIMGFrame(defaultUserIMGPath);
+    setIMGBase64("");
+    setShow(false);
+  };
 
   const handleUsernameChange = (value) => {
     value = validateUserUsernameInput(value, UIText);
@@ -81,10 +91,8 @@ export default function UserCreateModal() {
       });
     }
 
-    addUser(username, email, password)
+    addUser({ variables: { username, email, password, image: IMGBase64 } })
       .then(() => {
-        setUsername("");
-        setEmail("");
         handleClose();
         createNotification({
           title: UIText.successfulOperation,
@@ -97,9 +105,51 @@ export default function UserCreateModal() {
       });
   };
 
+  const handleIMGChange = (e) => {
+    // check file size
+    // size in byte
+    if (e.target.files[0].size > imageMaxSize) {
+      createNotification({
+        title: UIText.error,
+        message: `${UIText.imageTooLarge} ${imageMaxSize} B`,
+        type: "warning",
+      });
+      //clearIMG();
+      return;
+    }
+    if (!imageSupportedFileTypes.includes(e.target.files[0].type)) {
+      createNotification({
+        title: UIText.error,
+        message:
+          UIText.imageNotSupportedType +
+          imageSupportedFileTypes
+            .split(",")
+            .map((fileType) => " " + fileType.split("/")[1]),
+        type: "warning",
+      });
+      //clearIMGInput();
+      return;
+    }
+    previewIMG(e);
+    convertToBase64(e, setIMGBase64, UIText);
+  };
+
+  const clearIMG = () => {
+    document.getElementById("formFile").value = null;
+    setIMGFrame(defaultUserIMGPath);
+    setIMGBase64("");
+  };
+
+  const previewIMG = (e) => {
+    setIMGFrame(URL.createObjectURL(e.target.files[0]));
+  };
+
   return (
     <>
-      <Button className="btn btn-light p-2 ms-1 me-2 mb-2" onClick={handleShow}>
+      <Button
+        className="btn btn-light p-2 ms-1 me-2 mb-2"
+        onClick={() => setShow(true)}
+      >
         {iconMode ? (
           <GrAdd style={{ fontSize: "1.6rem" }} />
         ) : (
@@ -107,11 +157,26 @@ export default function UserCreateModal() {
         )}
       </Button>
 
-      <Modal show={show} onHide={handleClose}>
+      <Modal show={show} onHide={() => setShow(false)}>
         <Modal.Header closeButton className={darkMode && "bg-dark text-white"}>
           <Modal.Title>{UIText.createUserButtonText}</Modal.Title>
         </Modal.Header>
         <Modal.Body className={darkMode && "bg-dark text-white"}>
+          <div className="mb-5">
+            <img id="imgFrame" src={IMGFrame} className="img-fluid" />
+            <button onClick={clearIMG} className="btn btn-primary mt-3">
+              Clear IMG
+            </button>
+            <input
+              className="form-control"
+              type="file"
+              id="formFile"
+              onChange={(e) => {
+                handleIMGChange(e);
+              }}
+            />
+          </div>
+
           <div className="mb-3">
             <label className="form-label">{UIText.username}</label>
             <input
@@ -134,7 +199,7 @@ export default function UserCreateModal() {
           </div>
         </Modal.Body>
         <Modal.Footer className={darkMode && "bg-dark text-white"}>
-          <Button variant="danger" onClick={handleClose}>
+          <Button variant="danger" onClick={() => setShow(false)}>
             {iconMode ? (
               <MdOutlineCancel style={{ fontSize: "1.6rem" }} />
             ) : (
