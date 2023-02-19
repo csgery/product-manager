@@ -14,7 +14,6 @@ import { auth, defaultProductIMGPath } from "../../helper/helper";
 import useCustomError from "../../helper/hooks/useCustomError";
 
 export default function ProductDeletedShowInfo() {
-  const [toggleEditForm, setToggleEditForm] = useState(false);
   const [showIMGZoomModal, setShowIMGZoomModal] = useState(false);
 
   const [handleCustomError] = useCustomError();

@@ -9,18 +9,18 @@ import moment from "moment";
 import ProductUserModal from "../modals/ProductUserModal";
 import { UITextContext } from "../TranslationWrapper";
 import { TbEdit } from "react-icons/tb";
-import { Button } from "react-bootstrap";
-import { IconModeContext } from "../../App";
-import { auth } from "../../helper/helper";
+import { Button, Modal } from "react-bootstrap";
+import { IconModeContext, DarkModeContext } from "../../App";
+import { auth, defaultUserIMGPath } from "../../helper/helper";
 import useCustomError from "../../helper/hooks/useCustomError";
 
 export default function UserDeletedShowInfo() {
-  const [toggleEditForm, setToggleEditForm] = useState(false);
+  const [showIMGZoomModal, setShowIMGZoomModal] = useState(false);
 
   const [handleCustomError] = useCustomError();
-
   const UIText = useContext(UITextContext);
   const iconMode = useContext(IconModeContext);
+  const darkMode = useContext(DarkModeContext);
 
   const { id } = useParams();
 
@@ -48,7 +48,8 @@ export default function UserDeletedShowInfo() {
     if (data?.user.createdBy) {
       console.log("data.user.createdBy:", data.user.createdBy);
       getCreatorUser({ variables: { id: data.user.createdBy } });
-    } else if (data?.user.updatedBy) {
+    }
+    if (data?.user.updatedBy) {
       console.log("data.user.updatedBy:", data.user.updatedBy);
       getEditorUser({ variables: { id: data.user.updatedBy } });
     }
@@ -59,11 +60,6 @@ export default function UserDeletedShowInfo() {
   if (error) {
     handleCustomError(error);
   }
-
-  const handleFormToggle = (e) => {
-    setToggleEditForm(!toggleEditForm);
-    //editFormRef.current?.focus();
-  };
 
   // if (!loading && !error && data) {
   //   getUser({ variables: { id: data.product.createdBy } });
@@ -91,6 +87,18 @@ export default function UserDeletedShowInfo() {
               }
               style={{ width: "18rem" }}
             >
+              <div className="mt-2 text-center">
+                <img
+                  id="imgFrame"
+                  src={data.user.image || "../../../" + defaultUserIMGPath}
+                  className="img-fluid mb-2 align-self-center justify-content-center text-center"
+                  style={{ maxWidth: "500px" }}
+                  onDoubleClick={
+                    data.user.image ? () => setShowIMGZoomModal(true) : () => {}
+                  }
+                />
+              </div>
+
               <div className="card-body">
                 <h5 className="card-title">
                   <div>
@@ -143,7 +151,7 @@ export default function UserDeletedShowInfo() {
                           itemIdsNamesToProcess={[
                             [data.user.id, data.user.username, data.user.email],
                           ]}
-                          didProductComeFromItself={true}
+                          didItemComeFromItself={true}
                           redirectPathAfterSuccess={"/users/deleted"}
                           areThereMultipleProducts={false}
                           modalType="Remove"
@@ -177,6 +185,46 @@ export default function UserDeletedShowInfo() {
                           modalCloseButtonText={UIText.closeButtonText}
                         />
                       )}
+
+                    <Modal
+                      show={showIMGZoomModal}
+                      onHide={() => setShowIMGZoomModal(false)}
+                      size="xl"
+                    >
+                      <Modal.Header
+                        closeButton
+                        className={darkMode && "bg-dark text-white"}
+                      >
+                        <Modal.Title></Modal.Title>
+                      </Modal.Header>
+                      <Modal.Body className={darkMode && "bg-dark text-white"}>
+                        <div className="mt-2 text-center">
+                          <img
+                            id="imgFrame"
+                            src={
+                              data.user.image ||
+                              "../../../" + defaultUserIMGPath
+                            }
+                            className="img-fluid mb-2 align-self-center justify-content-center text-center"
+                            //style={{ maxWidth: "500px" }}
+                          />
+                        </div>
+                      </Modal.Body>
+                      <Modal.Footer
+                        className={darkMode && "bg-dark text-white"}
+                      >
+                        <Button
+                          variant="danger"
+                          onClick={() => setShowIMGZoomModal(false)}
+                        >
+                          {iconMode ? (
+                            <MdOutlineCancel style={{ fontSize: "1.6rem" }} />
+                          ) : (
+                            UIText.closeButtonText
+                          )}
+                        </Button>
+                      </Modal.Footer>
+                    </Modal>
                   </>
                 </div>
               </div>
