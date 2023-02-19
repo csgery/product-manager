@@ -5,7 +5,7 @@ import { UITextContext } from "../TranslationWrapper";
 import { IconModeContext } from "../../App";
 import {
   auth,
-  defaultProductIMGPath,
+  defaultProductIMGPath as defaultIMGPath,
   imageMaxSize,
   imageSupportedFileTypes,
 } from "../../helper/helper";
@@ -20,6 +20,8 @@ export default function Product({
   const UIText = useContext(UITextContext);
 
   const iconMode = useContext(IconModeContext);
+
+  const defaultProductIMGPath = "../../" + defaultIMGPath;
 
   const navigate = useNavigate();
   const [cbState, setCbState] = useState(false);

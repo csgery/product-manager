@@ -4,21 +4,23 @@ import { useQuery, useLazyQuery } from "@apollo/client";
 import { GET_USER } from "../../queries/userQueries";
 import { useState } from "react";
 import { GET_PRODUCT } from "../../queries/productQueries";
+import { Button, Modal } from "react-bootstrap";
 import SpinnerCustom from "../SpinnerCustom";
 import moment from "moment";
 import ProductUserModal from "./../modals/ProductUserModal";
 import { UITextContext } from "./../TranslationWrapper";
-import { IconModeContext } from "../../App";
-import { auth } from "../../helper/helper";
+import { IconModeContext, DarkModeContext } from "../../App";
+import { auth, defaultProductIMGPath } from "../../helper/helper";
 import useCustomError from "../../helper/hooks/useCustomError";
 
 export default function ProductDeletedShowInfo() {
   const [toggleEditForm, setToggleEditForm] = useState(false);
+  const [showIMGZoomModal, setShowIMGZoomModal] = useState(false);
 
   const [handleCustomError] = useCustomError();
-
   const UIText = useContext(UITextContext);
   const iconMode = useContext(IconModeContext);
+  const darkMode = useContext(DarkModeContext);
 
   const { id } = useParams();
 
@@ -46,7 +48,8 @@ export default function ProductDeletedShowInfo() {
     if (data?.product.createdBy) {
       console.log("data.product.createdBy:", data.product.createdBy);
       getCreatorUser({ variables: { id: data.product.createdBy } });
-    } else if (data?.product.updatedBy) {
+    }
+    if (data?.product.updatedBy) {
       console.log("data.product.updatedBy:", data.product.updatedBy);
       getEditorUser({ variables: { id: data.product.updatedBy } });
     }
@@ -57,18 +60,6 @@ export default function ProductDeletedShowInfo() {
   if (error) {
     handleCustomError(error);
   }
-
-  const handleFormToggle = (e) => {
-    setToggleEditForm(!toggleEditForm);
-    //editFormRef.current?.focus();
-  };
-
-  // if (!loading && !error && data) {
-  //   getUser({ variables: { id: data.product.createdBy } });
-  // }
-
-  // console.log("product:", data.product);
-  // console.log("userData:", userData);
 
   // if the product is valid than return that product (it needs to avoid an expoit:
   // you have validproducts reading rights, so you can read products/ID
@@ -89,6 +80,22 @@ export default function ProductDeletedShowInfo() {
               }
               style={{ width: "18rem" }}
             >
+              <div className="mt-2 text-center">
+                <img
+                  id="imgFrame"
+                  src={
+                    data.product.image || "../../../" + defaultProductIMGPath
+                  }
+                  className="img-fluid mb-2 align-self-center justify-content-center text-center"
+                  style={{ maxWidth: "500px" }}
+                  onDoubleClick={
+                    data.product.image
+                      ? () => setShowIMGZoomModal(true)
+                      : () => {}
+                  }
+                />
+              </div>
+
               <div className="card-body">
                 <h5 className="card-title">
                   <div>
@@ -148,7 +155,7 @@ export default function ProductDeletedShowInfo() {
                             data.product.shortId,
                           ],
                         ]}
-                        didProductComeFromItself={true}
+                        didItemComeFromItself={true}
                         redirectPathAfterSuccess={"/products/deleted"}
                         areThereMultipleProducts={false}
                         modalType="Remove"
@@ -172,7 +179,7 @@ export default function ProductDeletedShowInfo() {
                             data.product.shortId,
                           ],
                         ]}
-                        didProductComeFromItself={true}
+                        didItemComeFromItself={true}
                         redirectPathAfterSuccess={"/products/deleted"}
                         areThereMultipleProducts={false}
                         modalType="Restore"
@@ -185,6 +192,46 @@ export default function ProductDeletedShowInfo() {
                         modalCloseButtonText={UIText.closeButtonText}
                       />
                     )}
+
+                    <Modal
+                      show={showIMGZoomModal}
+                      onHide={() => setShowIMGZoomModal(false)}
+                      size="xl"
+                    >
+                      <Modal.Header
+                        closeButton
+                        className={darkMode && "bg-dark text-white"}
+                      >
+                        <Modal.Title></Modal.Title>
+                      </Modal.Header>
+                      <Modal.Body className={darkMode && "bg-dark text-white"}>
+                        <div className="mt-2 text-center">
+                          <img
+                            id="imgFrame"
+                            src={
+                              data.product.image ||
+                              "../../../" + defaultProductIMGPath
+                            }
+                            className="img-fluid mb-2 align-self-center justify-content-center text-center"
+                            //style={{ maxWidth: "500px" }}
+                          />
+                        </div>
+                      </Modal.Body>
+                      <Modal.Footer
+                        className={darkMode && "bg-dark text-white"}
+                      >
+                        <Button
+                          variant="danger"
+                          onClick={() => setShowIMGZoomModal(false)}
+                        >
+                          {iconMode ? (
+                            <MdOutlineCancel style={{ fontSize: "1.6rem" }} />
+                          ) : (
+                            UIText.closeButtonText
+                          )}
+                        </Button>
+                      </Modal.Footer>
+                    </Modal>
                   </>
                 </div>
               </div>

@@ -18,10 +18,9 @@ import useCustomError from "../../helper/hooks/useCustomError";
 
 export default function ProductShowInfo() {
   const [toggleEditForm, setToggleEditForm] = useState(false);
-
-  const [handleCustomError] = useCustomError();
   const [showIMGZoomModal, setShowIMGZoomModal] = useState(false);
 
+  const [handleCustomError] = useCustomError();
   const UIText = useContext(UITextContext);
   const iconMode = useContext(IconModeContext);
   const darkMode = useContext(DarkModeContext);
@@ -69,13 +68,6 @@ export default function ProductShowInfo() {
     setToggleEditForm(!toggleEditForm);
     //editFormRef.current?.focus();
   };
-
-  // if (!loading && !error && data) {
-  //   getUser({ variables: { id: data.product.createdBy } });
-  // }
-
-  // console.log("product:", data.product);
-  // console.log("userData:", userData);
 
   // if the product is valid than return that product (it needs to avoid an expoit:
   // you have validproducts reading rights, so you can read products/ID
