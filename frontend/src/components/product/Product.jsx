@@ -104,7 +104,7 @@ export default function Product({
 
   return (
     <>
-      {console.log(product.image)}
+      {/* {console.log(product.image)} */}
       <div
         className={"card mx-1 px-01 mb-2 product " + cardBackgroundClass}
         style={{ width: "18rem" }}
