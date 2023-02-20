@@ -52,6 +52,20 @@ function useCustomError() {
       //throw error;
       // try to handle this situation down in createNotification() method
     }
+
+    if (error.message.includes("Cast to ObjectId failed")) {
+      // dont send a notification, render Not Found at the actual page
+      return;
+    }
+
+    if (
+      code === userErrorCodes.userNotFound ||
+      code === productErrorCodes.productNotFound
+    ) {
+      // because we dont want a notification
+      return;
+    }
+
     //console.log("after separate message and code");
     // if there is message then there'll be code too
     if (code === userErrorCodes.userLoginFirst) {

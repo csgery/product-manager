@@ -82,7 +82,7 @@ export default function UserShowInfo() {
   // you have validusers reading rights, so you can read users/ID
   // and you dont have invalidusers reading right, so you CANT read users/deleted/ID
   // BUT there was an exploit: if you copy the deleteduser ID and use user/ID, you can read the deleted user with validusers reading right...)
-  if (data?.user?.valid) {
+  if (data && data?.user?.valid) {
     return (
       <>
         {console.log("data:", data)}
