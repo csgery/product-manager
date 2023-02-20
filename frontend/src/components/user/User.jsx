@@ -28,12 +28,17 @@ export default function User({
   // it looks like it's not re rendering, so we have to set to default the CB value
   // to restore the component's CB value to false (like after the first render)
   useEffect(() => {
-    if (
-      auth.isReadingOwnUser(user.id) ||
-      user.permissions.includes("protected")
-    ) {
-      showDeleteCBs = false;
-    }
+    // if (
+    //   !auth.isReadingOwnUser(user.id) &&
+    //   !user.permissions.includes(auth.PERMS.owner) &&
+    //   (!user.permissions.includes(auth.PERMS.protected) ||
+    //     (user.permissions.includes(auth.PERMS.protected) &&
+    //       auth.isSet(auth.PERMS.owner)))
+    // ) {
+    //   showDeleteCBs = true;
+    // } else {
+    //   showDeleteCBs = false;
+    // }
     if (!showDeleteCBs) {
       setCbState(false);
     }
@@ -72,7 +77,9 @@ export default function User({
     if (!showDeleteCBs) {
       return false;
     }
-    checkbox.current.checked = !checkbox.current.checked;
+    if (checkbox.current) {
+      checkbox.current.checked = !checkbox.current.checked;
+    }
     handleInputCBChange();
   };
 
@@ -91,7 +98,7 @@ export default function User({
     //console.log(checkbox.current.checked);
 
     // if (checkbox.current.checked === "true")
-    if (checkbox.current.checked) {
+    if (checkbox?.current?.checked) {
       //console.log("add id");
       setIdsNamesToDelete((oldIdsNamesToDelete) => [
         ...oldIdsNamesToDelete,
@@ -109,7 +116,7 @@ export default function User({
     // console.log("value:", e.target.value);
   };
 
-  console.log("USER:", user);
+  // console.log("USER:", user);
   return (
     <div
       className={"card mx-1 px-01 mb-2 product " + cardBackgroundClass}
@@ -123,7 +130,10 @@ export default function User({
       >
         {showDeleteCBs &&
           !auth.isReadingOwnUser(user.id) &&
-          !user.permissions.includes("protected") && (
+          !user.permissions.includes(auth.PERMS.owner) &&
+          (!user.permissions.includes(auth.PERMS.protected) ||
+            (user.permissions.includes(auth.PERMS.protected) &&
+              auth.isSet(auth.PERMS.owner))) && (
             <input
               type="checkbox"
               id="deleteCB"
@@ -147,8 +157,11 @@ export default function User({
           <>
             {user.valid ? (
               auth.isSet(auth.PERMS.delete_user) &&
-              (!auth.isReadingOwnUser(user.id) ||
-                !user.permissions.includes("protected")) && (
+              !auth.isReadingOwnUser(user.id) &&
+              !user.permissions.includes(auth.PERMS.owner) &&
+              (!user.permissions.includes(auth.PERMS.protected) ||
+                (user.permissions.includes(auth.PERMS.protected) &&
+                  auth.isSet(auth.PERMS.owner))) && (
                 <ProductUserModal
                   bind="user"
                   iconMode={iconMode}
@@ -167,7 +180,10 @@ export default function User({
               <>
                 {auth.isSet(auth.PERMS.remove_user) &&
                   !auth.isReadingOwnUser(user.id) &&
-                  !user.permissions.includes("protected") && (
+                  !user.permissions.includes(auth.PERMS.owner) &&
+                  (!user.permissions.includes(auth.PERMS.protected) ||
+                    (user.permissions.includes(auth.PERMS.protected) &&
+                      auth.isSet(auth.PERMS.owner))) && (
                     <ProductUserModal
                       bind="user"
                       iconMode={iconMode}
@@ -186,7 +202,10 @@ export default function User({
                   )}
                 {auth.isSet(auth.PERMS.restore_user) &&
                   !auth.isReadingOwnUser(user.id) &&
-                  !user.permissions.includes("protected") && (
+                  !user.permissions.includes(auth.PERMS.owner) &&
+                  (!user.permissions.includes(auth.PERMS.protected) ||
+                    (user.permissions.includes(auth.PERMS.protected) &&
+                      auth.isSet(auth.PERMS.owner))) && (
                     <ProductUserModal
                       bind="user"
                       iconMode={iconMode}

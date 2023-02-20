@@ -66,7 +66,10 @@ export default function UsersDeleted() {
       .filter(
         (deletedUser) =>
           !auth.isReadingOwnUser(deletedUser.id) &&
-          !deletedUser.permissions.includes("protected")
+          !deletedUser.permissions.includes(auth.PERMS.owner) &&
+          (!deletedUser.permissions.includes(auth.PERMS.protected) ||
+            (deletedUser.permissions.includes(auth.PERMS.protected) &&
+              auth.isSet(auth.PERMS.owner)))
       )
       .forEach((item) => {
         const user = idsNamesToDelete.find(
@@ -81,7 +84,10 @@ export default function UsersDeleted() {
       deletedUsers.filter(
         (deletedUser) =>
           !auth.isReadingOwnUser(deletedUser.id) &&
-          !deletedUser.permissions.includes("protected")
+          !deletedUser.permissions.includes(auth.PERMS.owner) &&
+          (!deletedUser.permissions.includes(auth.PERMS.protected) ||
+            (deletedUser.permissions.includes(auth.PERMS.protected) &&
+              auth.isSet(auth.PERMS.owner)))
       ).length
     ) {
       // console.log(
@@ -92,7 +98,10 @@ export default function UsersDeleted() {
         .filter(
           (deletedUser) =>
             !auth.isReadingOwnUser(deletedUser.id) &&
-            !deletedUser.permissions.includes("protected")
+            !deletedUser.permissions.includes(auth.PERMS.owner) &&
+            (!deletedUser.permissions.includes(auth.PERMS.protected) ||
+              (deletedUser.permissions.includes(auth.PERMS.protected) &&
+                auth.isSet(auth.PERMS.owner)))
         )
         .forEach((deletedUser) => {
           setIdsNamesToDelete((oldIdsNamesToDelete) =>
@@ -108,7 +117,10 @@ export default function UsersDeleted() {
       .filter(
         (deletedUser) =>
           !auth.isReadingOwnUser(deletedUser.id) &&
-          !deletedUser.permissions.includes("protected")
+          !deletedUser.permissions.includes(auth.PERMS.owner) &&
+          (!deletedUser.permissions.includes(auth.PERMS.protected) ||
+            (deletedUser.permissions.includes(auth.PERMS.protected) &&
+              auth.isSet(auth.PERMS.owner)))
       )
       .forEach((deletedUser) => {
         // check if the product has already set for delete
