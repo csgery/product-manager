@@ -74,11 +74,34 @@ export default function UsersValid() {
     let counter = 0;
 
     // filter out own and protected users and than count the entries
+    // !auth.isReadingOwnUser(user.id) &&
+    //           !user.permissions.includes(auth.PERMS.owner) &&
+    //           (!user.permissions.includes(auth.PERMS.protected) ||
+    //             (user.permissions.includes(auth.PERMS.protected) &&
+    //               auth.isSet(auth.PERMS.owner))) &&
+
+    // console.log("validUsers", validUsers);
+
+    // console.log(
+    //   "validUsers.filter",
+    //   validUsers.filter(
+    //     (validUser) =>
+    //       !auth.isReadingOwnUser(validUser.id) &&
+    //       !validUser.permissions.includes(auth.PERMS.owner) &&
+    //       (!validUser.permissions.includes(auth.PERMS.protected) ||
+    //         (validUser.permissions.includes(auth.PERMS.protected) &&
+    //           auth.isSet(auth.PERMS.owner)))
+    //   )
+    // );
+
     validUsers
       .filter(
         (validUser) =>
           !auth.isReadingOwnUser(validUser.id) &&
-          !validUser.permissions.includes("protected")
+          !validUser.permissions.includes(auth.PERMS.owner) &&
+          (!validUser.permissions.includes(auth.PERMS.protected) ||
+            (validUser.permissions.includes(auth.PERMS.protected) &&
+              auth.isSet(auth.PERMS.owner)))
       )
       .forEach((item) => {
         const user = idsNamesToDelete.find(
@@ -93,7 +116,10 @@ export default function UsersValid() {
       validUsers.filter(
         (validUser) =>
           !auth.isReadingOwnUser(validUser.id) &&
-          !validUser.permissions.includes("protected")
+          !validUser.permissions.includes(auth.PERMS.owner) &&
+          (!validUser.permissions.includes(auth.PERMS.protected) ||
+            (validUser.permissions.includes(auth.PERMS.protected) &&
+              auth.isSet(auth.PERMS.owner)))
       ).length
     ) {
       // filter out own and protected users and
@@ -102,7 +128,10 @@ export default function UsersValid() {
         .filter(
           (validUser) =>
             !auth.isReadingOwnUser(validUser.id) &&
-            !validUser.permissions.includes("protected")
+            !validUser.permissions.includes(auth.PERMS.owner) &&
+            (!validUser.permissions.includes(auth.PERMS.protected) ||
+              (validUser.permissions.includes(auth.PERMS.protected) &&
+                auth.isSet(auth.PERMS.owner)))
         )
         .forEach((validUser) => {
           setIdsNamesToDelete((oldIdsNamesToDelete) =>
@@ -120,7 +149,10 @@ export default function UsersValid() {
       .filter(
         (validUser) =>
           !auth.isReadingOwnUser(validUser.id) &&
-          !validUser.permissions.includes("protected")
+          !validUser.permissions.includes(auth.PERMS.owner) &&
+          (!validUser.permissions.includes(auth.PERMS.protected) ||
+            (validUser.permissions.includes(auth.PERMS.protected) &&
+              auth.isSet(auth.PERMS.owner)))
       )
       .forEach((validUser) => {
         // check if the product has already set for delete

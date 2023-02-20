@@ -29,8 +29,11 @@ export default function User({
   // to restore the component's CB value to false (like after the first render)
   useEffect(() => {
     if (
-      auth.isReadingOwnUser(user.id) ||
-      user.permissions.includes("protected")
+      !auth.isReadingOwnUser(user.id) &&
+      !user.permissions.includes(auth.PERMS.owner) &&
+      (!user.permissions.includes(auth.PERMS.protected) ||
+        (user.permissions.includes(auth.PERMS.protected) &&
+          auth.isSet(auth.PERMS.owner)))
     ) {
       showDeleteCBs = false;
     }
@@ -109,7 +112,7 @@ export default function User({
     // console.log("value:", e.target.value);
   };
 
-  console.log("USER:", user);
+  // console.log("USER:", user);
   return (
     <div
       className={"card mx-1 px-01 mb-2 product " + cardBackgroundClass}
@@ -123,7 +126,10 @@ export default function User({
       >
         {showDeleteCBs &&
           !auth.isReadingOwnUser(user.id) &&
-          !user.permissions.includes("protected") && (
+          !user.permissions.includes(auth.PERMS.owner) &&
+          (!user.permissions.includes(auth.PERMS.protected) ||
+            (user.permissions.includes(auth.PERMS.protected) &&
+              auth.isSet(auth.PERMS.owner))) && (
             <input
               type="checkbox"
               id="deleteCB"
@@ -147,8 +153,11 @@ export default function User({
           <>
             {user.valid ? (
               auth.isSet(auth.PERMS.delete_user) &&
-              (!auth.isReadingOwnUser(user.id) ||
-                !user.permissions.includes("protected")) && (
+              !auth.isReadingOwnUser(user.id) &&
+              !user.permissions.includes(auth.PERMS.owner) &&
+              (!user.permissions.includes(auth.PERMS.protected) ||
+                (user.permissions.includes(auth.PERMS.protected) &&
+                  auth.isSet(auth.PERMS.owner))) && (
                 <ProductUserModal
                   bind="user"
                   iconMode={iconMode}
@@ -167,7 +176,10 @@ export default function User({
               <>
                 {auth.isSet(auth.PERMS.remove_user) &&
                   !auth.isReadingOwnUser(user.id) &&
-                  !user.permissions.includes("protected") && (
+                  !user.permissions.includes(auth.PERMS.owner) &&
+                  (!user.permissions.includes(auth.PERMS.protected) ||
+                    (user.permissions.includes(auth.PERMS.protected) &&
+                      auth.isSet(auth.PERMS.owner))) && (
                     <ProductUserModal
                       bind="user"
                       iconMode={iconMode}
@@ -186,7 +198,10 @@ export default function User({
                   )}
                 {auth.isSet(auth.PERMS.restore_user) &&
                   !auth.isReadingOwnUser(user.id) &&
-                  !user.permissions.includes("protected") && (
+                  !user.permissions.includes(auth.PERMS.owner) &&
+                  (!user.permissions.includes(auth.PERMS.protected) ||
+                    (user.permissions.includes(auth.PERMS.protected) &&
+                      auth.isSet(auth.PERMS.owner))) && (
                     <ProductUserModal
                       bind="user"
                       iconMode={iconMode}

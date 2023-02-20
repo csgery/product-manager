@@ -375,7 +375,7 @@ export default {
       const reqUserPermissions =
         userCtx[process.env.JWT_TOKEN_SCOPE].permissions;
       //console.log("reqUserPermissions", reqUserPermissions);
-      console.log("reqUserPermissions", reqUserPermissions);
+      //console.log("reqUserPermissions", reqUserPermissions);
 
       for (const userToEdit of inputArray) {
         const originalUser = await User.findById(userToEdit.id);
@@ -519,20 +519,29 @@ export default {
       try {
         const lang = req.headers.language || "en";
         const user = await User.findById(id);
+        const reqUserPermissions =
+          userCtx[process.env.JWT_TOKEN_SCOPE].permissions;
+        console.log("reqUserPermissions", reqUserPermissions);
         if (!user) {
           throw userNotFound_Error(lang);
         }
-        if (user.permissions.includes(auth.PERMS.protected)) {
+        if (
+          user.permissions.includes(auth.PERMS.owner) ||
+          (user.permissions.includes(auth.PERMS.protected) &&
+            !reqUserPermissions.includes(auth.PERMS.owner))
+        ) {
           const userLog = new UserLog({
             userId: user.id,
             oldUsername: user.username,
             createdBy: userCtx.sub,
             actionType: "softdelete",
             message: "user-protection-violation",
+            securityLevel: "severe_frontend-modifying",
           });
           await userLog.save();
           throw userIsProtected(lang);
         }
+
         if (!user.valid) {
           throw userAlreadySoftDeleted_Error(lang);
         }
