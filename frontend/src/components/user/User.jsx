@@ -28,15 +28,17 @@ export default function User({
   // it looks like it's not re rendering, so we have to set to default the CB value
   // to restore the component's CB value to false (like after the first render)
   useEffect(() => {
-    if (
-      !auth.isReadingOwnUser(user.id) &&
-      !user.permissions.includes(auth.PERMS.owner) &&
-      (!user.permissions.includes(auth.PERMS.protected) ||
-        (user.permissions.includes(auth.PERMS.protected) &&
-          auth.isSet(auth.PERMS.owner)))
-    ) {
-      showDeleteCBs = false;
-    }
+    // if (
+    //   !auth.isReadingOwnUser(user.id) &&
+    //   !user.permissions.includes(auth.PERMS.owner) &&
+    //   (!user.permissions.includes(auth.PERMS.protected) ||
+    //     (user.permissions.includes(auth.PERMS.protected) &&
+    //       auth.isSet(auth.PERMS.owner)))
+    // ) {
+    //   showDeleteCBs = true;
+    // } else {
+    //   showDeleteCBs = false;
+    // }
     if (!showDeleteCBs) {
       setCbState(false);
     }
@@ -75,7 +77,9 @@ export default function User({
     if (!showDeleteCBs) {
       return false;
     }
-    checkbox.current.checked = !checkbox.current.checked;
+    if (checkbox.current) {
+      checkbox.current.checked = !checkbox.current.checked;
+    }
     handleInputCBChange();
   };
 
@@ -94,7 +98,7 @@ export default function User({
     //console.log(checkbox.current.checked);
 
     // if (checkbox.current.checked === "true")
-    if (checkbox.current.checked) {
+    if (checkbox?.current?.checked) {
       //console.log("add id");
       setIdsNamesToDelete((oldIdsNamesToDelete) => [
         ...oldIdsNamesToDelete,
