@@ -64,7 +64,7 @@ export default function ProductDeletedShowInfo() {
   // you have validproducts reading rights, so you can read products/ID
   // and you dont have invalidproducts reading right, so you CANT read products/deleted/ID
   // BUT there was an exploit: if you copy the deletedProduct ID and use product/ID, you can read the deleted product with validproducts reading right...)
-  if (!data.product.valid) {
+  if (data && !data?.product?.valid) {
     return (
       <>
         {/*console.log("data:", data)*/}
