@@ -3,6 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useState, useRef, useContext } from "react";
 import { UITextContext } from "../TranslationWrapper";
 import { IconModeContext } from "../../App";
+import { BsShieldShaded } from "react-icons/bs";
+import { TbCrown } from "react-icons/tb";
+import { TiCancel } from "react-icons/ti";
 import {
   auth,
   defaultUserIMGPath as defaultIMGPath,
@@ -150,7 +153,45 @@ export default function User({
           className="img-fluid mb-2"
           style={{ maxWidth: "200px" }}
         />
-        <h5 className="card-title">{user.username}</h5>
+        <h5 className="card-title">
+          {auth.isSet(auth.PERMS.updateUser_permissions) ? (
+            <>
+              <span className={!user.canLogin ? "text-danger" : "text-dark"}>
+                {user.username}
+              </span>
+              {!user.canLogin && (
+                <TiCancel
+                  data-toggle="tooltip"
+                  data-placement="top"
+                  title={UIText.blocked}
+                  className="align-middle text-center text-danger "
+                  style={{ fontSize: "1.9rem", marginBottom: "2px" }}
+                />
+              )}
+              {user.permissions.includes(auth.PERMS.protected) && (
+                <BsShieldShaded
+                  data-toggle="tooltip"
+                  data-placement="top"
+                  title={UIText.protected}
+                  className="ms-1 align-middle text-success"
+                  style={{ fontSize: "1.3rem", marginBottom: "3px" }}
+                />
+              )}
+
+              {user.permissions.includes(auth.PERMS.owner) && (
+                <TbCrown
+                  data-toggle="tooltip"
+                  data-placement="top"
+                  title={UIText.owner}
+                  className="ms-1 text-warning"
+                  style={{ fontSize: "1.8rem", marginBottom: "3px" }}
+                />
+              )}
+            </>
+          ) : (
+            <>{user.username}</>
+          )}
+        </h5>
         <h6 className="card-subtitle mb-2 ">{user.email}</h6>
 
         {!showDeleteCBs && (
