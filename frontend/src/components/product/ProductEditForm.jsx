@@ -150,7 +150,6 @@ const ProductEditForm = ({ product, setToggleEditForm, iconMode }) => {
       e,
       previewIMG,
       setIMGBase64,
-      imgInputRef,
       UIText
     );
     if (successfulIMGChange) {
@@ -193,7 +192,7 @@ const ProductEditForm = ({ product, setToggleEditForm, iconMode }) => {
             type="file"
             id="formFile"
             onChange={(e) => {
-              handleIMGChange(e, previewIMG, setIMGBase64, imgInputRef, UIText);
+              handleIMGChange(e, previewIMG, setIMGBase64, UIText);
             }}
             ref={imgInputRef}
           />

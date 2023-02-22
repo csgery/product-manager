@@ -582,13 +582,7 @@ const convertToBase64 = (event, setIMGBase64, UIText) => {
   };
 };
 
-const handleIMGChange = (
-  e,
-  previewIMG_Callback,
-  setIMGBase64,
-  imgInputRef,
-  UIText
-) => {
+const handleIMGChange = (e, previewIMG_Callback, setIMGBase64, UIText) => {
   // check file size
   // size in byte
   if (e.target.files[0].size > imageMaxSize) {
@@ -598,7 +592,7 @@ const handleIMGChange = (
       type: "warning",
     });
     //clearIMG();
-    imgInputRef.current.files = null;
+    e.target.value = null;
     return false;
   }
   if (
@@ -615,7 +609,7 @@ const handleIMGChange = (
       type: "warning",
     });
     //clearIMGInput();
-    imgInputRef.current.files = null;
+    e.target.value = null;
     return false;
   }
   previewIMG_Callback(e);
