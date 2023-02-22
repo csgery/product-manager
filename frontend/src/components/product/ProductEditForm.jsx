@@ -1,5 +1,5 @@
 import React from "react";
-import { useState, useEffect, useRef, useContext } from "react";
+import { useState, useEffect, useRef, useContext, createRef } from "react";
 import { useMutation } from "@apollo/client";
 import { GET_VALIDPRODUCTS } from "../../queries/productQueries";
 import { UPDATE_PRODUCT } from "../../mutations/productMutations";
@@ -7,8 +7,7 @@ import {
   createNotification,
   validateProductInput,
   defaultProductIMGPath as defaultImage,
-  imageMaxSize,
-  imageSupportedFileTypes,
+  handleIMGChange,
 } from "../../helper/helper";
 import useCustomError from "../../helper/hooks/useCustomError";
 import { UITextContext } from "../TranslationWrapper";
@@ -41,39 +40,13 @@ const ProductEditForm = ({ product, setToggleEditForm, iconMode }) => {
 
   const focusRef = useRef(null);
 
+  const imgInputRef = useRef(null);
+
   const handleInputChange = (value, setStateCallback) => {
     value = validateProductInput(value, UIText);
     setStateCallback(value);
   };
 
-  const handleIMGChange = (e) => {
-    // check file size
-    // size in byte
-    if (e.target.files[0].size > imageMaxSize) {
-      createNotification({
-        title: UIText.error,
-        message: `${UIText.imageTooLarge} ${imageMaxSize} B`,
-        type: "warning",
-      });
-      //clearIMG();
-      return;
-    }
-    if (!imageSupportedFileTypes.includes(e.target.files[0].type)) {
-      createNotification({
-        title: UIText.error,
-        message:
-          UIText.imageNotSupportedType +
-          imageSupportedFileTypes
-            .split(",")
-            .map((fileType) => " " + fileType.split("/")[1]),
-        type: "warning",
-      });
-      //clearIMGInput();
-      return;
-    }
-    previewIMG(e);
-    convertToBase64(e);
-  };
   const clearIMG = () => {
     document.getElementById("formFile").value = null;
     setIMGFrame(defaultProductIMGPath);
@@ -170,6 +143,21 @@ const ProductEditForm = ({ product, setToggleEditForm, iconMode }) => {
     return false;
   };
 
+  const handleIMGDrop = (e) => {
+    e.preventDefault();
+    e.target.files = e.dataTransfer.files;
+    const successfulIMGChange = handleIMGChange(
+      e,
+      previewIMG,
+      setIMGBase64,
+      UIText
+    );
+    if (successfulIMGChange) {
+      //console.log(imgInputRef);
+      imgInputRef.current.files = e.dataTransfer.files;
+    }
+  };
+
   return (
     <div className="mt-4 w-75 mx-auto">
       <h3>{UIText.productFormTitle}</h3>
@@ -180,6 +168,8 @@ const ProductEditForm = ({ product, setToggleEditForm, iconMode }) => {
             src={IMGFrame}
             className="img-fluid"
             style={{ maxWidth: "600px" }}
+            onDrop={(e) => handleIMGDrop(e)}
+            onDragOver={(e) => e.preventDefault()}
           />
           <div className="mb-2 mt-2 text-center">
             <button
@@ -202,8 +192,9 @@ const ProductEditForm = ({ product, setToggleEditForm, iconMode }) => {
             type="file"
             id="formFile"
             onChange={(e) => {
-              handleIMGChange(e);
+              handleIMGChange(e, previewIMG, setIMGBase64, UIText);
             }}
+            ref={imgInputRef}
           />
         </div>
         <div className="mb-3">

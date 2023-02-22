@@ -582,6 +582,41 @@ const convertToBase64 = (event, setIMGBase64, UIText) => {
   };
 };
 
+const handleIMGChange = (e, previewIMG_Callback, setIMGBase64, UIText) => {
+  // check file size
+  // size in byte
+  if (e.target.files[0].size > imageMaxSize) {
+    createNotification({
+      title: UIText.error,
+      message: `${UIText.imageTooLarge} ${imageMaxSize} B`,
+      type: "warning",
+    });
+    //clearIMG();
+    e.target.value = null;
+    return false;
+  }
+  if (
+    e.target.files[0].type === "" ||
+    !imageSupportedFileTypes.includes(e.target.files[0].type)
+  ) {
+    createNotification({
+      title: UIText.error,
+      message:
+        UIText.imageNotSupportedType +
+        imageSupportedFileTypes
+          .split(",")
+          .map((fileType) => " " + fileType.split("/")[1]),
+      type: "warning",
+    });
+    //clearIMGInput();
+    e.target.value = null;
+    return false;
+  }
+  previewIMG_Callback(e);
+  convertToBase64(e, setIMGBase64, UIText);
+  return true;
+};
+
 const defaultProductIMGPath = import.meta.env.VITE_PRODUCT_DEFAULTIMAGE;
 const defaultUserIMGPath = import.meta.env.VITE_USER_DEFAULTIMAGE;
 const imageMaxSize = import.meta.env.VITE_IMAGE_MAXSIZE;
@@ -611,4 +646,5 @@ export {
   imageMaxSize,
   imageSupportedFileTypes,
   convertToBase64,
+  handleIMGChange,
 };
