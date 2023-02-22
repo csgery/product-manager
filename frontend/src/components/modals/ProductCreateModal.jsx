@@ -27,6 +27,7 @@ export default function ProductCreateModal() {
   const [quantity, setQuantity] = useState(0);
   const [description, setDescription] = useState("");
   const [IMGFrame, setIMGFrame] = useState(defaultProductIMGPath);
+  const [imgFile, setImgFile] = useState(null);
   const [IMGBase64, setIMGBase64] = useState("");
 
   const [show, setShow] = useState(false);
@@ -114,7 +115,7 @@ export default function ProductCreateModal() {
       UIText
     );
     if (successfulIMGChange) {
-      console.log(imgInputRef);
+      setImgFile(e.dataTransfer.files);
       imgInputRef.current.files = e.dataTransfer.files;
     }
   };
@@ -154,7 +155,19 @@ export default function ProductCreateModal() {
                 type="file"
                 id="formFile"
                 onChange={(e) => {
-                  handleIMGChange(e, previewIMG, setIMGBase64, UIText);
+                  const successfulIMGChange = handleIMGChange(
+                    e,
+                    previewIMG,
+                    setIMGBase64,
+                    UIText
+                  );
+                  if (successfulIMGChange) {
+                    setImgFile(e.dataTransfer.files);
+                    imgInputRef.current.files = e.dataTransfer.files;
+                  } else {
+                    // we have to set the previous img file or the input value will be null
+                    imgInputRef.current.files = imgFile; // previous img file
+                  }
                 }}
                 ref={imgInputRef}
               />
