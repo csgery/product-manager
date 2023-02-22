@@ -23,6 +23,8 @@ const ProductEditForm = ({ product, setToggleEditForm, iconMode }) => {
   const [IMGFrame, setIMGFrame] = useState(
     product.image || defaultProductIMGPath
   );
+  const [imgFile, setImgFile] = useState(null);
+
   const [IMGBase64, setIMGBase64] = useState(product.image);
 
   const [handleCustomError] = useCustomError();
@@ -61,23 +63,6 @@ const ProductEditForm = ({ product, setToggleEditForm, iconMode }) => {
 
   const previewIMG = (e) => {
     setIMGFrame(URL.createObjectURL(e.target.files[0]));
-  };
-
-  const convertToBase64 = (e) => {
-    var reader = new FileReader();
-    reader.readAsDataURL(e.target.files[0]);
-
-    reader.onload = () => {
-      setIMGBase64(reader.result);
-    };
-    reader.onerror = (error) => {
-      createNotification({
-        title: UIText.error,
-        message: `${UIText.pleaseTryAgainLater}\nError: ${error}`,
-        type: "danger",
-      });
-      //console.log("Error: ", error);
-    };
   };
 
   const handleSubmit = (e) => {
@@ -153,7 +138,7 @@ const ProductEditForm = ({ product, setToggleEditForm, iconMode }) => {
       UIText
     );
     if (successfulIMGChange) {
-      //console.log(imgInputRef);
+      setImgFile(e.dataTransfer.files);
       imgInputRef.current.files = e.dataTransfer.files;
     }
   };
@@ -192,7 +177,19 @@ const ProductEditForm = ({ product, setToggleEditForm, iconMode }) => {
             type="file"
             id="formFile"
             onChange={(e) => {
-              handleIMGChange(e, previewIMG, setIMGBase64, UIText);
+              const successfulIMGChange = handleIMGChange(
+                e,
+                previewIMG,
+                setIMGBase64,
+                UIText
+              );
+              if (successfulIMGChange) {
+                setImgFile(e.dataTransfer.files);
+                imgInputRef.current.files = e.dataTransfer.files;
+              } else {
+                // we have to set the previous img file or the input value will be null
+                imgInputRef.current.files = imgFile; // previous img file
+              }
             }}
             ref={imgInputRef}
           />

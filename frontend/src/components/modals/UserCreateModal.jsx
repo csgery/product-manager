@@ -23,6 +23,7 @@ export default function UserCreateModal() {
   const [email, setEmail] = useState("");
   const [show, setShow] = useState(false);
   const [IMGFrame, setIMGFrame] = useState(defaultUserIMGPath);
+  const [imgFile, setImgFile] = useState(null);
   const [IMGBase64, setIMGBase64] = useState("");
   const password = import.meta.env.VITE_DEFAULT_USERPASSWORD;
 
@@ -125,7 +126,7 @@ export default function UserCreateModal() {
       UIText
     );
     if (successfulIMGChange) {
-      //console.log(imgInputRef);
+      setImgFile(e.dataTransfer.files);
       imgInputRef.current.files = e.dataTransfer.files;
     }
   };
@@ -164,7 +165,19 @@ export default function UserCreateModal() {
               type="file"
               id="formFile"
               onChange={(e) => {
-                handleIMGChange(e, previewIMG, setIMGBase64, UIText);
+                const successfulIMGChange = handleIMGChange(
+                  e,
+                  previewIMG,
+                  setIMGBase64,
+                  UIText
+                );
+                if (successfulIMGChange) {
+                  setImgFile(e.dataTransfer.files);
+                  imgInputRef.current.files = e.dataTransfer.files;
+                } else {
+                  // we have to set the previous img file or the input value will be null
+                  imgInputRef.current.files = imgFile; // previous img file
+                }
               }}
               ref={imgInputRef}
             />
