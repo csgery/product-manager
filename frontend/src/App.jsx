@@ -21,7 +21,7 @@ import ViewerPage from "./pages/ViewerPage";
 import DictTest from "./components/DictTest";
 import BadAuth from "./components/BadAuth";
 // import { useConfigClient } from "./helper/useConfigHeader";
-import { auth } from "./helper/helper";
+import { auth, ENV_TYPES } from "./helper/helper";
 import { onError } from "@apollo/client/link/error";
 import TranslationWrapper from "./components/TranslationWrapper";
 // import RefreshTokenPage from "./pages/RefreshTokenPage";
@@ -37,6 +37,10 @@ export const IconModeContext = createContext();
 export const TokensContext = createContext();
 
 function App() {
+  if (import.meta.env.VITE_ENV === ENV_TYPES.development) {
+    console.log(`Server running in ${ENV_TYPES.development} mode`);
+  }
+
   const [lang, setLang] = useState(localStorage.getItem("lang") || "en");
   const [darkMode, setDarkMode] = useState(
     localStorage.getItem("darkmode") === "true" ? true : false
@@ -249,6 +253,7 @@ function App() {
                 <Router>
                   <div
                     className={"App " + (darkMode ? "darkmode " : "lightmode ")}
+                    style={{ maxHeight: "100%" }}
                   >
                     <Navigation
                       handleLangChange={handleLangChange}

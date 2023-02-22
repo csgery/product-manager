@@ -5,6 +5,7 @@ import { REFRESH_TOKEN } from "../../mutations/userMutations";
 import { TokensContext } from "../../App";
 import { UITextContext } from "../../components/TranslationWrapper";
 import {
+  ENV_TYPES,
   createNotification,
   getErrorMessageCode,
   userErrorCodes,
@@ -83,7 +84,7 @@ function useCustomError() {
 
     if (code === userErrorCodes.userExpiredAccessJWT) {
       getRefreshToken();
-      //navigate(`/viewer/refreshtoken/${getUserId()}`);
+      if (import.meta.env.VITE_ENV === ENV_TYPES.production) return;
     }
     // if (code === productErrorCodes.productExistedShortID) {
     //   console.log("existed shortID, firing notification...");
