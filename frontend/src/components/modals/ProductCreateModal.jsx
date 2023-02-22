@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useRef } from "react";
 import { useMutation } from "@apollo/client";
 import { CREATE_PRODUCT } from "../../mutations/productMutations";
 import { GET_VALIDPRODUCTS } from "../../queries/productQueries";
@@ -14,9 +14,7 @@ import { IconModeContext } from "../../App";
 import {
   validateProductInput,
   defaultProductIMGPath,
-  imageMaxSize,
-  imageSupportedFileTypes,
-  convertToBase64,
+  handleIMGChange,
 } from "../../helper/helper";
 
 export default function ProductCreateModal() {
@@ -39,6 +37,8 @@ export default function ProductCreateModal() {
   const [handleCustomError] = useCustomError();
 
   const iconMode = useContext(IconModeContext);
+
+  const imgInputRef = useRef(null);
 
   const handleClose = () => {
     setName("");
@@ -94,35 +94,6 @@ export default function ProductCreateModal() {
       });
   };
 
-  const handleIMGChange = (e) => {
-    // check file size
-    // size in byte
-    if (e.target.files[0].size > imageMaxSize) {
-      createNotification({
-        title: UIText.error,
-        message: `${UIText.imageTooLarge} ${imageMaxSize} B`,
-        type: "warning",
-      });
-      //clearIMG();
-      return;
-    }
-    if (!imageSupportedFileTypes.includes(e.target.files[0].type)) {
-      createNotification({
-        title: UIText.error,
-        message:
-          UIText.imageNotSupportedType +
-          imageSupportedFileTypes
-            .split(",")
-            .map((fileType) => " " + fileType.split("/")[1]),
-        type: "warning",
-      });
-      //clearIMGInput();
-      return;
-    }
-    previewIMG(e);
-    convertToBase64(e, setIMGBase64, UIText);
-  };
-
   const clearIMG = () => {
     document.getElementById("formFile").value = null;
     setIMGFrame(defaultProductIMGPath);
@@ -131,6 +102,22 @@ export default function ProductCreateModal() {
 
   const previewIMG = (e) => {
     setIMGFrame(URL.createObjectURL(e.target.files[0]));
+  };
+
+  const handleIMGDrop = (e) => {
+    e.preventDefault();
+    e.target.files = e.dataTransfer.files;
+    const successfulIMGChange = handleIMGChange(
+      e,
+      previewIMG,
+      setIMGBase64,
+      imgInputRef,
+      UIText
+    );
+    if (successfulIMGChange) {
+      console.log(imgInputRef);
+      imgInputRef.current.files = e.dataTransfer.files;
+    }
   };
 
   return (
@@ -153,7 +140,13 @@ export default function ProductCreateModal() {
         <Modal.Body className={darkMode && "bg-dark text-white"}>
           <div className="container col-md-6">
             <div className="mb-5">
-              <img id="imgFrame" src={IMGFrame} className="img-fluid" />
+              <img
+                id="imgFrame"
+                src={IMGFrame}
+                className="img-fluid"
+                onDrop={(e) => handleIMGDrop(e)}
+                onDragOver={(e) => e.preventDefault()}
+              />
               <button onClick={clearIMG} className="btn btn-primary mt-3">
                 Clear IMG
               </button>
@@ -162,8 +155,15 @@ export default function ProductCreateModal() {
                 type="file"
                 id="formFile"
                 onChange={(e) => {
-                  handleIMGChange(e);
+                  handleIMGChange(
+                    e,
+                    previewIMG,
+                    setIMGBase64,
+                    imgInputRef,
+                    UIText
+                  );
                 }}
+                ref={imgInputRef}
               />
             </div>
           </div>

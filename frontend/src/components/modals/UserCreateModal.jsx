@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useRef } from "react";
 import { useMutation } from "@apollo/client";
 import { CREATE_USER } from "../../mutations/userMutations";
 import { GET_VALIDUSERS } from "../../queries/userQueries";
@@ -15,9 +15,7 @@ import {
   validateUserEmailInput,
   validateUserUsernameInput,
   defaultUserIMGPath,
-  imageSupportedFileTypes,
-  imageMaxSize,
-  convertToBase64,
+  handleIMGChange,
 } from "../../helper/helper";
 
 export default function UserCreateModal() {
@@ -32,6 +30,8 @@ export default function UserCreateModal() {
   const UIText = useContext(UITextContext);
 
   const [handleCustomError] = useCustomError();
+
+  const imgInputRef = useRef(null);
 
   const iconMode = useContext(IconModeContext);
 
@@ -105,35 +105,6 @@ export default function UserCreateModal() {
       });
   };
 
-  const handleIMGChange = (e) => {
-    // check file size
-    // size in byte
-    if (e.target.files[0].size > imageMaxSize) {
-      createNotification({
-        title: UIText.error,
-        message: `${UIText.imageTooLarge} ${imageMaxSize} B`,
-        type: "warning",
-      });
-      //clearIMG();
-      return;
-    }
-    if (!imageSupportedFileTypes.includes(e.target.files[0].type)) {
-      createNotification({
-        title: UIText.error,
-        message:
-          UIText.imageNotSupportedType +
-          imageSupportedFileTypes
-            .split(",")
-            .map((fileType) => " " + fileType.split("/")[1]),
-        type: "warning",
-      });
-      //clearIMGInput();
-      return;
-    }
-    previewIMG(e);
-    convertToBase64(e, setIMGBase64, UIText);
-  };
-
   const clearIMG = () => {
     document.getElementById("formFile").value = null;
     setIMGFrame(defaultUserIMGPath);
@@ -142,6 +113,22 @@ export default function UserCreateModal() {
 
   const previewIMG = (e) => {
     setIMGFrame(URL.createObjectURL(e.target.files[0]));
+  };
+
+  const handleIMGDrop = (e) => {
+    e.preventDefault();
+    e.target.files = e.dataTransfer.files;
+    const successfulIMGChange = handleIMGChange(
+      e,
+      previewIMG,
+      setIMGBase64,
+      imgInputRef,
+      UIText
+    );
+    if (successfulIMGChange) {
+      //console.log(imgInputRef);
+      imgInputRef.current.files = e.dataTransfer.files;
+    }
   };
 
   return (
@@ -163,7 +150,13 @@ export default function UserCreateModal() {
         </Modal.Header>
         <Modal.Body className={darkMode && "bg-dark text-white"}>
           <div className="mb-5">
-            <img id="imgFrame" src={IMGFrame} className="img-fluid" />
+            <img
+              id="imgFrame"
+              src={IMGFrame}
+              className="img-fluid"
+              onDrop={(e) => handleIMGDrop(e)}
+              onDragOver={(e) => e.preventDefault()}
+            />
             <button onClick={clearIMG} className="btn btn-primary mt-3">
               Clear IMG
             </button>
@@ -172,8 +165,15 @@ export default function UserCreateModal() {
               type="file"
               id="formFile"
               onChange={(e) => {
-                handleIMGChange(e);
+                handleIMGChange(
+                  e,
+                  previewIMG,
+                  setIMGBase64,
+                  imgInputRef,
+                  UIText
+                );
               }}
+              ref={imgInputRef}
             />
           </div>
 
