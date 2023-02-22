@@ -4,6 +4,12 @@ import {
   userPWRegex_Error,
   userEmailRegex_Error,
 } from "./errors/userErrors.js";
+
+export const ENV_TYPES = {
+  development: "development",
+  production: "production",
+};
+
 // import { User } from "../models/user.js";
 const formatDate = (date) => new Date(date).toISOString();
 

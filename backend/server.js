@@ -27,10 +27,7 @@ import typeDefs from "./graphql/schema/index.js";
 import resolvers from "./graphql/resolvers/index.js";
 
 import User from "./models/user.js";
-import {
-  userExpiredAccessJWT_Error,
-  userExpiredRefreshJWT_Error,
-} from "./helper/errors/userErrors.js";
+import { ENV_TYPES } from "./helper/helper.js";
 
 const port = process.env.PORT || 3000;
 
@@ -56,7 +53,7 @@ const server = new ApolloServer({
 await server.start();
 //server.applyMiddleware({ app });
 
-app.set("trust proxy", process.env.NODE_ENV !== "production");
+app.set("trust proxy", process.env.NODE_ENV !== ENV_TYPES.production);
 
 // enable cors
 var corsOptions = {
@@ -199,10 +196,11 @@ app.use(
 
 try {
   console.log("Connecing to MongoDB...");
-  mongoose.set("debug", process.env.NODE_ENV === "development");
+  mongoose.set("debug", process.env.NODE_ENV === ENV_TYPES.development);
   await mongoose.connect(process.env.MDB_URI, { autoIndex: true });
   await new Promise((resolve) => httpServer.listen({ port: port }, resolve));
   console.log(`🚀 Server ready at ${process.env.BACKEND_URI}/`);
+  console.log(`Server running in ${process.env.NODE_ENV} mode`);
 } catch (err) {
   console.log(err);
 }

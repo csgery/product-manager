@@ -171,7 +171,7 @@ const ProductEditForm = ({ product, setToggleEditForm, iconMode }) => {
   };
 
   return (
-    <div className="mt-4 mb-4 w-75 mx-auto">
+    <div className="mt-4 w-75 mx-auto">
       <h3>{UIText.productFormTitle}</h3>
       <div /*onSubmit={handleSubmit}*/>
         <div className="mb-5 text-center">
@@ -237,7 +237,7 @@ const ProductEditForm = ({ product, setToggleEditForm, iconMode }) => {
             onChange={(e) => setQuantity(Number(e.target.value))}
           ></input>
         </div>
-        <div className="form-group">
+        <div className="form-group mb-3">
           <label className="form-label" htmlFor="description">
             {UIText.description}
           </label>
@@ -249,29 +249,31 @@ const ProductEditForm = ({ product, setToggleEditForm, iconMode }) => {
             value={description}
           ></textarea>
         </div>
-        <button
-          type="button"
-          className="btn btn-danger "
-          onClick={() => setToggleEditForm(false)}
-        >
-          {iconMode ? (
-            <MdOutlineCancel style={{ fontSize: "1.6rem" }} />
-          ) : (
-            UIText.cancelButtonText
-          )}
-        </button>
-        <button
-          type="submit"
-          className="btn btn-primary ms-1 "
-          disabled={handleEditBTNDisabling()}
-          onClick={handleSubmit}
-        >
-          {iconMode ? (
-            <MdOutlineDoneOutline style={{ fontSize: "1.6rem" }} />
-          ) : (
-            UIText.editButtonText
-          )}
-        </button>
+        <div className="">
+          <button
+            type="button"
+            className="btn btn-danger mb-3 "
+            onClick={() => setToggleEditForm(false)}
+          >
+            {iconMode ? (
+              <MdOutlineCancel style={{ fontSize: "1.6rem" }} />
+            ) : (
+              UIText.cancelButtonText
+            )}
+          </button>
+          <button
+            type="submit"
+            className="btn btn-primary ms-1 mb-3 "
+            disabled={handleEditBTNDisabling()}
+            onClick={handleSubmit}
+          >
+            {iconMode ? (
+              <MdOutlineDoneOutline style={{ fontSize: "1.6rem" }} />
+            ) : (
+              UIText.editButtonText
+            )}
+          </button>
+        </div>
       </div>
     </div>
   );

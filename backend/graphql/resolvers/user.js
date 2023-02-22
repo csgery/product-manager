@@ -30,6 +30,7 @@ import {
   userUserUnblocking_Error,
 } from "../../helper/errors/userErrors.js";
 import {
+  ENV_TYPES,
   checkEmailRegex,
   checkPWRegex,
   validatePermissions,
@@ -155,7 +156,7 @@ export default {
   Mutation: {
     // TODO: Only in development and first initialise in production
     createAdmin: async () => {
-      if (process.env.NODE_ENV !== "development") {
+      if (process.env.NODE_ENV !== ENV_TYPES.development) {
         throw new Error("This method is forbidden!");
       }
       const user = new User({
@@ -183,7 +184,7 @@ export default {
       return user;
     },
     checkPermValidationTime: (parent, { count }) => {
-      if (process.env.NODE_ENV !== "development") {
+      if (process.env.NODE_ENV !== ENV_TYPES.development) {
         throw new Error("This method is forbidden!");
       }
       if (typeof count !== "number") {
@@ -636,7 +637,7 @@ export default {
       checkPWRegex(newPassword);
       const isPWCorrect = await bcrypt.compare(currentPassword, user.password);
       if (!isPWCorrect) {
-        if (process.env.NODE_ENV === "development") {
+        if (process.env.NODE_ENV === ENV_TYPES.development) {
           throw new Error(
             "PW is incorrect BUT THIS MESSAGE ONLY FOR DEVELOPMENT!"
           );
@@ -792,7 +793,7 @@ export default {
       }
       const isPWCorrect = await bcrypt.compare(password, user.password);
       if (!isPWCorrect) {
-        if (process.env.NODE_ENV === "development") {
+        if (process.env.NODE_ENV === ENV_TYPES.development) {
           throw new Error(
             "PW is incorrect BUT THIS MESSAGE ONLY FOR DEVELOPMENT!"
           );

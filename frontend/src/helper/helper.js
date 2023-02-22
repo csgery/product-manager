@@ -8,6 +8,11 @@ import { Store } from "react-notifications-component";
 //   return localStorage.getItem("permissions").includes(permission);
 // };
 
+export const ENV_TYPES = {
+  development: "development",
+  production: "production",
+};
+
 const auth = {
   PERMS: {
     // products
